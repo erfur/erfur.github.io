@@ -18,7 +18,7 @@
 %padding-post {
   padding: $padding-x-small $padding-x-large;
   @media (max-width: $xl-break) {
-    padding: $padding-x-small ($padding-large * 2);
+    padding: $padding-x-small ($padding-large * 3);
   }
   @media (max-width: $l-break) {
     padding: $padding-x-small $padding-large;
@@ -46,7 +46,7 @@
 }
 
 .subtle-txt-shadow {
-  text-shadow: 1px 1px 2px var(--text-shadow);
+  text-shadow: 1px 1px 10px var(--text-shadow);
 }
 
 // Buttons

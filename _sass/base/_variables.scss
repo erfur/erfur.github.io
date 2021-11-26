@@ -5,8 +5,8 @@ $font-family-logo: 'Source Sans Pro', Helvetica, Arial, sans-serif;
 $font-size: 1.25em;
 
 $monospace: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, sans-serif !default;
-$font-size-code: 0.85em !default;
-$font-height-code: 1.3em !default;
+$font-size-code: 0.95em !default;
+$font-height-code: 1.1em !default;
 $border-radius: 4px !default;
 
 /* PADDING */
@@ -51,20 +51,20 @@ html, html[data-theme="light"] {
 }
 
 html[data-theme="dark"] {
-  --background: #22272e; // brand, background
+  --background: #2a2630; // brand, background
   --blockquote: #373e47; // blockquote
   --selection: #545d68; // selection
   --meta: #909dab; // meta
-  --link: #00a8e0; // theme, link, link shadow header bg
+  --link: #af99c0; // theme, link, link shadow header bg
   --header-background: #2A3444; // Color before header image load
-  --header-text: #e7f3f4; // header text, feature img text
+  --header-text: #e2f7f7; // header text, feature img text
   --header-link: #adbac7; // header link, search color
   --code-background: #2A3444;
   --code-inline: #d9b600;
   --text-shadow: #2d333b; // text shadow
   --text: #cdd9e5; // text
-  --h1: #d40059; // headers
-  --h2: #b37eff;
+  --h1: #44b3c2; // headers
+  --h2: #59a0b6;
   --h3: #ff66c2;
   --h4: #00af9e;
   --h5: #6bac00;

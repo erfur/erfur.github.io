@@ -13,7 +13,8 @@
 
   h1 {
     font-family: $font-family-logo;
-    @extend .subtle-txt-shadow;
+    text-shadow: 1px 1px 10px lightyellow;
+    // @extend .subtle-txt-shadow;
   }
 
   /* --- Responsive --- */
