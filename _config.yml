@@ -10,7 +10,7 @@ favicon: assets/favicon.ico                             # Icon displayed in the 
 
 # Header and footer text
 header_text: "bits 'n pieces reloaded"
-header_feature_image: assets/img/pexels/triangular.jpeg
+header_feature_image: assets/img/banner.png
 footer_text: ""
 
 # Blog
