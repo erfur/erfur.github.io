@@ -71,3 +71,82 @@ exec systemd-run --user $(compgen -c | fzf)
 ```
 
 With this I solved the problem in a simple way. On to writing scripts for my workflows using fzf...
+
+**Update**: This week, while using fzf as my dmenu launcher, I noticed that I
+wasn't able to launch vscode. Turns out systemd-run doesnt get along with it
+because it forks when launched. To be able to start vscode with systemd-run,
+`--service-type=forking` is required. This adds a layer of complexity to the
+script as I need to know if a program forks itself when launched. So I started
+looking for other solutions.
+
+
+## i3-msg is the way
+
+i3 comes with the `i3-dmenu-desktop` command (a perl script) which wraps dmenu
+to provide a quick way to launch programs. I read the script to find out how it
+launched programs and saw that it uses i3-msg to execute programs through the
+window manager:
+
+```perl
+    # i3 executes applications by passing the argument to i3’s “exec” command
+    # as-is to $SHELL -c. The i3 parser supports quoted strings: When a string
+    # starts with a double quote ("), everything is parsed as-is until the next
+    # double quote which is NOT preceded by a backslash (\).
+    #
+    # Therefore, we escape all double quotes (") by replacing them with \"
+    $exec =~ s/"/\\"/g;
+
+    if (exists($app->{StartupNotify}) && !$app->{StartupNotify}) {
+        $nosn = '--no-startup-id';
+    }
+    $cmd = qq|exec $nosn "$exec"|;
+}
+
+system('i3-msg', $cmd) == 0 or die "Could not launch i3-msg: $?";
+```
+
+I implemented the same approach in my script:
+
+```
+#!/bin/bash
+
+exec i3-msg -q "exec --no-startup-id $(compgen -c | fzf)"
+```
+
+
+## running a custom command
+
+By default, fzf writes whatever entry the user selects to stdout. This is not
+very useful when the user wants to execute a custom command. Fzf solves this
+with the `--print-query` option. With this flag, fzf writes the query first and
+then the selected option to stdout as seperate lines.
+
+{% include aligner.html images="fzf/fzf1.gif" column=1 %}
+
+Since it doesn't make sense to execute multiple lines, I only get the last line
+with `tail -1` and execute. However this causes another problem: If a custom
+command query leaves entries on the menu, the menu entry will be executed
+instead of the custom query. To avoid these problems altogether, its more
+convenient to use custom keybindings with the `--bind` option. To print the
+query only, I launch fzf like this:
+
+```
+fzf --bind=ctrl-space:print-query
+```
+
+It's also possible to use both of these options together and select with
+ctrl-space whenever the custom command does not filter out all the entries.
+
+My final script looks like this:
+
+```
+#!/bin/bash
+
+# --print-query is used to run a custom command when none of the list is
+# selected.
+OPTS='--info=inline --print-query --bind=ctrl-space:print-query,tab:replace-query'
+
+exec i3-msg -q "exec --no-startup-id $(compgen -c | fzf $OPTS | tail -1)"
+```
+
+{% include aligner.html images="fzf/fzf2.gif" column=1 %}
