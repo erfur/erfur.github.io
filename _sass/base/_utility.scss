@@ -16,12 +16,12 @@
 }
 
 %padding-post {
-  padding: $padding-x-small $padding-x-large;
+  padding: $padding-x-small ($padding-x-large * 1.3);
   @media (max-width: $xl-break) {
     padding: $padding-x-small ($padding-large * 3);
   }
   @media (max-width: $l-break) {
-    padding: $padding-x-small $padding-large;
+    padding: $padding-x-small ($padding-large * 2);
   }
   @media (max-width: $m-break) {
     padding: $padding-x-small $padding-medium;

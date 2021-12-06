@@ -1,0 +1,71 @@
+.sidebar {
+  // mobile
+  @media screen and (min-resolution: 144dpi) {
+    position: relative;
+    top: unset;
+    right: unset;
+    width: 100%;
+    text-align: center;
+  }
+
+  // full screen
+  @media screen and (min-width: 1600px) and (max-resolution: 144dpi) {
+    position: fixed;
+    top: 100px;
+    right: 5%;
+    width: 20%;
+  }
+
+  // split screen
+  @media screen and (max-width: 1600px) {
+    position: relative;
+    top: unset;
+    right: unset;
+    width: 100%;
+    text-align: center;
+  }
+}
+
+#toc {
+  position: relative;
+  font-size: 0.7em;
+}
+
+#toc.fixed {
+  position: fixed;
+  top: 40px;
+}
+
+.toc-link {
+    // widows: 1;
+    width: 100%;
+    display: block;
+}
+
+.is-active-link {
+    width: 100%;
+    font-weight: bold;
+}
+
+.toc-link::before {
+  @media screen and (min-width: 1600px) and (max-resolution: 144dpi) {
+    background-color: #808080;
+    content: " ";
+    display: inline-block;
+    height: inherit;
+    left: 0;
+    margin-top: 3px;
+    margin-left: 3px;
+    position: absolute;
+    width: 3px;
+  }
+}
+
+.is-active-link::before {
+  @media screen and (min-width: 1600px) and (max-resolution: 144dpi) {
+    background-color: #55466e;
+    box-shadow: 0px 0px 4px 2px #0ff;
+    height: 1.2em;
+  }
+}
+
