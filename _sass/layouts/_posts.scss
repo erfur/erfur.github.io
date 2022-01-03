@@ -146,6 +146,8 @@ header {
   h5 { color: var(--h5); }
   h6 { color: var(--h6); }
 
+  text-align: justify;
+
   a {
     :visited {
       filter: saturate(0.7);
