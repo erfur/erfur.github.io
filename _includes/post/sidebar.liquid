@@ -1,5 +1,5 @@
 <div class="sidebar">
-<nav id="toc" class="toc"></nav>
+<div id="toc" class="toc"></div>
 <script>
 $(function() {
   var toc = $('#toc')
@@ -7,9 +7,10 @@ $(function() {
     tocSelector: '#toc',
     contentSelector: 'article',
     headingSelector: 'h1, h2, h3',
+    collapseDepth: 3,
   });
-  var offset = toc.offset();
-  toc.width(toc.width());
+  {% comment %} var offset = toc.offset(); {% endcomment %}
+  {% comment %} toc.width(toc.width()); {% endcomment %}
 /*
   $(window).scroll(function () {
     if (!window.matchMedia("only screen and (max-width: 768px)").matches && $(window).scrollTop() > offset.top) {

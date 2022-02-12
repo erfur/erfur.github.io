@@ -12,7 +12,8 @@
         <div {% if column %} style="flex: {{ column }}%" {% else %} class="column" {% endif %}  >
             <img {% if images.size == 1 %}class="single"{% endif %}
                  src="{{ image | prepend: 'assets/img/' | relative_url }}"
-                 alt="{{ image | prepend: '/' | split: '/' | last }}">
+                 alt="{{ image | prepend: '/' | split: '/' | last }}"
+                 {% if include.width %}style="width: {{include.width}}%"{% endif %}>
         </div>
         {% endfor %}
     </div>

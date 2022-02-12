@@ -29,6 +29,12 @@
 #toc {
   position: relative;
   font-size: 0.7em;
+
+  @media screen and (max-width: 1600px) {
+      position: sticky;
+      top: 50px;
+      width: 100%;
+  }
 }
 
 #toc.fixed {
@@ -40,6 +46,7 @@
     // widows: 1;
     width: 100%;
     display: block;
+    margin-bottom: 2px;
 }
 
 .is-active-link {
