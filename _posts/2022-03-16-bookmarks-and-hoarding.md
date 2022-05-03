@@ -1,0 +1,103 @@
+---
+layout: post
+title: Bookmarks and selfhosting
+tags: workflow
+---
+
+Over the years, I've accumulated thousands of links that I kept in various
+different mediums in a messy way. I would stack them in what I called "daily
+notes" where sometimes the "notes" consisted of nothing but links. It was of
+course with the intention that I would someday organize them all and read them.
+The intention wasn't realized up until I decided to tidy up my personal projects
+and files, after which I started planning to build a selfhosted cloud
+environment to keep everything centralized.
+
+I have multiple environments that I use for projects, and sometimes I need to
+keep a project up in more than one. This results in multiple versions of the
+same project, in the worst case requiring a manual merge of modified files. It
+is of course a waste of time when we have technologies like git and the ability
+to keep files on a remote server and even mount remote filesystems. It only made
+sense to at least have a git server to keep my projects in sync.
+
+I had my trusty old T430 with decent specs lying around so the hardware was
+already available. I installed arch on it (I do use Arch btw) and didn't even
+bother installing a gui, just installed docker and my terminal environment then
+went to work.
+
+## Selfhosting
+
+Selfhosting is like picking up a catalog of apps except every choice is a random
+roll of lacking features, bugs, old software stacks or long lists of plans that
+are nowhere near completion. But that's the nature of open source software;
+there are tradeoffs you need to accept in order to claim ownership.
+
+Things are looking good though, with the rise of modern software approaches and
+languages, selfhosted apps are becoming more streamlined and easy to pack
+features into. Gitea for example is written in golang and it's feature complete
+enough that I did not feel the need to run a behemoth of a git server like
+gitlab. It's very lightweight that I think it could even run on a pi zero.
+There's also the Progressive Web Apps which generally mean that I won't need a
+mobile app to access them from my phone.
+
+I had a couple selfhosted apps running before: an rss server (ttrss) and a
+project management app (wekan). I accessed them through their internal docker
+ips and I kept them on my laptop so they wouldn't always be up. At the time the
+lack of configuration kept me from fully depending on them. This time I went
+full on with the configuration so that it would really feel like a proper cloud.
+
+{% include aligner.html images="bookmarks/selfhosted1.jpg" caption="An early diagram of my selfcloud server from my internal documentation." width=100 %}
+
+I had a list of required apps:
+
+- file server
+- bookmark server
+- git server
+- task manager
+
+First app I installed was of course nextcloud. It is a staple in the selfhosted
+world with its file server capabilities and app support. With Deck and Bookmarks
+apps that can be installed from nextcloud app market, it can easily be the only
+selfhosted an average user needs to install. With Gitea and Nextcloud, the
+basics are covered. I also installed Sonarr and Transmission to keep track of my
+favorite tv shows.
+
+### How to access each app?
+
+Having more than one web app on a server is cool but there's a catch: There's
+only one port as default for HTTP and HTTPS. To have access to all apps, every
+one of them has to be set up to serve on a different port, which causes chaos in
+configuration and is quite ugly to be honest. Not to mention using the IP of the
+machine to access the apps is also not desirable.
+
+This is where DNS and reverse proxy solutions come into play. I used pihole and
+traefik to assign a custom domain to my server's IP and to assign and handle
+subdomains for my selfhosted apps.
+
+I even went as far as setting up a vpn infrastructure to access the apps from
+outside of my home network, with one dns server handling requests from inside
+the vpn network and one handling requests from inside the home network. I can
+use the same url to use an app within both the vpn and the home network. I will
+probably write a blog post dedicated to this setup in the future.
+
+### Not so fast!
+
+It's all fun and games until it gets serious and that's what happened with the
+Bookmarks app. Initially I started adding my current bookmarks into the app. I'd
+eventually upload all the links I kept in files. However after some time the
+link count grew and I noticed that the app was having a hard time loading new
+pages and each load sent me back to the beginning of the page which was annoying
+and killed the usability of the app for me. I had to set up a dedicated bookmark
+app that could handle a large set of bookmarks.
+
+I went through my options and settled with Shaarli. It's been around for years
+now and has a nice set of features and it can be extended with plugins (which I
+actually did for a feature that I needed).
+
+So now I keep all of my 2000+ bookmarks in a server that I can access from
+anywhere. I'm in the progress of tagging them so that I can find what I'm
+looking for later on.
+
+I wanted to finish writing this post more than a month ago but procrastination
+hit hard. It ended up being more of a rambling, though that's fine; better to
+publish anything than nothing at all. Hopefully I'll return with more exciting
+things.
