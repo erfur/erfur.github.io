@@ -1,11 +1,15 @@
 ---
 layout: post
 title: "Savaş Oyunları: Format İpliklerinin Dönüşü Part II"
-category: pwn
+tags: pwn
 date: 18.07.13
 ---
 
-_Taklitlerinden sakının._
+Önceki yazıda tw33tchainz programının altını üstüne getirdik.
+Disassembler'da incelediğimiz programın kullanıcıya gösterilmeyen ilginç
+prosedürler içerdiğini keşfettik. Programın çifte standart uyguladığını,
+admin isek debug modunu açabildiğimizi gördük. Peki nasıl admin olunur?
+Fonksiyonları hatırlayıp, daha detaylı inceleyip görelim.
 
 _Not: Önceki yazıdaki radare2'yi ssh üzerinden bize verilen
 sanal imaja bağlanıp kullanmıştım. Eski sürüm olduğu için birçok
@@ -13,14 +17,6 @@ sanal imaja bağlanıp kullanmıştım. Eski sürüm olduğu için birçok
 makinamda analize devam edeceğim. radare2'yi mümkün olduğunca en son
 sürümde kullanmaya çalışın. Çok aktif bir geliştirme sürecinde olduğu
 için uygulamaya her sürümde önemli özellikler ekleniyor._
-
-# Altı üstü bi tweet atıcaktık
-
-Önceki yazıda tw33tchainz programının altını üstüne getirdik.
-Disassembler'da incelediğimiz programın kullanıcıya gösterilmeyen ilginç
-prosedürler içerdiğini keşfettik. Programın çifte standart uyguladığını,
-admin isek debug modunu açabildiğimizi gördük. Peki nasıl admin olunur?
-Fonksiyonları hatırlayıp, daha detaylı inceleyip görelim.
 
  - print_banner
  - gen_pass
@@ -35,13 +31,13 @@ Program çıktının renkli olması için printf ile escape sequence
 bastırdıktan sonra print_banner() fonksiyonunu çağırıyor. Bu fonksiyonda
 da program afişini bastırıyor.
 
-![](/assets/2018-07-13-rpisec_project1_pt2/0print_banner.png)
+{% include aligner.html images="/2018-07-13-rpisec_project1_pt2/0print_banner.png" width=100 %}
 
 Daha sonra gen_pass() fonksiyonu çağrılıyor.
 
 ## gen_pass()
 
-![](/assets/2018-07-13-rpisec_project1_pt2/1gen_pass.png)
+{% include aligner.html images="/2018-07-13-rpisec_project1_pt2/1gen_pass.png" width=100 %}
 
 Bu fonksiyonda /dev/urandom'dan 16 byte okunup obj.secretpass adresine
 yazılıyor. İleride kullanmamız gerecek bir detaya benziyor.
@@ -50,7 +46,7 @@ Sırada gen_user() fonksiyonu var.
 
 ## gen_user()
 
-![](/assets/2018-07-13-rpisec_project1_pt2/2gen_user1.png)
+{% include aligner.html images="/2018-07-13-rpisec_project1_pt2/2gen_user1.png" width=100 %}
 
 Fonksiyon ilk olarak bellekteki iki alana memset() ile belli byte 
 değerleri yazıyor:
@@ -62,12 +58,12 @@ memset(obj.user, '\xcc', 0x10);
 
 Daha sonra ekrana "Enter Username:" yazdırıp fgets() ile input alıyor:
 
-![](/assets/2018-07-13-rpisec_project1_pt2/3gen_user2.png)
+{% include aligner.html images="/2018-07-13-rpisec_project1_pt2/3gen_user2.png" width=100 %}
 
 Verdiğimiz input obj.user adresine yazılıyor. Ardından program 
 "Enter Salt:" yazdıktan sonra bizden salt değerini istiyor:
 
-![](/assets/2018-07-13-rpisec_project1_pt2/4gen_user3.png)
+{% include aligner.html images="/2018-07-13-rpisec_project1_pt2/4gen_user3.png" width=100 %}
 
 Bu sefer girilen inputu da 0x804d0d0 adresine yazdıktan sonra local_18 
 adresi stack'e yazılıp hash() fonksiyonu çağrılıyor. "Generated
@@ -81,7 +77,7 @@ nasıl ürettiğini öğrenelim.
 
 ### hash()
 
-![](/assets/2018-07-13-rpisec_project1_pt2/5hash.png)
+{% include aligner.html images="/2018-07-13-rpisec_project1_pt2/5hash.png" width=100 %}
 
 Oldukça basit bir fonksiyonla karşılaşıyoruz. local_4h adresinde bir
 sayaç değeri var ve sol alttaki bloğu 16 kere çalıştırıyor. Bu blokta
@@ -96,7 +92,7 @@ parola print_pass() fonksiyonuna veriliyor.
 
 ### print_pass()
 
-![](/assets/2018-07-13-rpisec_project1_pt2/6print_pass.png)
+{% include aligner.html images="/2018-07-13-rpisec_project1_pt2/6print_pass.png" width=100 %}
 
 print_pass() fonksiyonunda elde edilen parolanın dörder byte'lık bloklar
 halinde tersine çevrildiğini görüyoruz. Bu işlemden sonra parolamız hex
@@ -104,7 +100,7 @@ halinde bastırılıyor.
 
 Programın incelediğimiz yere kadar yaptıklarının çıktısı aşağıdaki gibi:
 
-![](/assets/2018-07-13-rpisec_project1_pt2/7sofar.png)
+{% include aligner.html images="/2018-07-13-rpisec_project1_pt2/7sofar.png" width=100 %}
 
 Enter'a bastıktan sonra program bizi ana menüye alıyor. 
 
@@ -123,14 +119,14 @@ Ana menüden erişebileceğimiz fonksiyonları da hatırlayalım:
 Direkt en ilgi çeken fonksiyona girelim ve admin olmak için ne istiyormuş
 görelim:
 
-![](/assets/2018-07-13-rpisec_project1_pt2/8maybe_admin.png)
+{% include aligner.html images="/2018-07-13-rpisec_project1_pt2/8maybe_admin.png" width=100 %}
 
 Program bizden bir parola istiyor ama hangi parola olduğu belli değil.
 Programın kendi ürettiği parolayı denedim ancak işe yaramadı (O kadar
 kolay olsaydı bu kadar uğraşmazdık demi?). Kodları inceleyip durumu
 açıklığa kavuşturalım:
 
-![](/assets/2018-07-13-rpisec_project1_pt2/9maybe_admin_r2.png)
+{% include aligner.html images="/2018-07-13-rpisec_project1_pt2/9maybe_admin_r2.png" width=100 %}
 
 Yukarıdaki kodun C'de karşılığı şöyle:
 
@@ -270,13 +266,13 @@ kullanabileceğiz. Şimdi scripti denemenin vakti geldi.
 $ ./solve.py
 {% endhighlight %}
 
-![](/assets/2018-07-13-rpisec_project1_pt2/10admin.png)
+{% include aligner.html images="/2018-07-13-rpisec_project1_pt2/10admin.png" width=100 %}
 
 Admin olmayı başardık ve menüde yeni bir girdi belirdi: "6: Turn debug
 mode on". Debug modunu açıp programı kullandığımızda "View chainz"
 menüsünde attığımız tweetlerin hafızadaki adreslerini görebiliyoruz:
 
-![](/assets/2018-07-13-rpisec_project1_pt2/11addresses.png)
+{% include aligner.html images="/2018-07-13-rpisec_project1_pt2/11addresses.png" width=100 %}
 
 Bu adresleri exploit geliştirme aşamasında kullanmamız gerekebilir.
 

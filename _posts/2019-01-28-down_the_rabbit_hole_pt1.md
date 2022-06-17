@@ -1,24 +1,9 @@
 ---
 layout: post
 title: "[EN] Down the Rabbit Hole - Part I: A Journey into the UEFI Land"
-category: rev
+tags: re
 date: 19.01.28
 ---
-<!-- *Aka Modifying a ThinkPad T430 BIOS with UEFITool and Radare2* -->
-
-- [**Prologue**](#prologue)
-  - [**A concise statement of the problem at hand**](#a-concise-statement-of-the-problem-at-hand)
-  - [**Possible solutions**](#possible-solutions)
-  - [**My initial roadmap**](#my-initial-roadmap)
-- [**Reading the contents of BIOS**](#reading-the-contents-of-bios)
-- [**Finding and modifying the whitelist mechanism(aka going down the rabbit hole)**](#finding-and-modifying-the-whitelist-mechanismaka-going-down-the-rabbit-hole)
-  - [**Know thy enemy: UEFI**](#know-thy-enemy-uefi)
-  - [**Extracting UEFI Modules**](#extracting-uefi-modules)
-  - [**Locating the point of interest**](#locating-the-point-of-interest)
-
-# **Prologue**
-
-*No DRM's were harmed during this ordeal, I swear. - erfur*
 
 Ever since I bought a little X230 to use at school, I'm simply in love with Thinkpads. The build quality,
 reliability and serviceability are just some of the aspects that draw me to these machines. They are not perfect;
@@ -161,23 +146,23 @@ Armed with theoretical and practical knowledge, now I can tackle the BIOS dump w
 
 Using the aforementioned [UEFITool](https://github.com/LongSoft/UEFITool)(great tool btw), I extracted the modules and was greeted by hundreds of them. Many of them were automatically named by the tool. Module names were mostly self-explanatory, but nothing obvious came up. Now it's time to look for something that resembles a whitelist.
 
-![](/assets/2019-01-28-down_the_rabbit_hole_pt1/uefitool.png)
+{% include aligner.html images="/2019-01-28-down_the_rabbit_hole_pt1/uefitool.png" width=100 %}
 
 ## **Locating the point of interest**
 
 It is obviously not reasonable to try every single module to see if it leads to a whitelist mechanism. Now I will use the only solid lead I've got to pinpoint the location of whitelist: **An error message**:
 
-![](/assets/2019-01-28-down_the_rabbit_hole_pt1/error.png)
+{% include aligner.html images="/2019-01-28-down_the_rabbit_hole_pt1/error.png" width=100 %}
 
     1802: Unauthorized network card is plugged in - Power off and remove the miniPCI network card
 
 I will proceed with the assumption that the module that holds this string will also be in charge of the whitelist. Luckily, searching for this string yields only one result:
 
-![](/assets/2019-01-28-down_the_rabbit_hole_pt1/uefitool_search.png)
+{% include aligner.html images="/2019-01-28-down_the_rabbit_hole_pt1/uefitool_search.png" width=100 %}
 
 I can see the string in hexview:
 
-![](/assets/2019-01-28-down_the_rabbit_hole_pt1/hex_view.png)
+{% include aligner.html images="/2019-01-28-down_the_rabbit_hole_pt1/hex_view.png" width=100 %}
 
 Time to extract the PE file and do some reversing. In the next post I will try to delve into this file with radare2, stay tuned!
 

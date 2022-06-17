@@ -1,35 +1,19 @@
 ---
 layout: post
 title: "[EN] Down the Rabbit Hole - Part III: Patching the Whitelist"
-category: reverse
+tags: re
 date: 2019.03.28
 ---
-<!-- # [EN] Down the Rabbit Hole - Part III: Patching the Whitelist -->
-
-> *Blogging is hard.*
-
-- [Following the trail of references](#following-the-trail-of-references)
-  - [fcn.000109fc (printError)](#fcn000109fc-printerror)
-  - [fcn.00010b10 (checkID)](#fcn00010b10-checkid)
-    - [Device ID table](#device-id-table)
-    - [PCI ID check block (aka where the whitelist is enforced)](#pci-id-check-block-aka-where-the-whitelist-is-enforced)
-- [Getting rid of the whitelist](#getting-rid-of-the-whitelist)
-  - [Modifying the program flow](#modifying-the-program-flow)
-- [Putting everything back together](#putting-everything-back-together)
-- [But wait, there's more?](#but-wait-theres-more)
-- [References](#references)
-
-# Following the trail of references
 
 Picking up where I've left off, I will take a look at where the string is referenced.
 
 ## fcn.000109fc (printError)
 
-![](/assets/2019-03-28-down_the_rabbit_hole_pt3/printError-1.png)
+{% include aligner.html images="/2019-03-28-down_the_rabbit_hole_pt3/printError-1.png" width=100 %}
 
 This function starts with calling a protocol which is referenced in ```SystemErrorLogDxe.efi```, if the return value is not less than 0 (which I'm assuming means an error hasn't occured) the rest of the blocks are executed.
 
-![](/assets/2019-03-28-down_the_rabbit_hole_pt3/printError-2.png)
+{% include aligner.html images="/2019-03-28-down_the_rabbit_hole_pt3/printError-2.png" width=100 %}
 
 The offset that points to the error string (which is at ```0x10258```) is used in the last block to craft the error message.
 
@@ -39,7 +23,7 @@ This function has xrefs in ```fcn.00010b10```.
 
 ## fcn.00010b10 (checkID)
 
-![](/assets/2019-03-28-down_the_rabbit_hole_pt3/pciCheck0.png)
+{% include aligner.html images="/2019-03-28-down_the_rabbit_hole_pt3/pciCheck0.png" width=100 %}
 
 Up until this point, I didn't think of asking the most important question: **What does the application check to enforce the whitelist?** The answer is simple: Subsystem Device IDs. 
 
@@ -47,7 +31,7 @@ Up until this point, I didn't think of asking the most important question: **Wha
 
 The program has a hardcoded table of IDs sitting at offset ```0x10270```:
 
-![](/assets/2019-03-28-down_the_rabbit_hole_pt3/idtable.png)
+{% include aligner.html images="/2019-03-28-down_the_rabbit_hole_pt3/idtable.png" width=100 %}
 
 Each entry consists of the following:
 
@@ -63,11 +47,11 @@ struct TableEntry {
 
 When I checked the ID of my card with ```lspci -nn```:
 
-![](/assets/2019-03-28-down_the_rabbit_hole_pt3/wificard.png)
+{% include aligner.html images="/2019-03-28-down_the_rabbit_hole_pt3/wificard.png" width=100 %}
 
 I had to go deeper with ```lspci -x``` to find the subsystem ID:
 
-![](/assets/2019-03-28-down_the_rabbit_hole_pt3/wificard2.png)
+{% include aligner.html images="/2019-03-28-down_the_rabbit_hole_pt3/wificard2.png" width=100 %}
 
 Meaning that:
 
@@ -118,30 +102,30 @@ Back to fcn.00010b10. Depending on the second argument (held in rdx) one of two 
 
 The block starts with checking for the terminating entry:
 
-![](/assets/2019-03-28-down_the_rabbit_hole_pt3/pciCheck1.png)
+{% include aligner.html images="/2019-03-28-down_the_rabbit_hole_pt3/pciCheck1.png" width=100 %}
 
 Then the current entry is compared with the ID that was given as an argument to the function:
 
-![](/assets/2019-03-28-down_the_rabbit_hole_pt3/pciCheck2.png)
+{% include aligner.html images="/2019-03-28-down_the_rabbit_hole_pt3/pciCheck2.png" width=100 %}
 
 If the comparison fails, the next entry is checked if it's the end of the table (```0x10caa```). If it is, the printError function is called (jump to ```0x10bcd```). If there are still entries left, the flow goes back to ```0x10c7b``` for the check on the next entry.
 
-![](/assets/2019-03-28-down_the_rabbit_hole_pt3/pciCheck3.png)
+{% include aligner.html images="/2019-03-28-down_the_rabbit_hole_pt3/pciCheck3.png" width=100 %}
 
 If the entry is identical with the ID, The last value in the entry is checked (```0x10cc5```). If it's ```1``` then ```unknownProtocolHandle2``` is called. After looking through the references I found that it's installed in the ```MiscGaIoDxe.efi``` application, which uses the protocol from ```CpuIo.efi```. The names themselves don't reveal much, so I still don't know what this block does.
 
 
 > After some research on the entries, especially on the Intel cards, I found a feature that correlates with the values at the end of these entries. All the cards that is ```1``` features Intel vPro. One Intel card that does not have vPro also has a ```0``` value. I will assume that this is the case (Because of time constraints, I couldn't go deeper to find out what this protocol actually does. I will have to continue with this assumption). Since I do not want anything to do with vPro, I will not use this block in my modified flow.
 
-![](/assets/2019-03-28-down_the_rabbit_hole_pt3/pciCheck4.png)
+{% include aligner.html images="/2019-03-28-down_the_rabbit_hole_pt3/pciCheck4.png" width=100 %}
 
 After setting ```sil``` accordingly, ```LenovoScratchData``` variable of the card (that is unique to the guid) is read and the value that falls into ```var_44h``` is compared against ```sil```. If they're not equal, then the value is set and the data is written back.
 
 Here's an interesting block:
 
-![](/assets/2019-03-28-down_the_rabbit_hole_pt3/pciCheck5.png)
+{% include aligner.html images="/2019-03-28-down_the_rabbit_hole_pt3/pciCheck5.png" width=100 %}
 
-![](/assets/2019-03-28-down_the_rabbit_hole_pt3/pciCheck6.png)
+{% include aligner.html images="/2019-03-28-down_the_rabbit_hole_pt3/pciCheck6.png" width=100 %}
 
 The current ID is compared against the device ```Centrino Advanced-N 6235 AGN``` (which already exists in the table) and if it's a match, ```LenovoScratchData``` is written back with the value at ```var_4fh``` set, then ```ResetSystem()``` function is called from the ```RuntimeServices``` table. No idea what this is for either.
 
@@ -161,7 +145,7 @@ The first option seems risky as I don't know how the other applications will beh
 
 What I want to do is let the whitelist take care of the cards that are already in the table and not go into the error function for the rest. To accomplish this, I will modify the block in which the last entry is checked. If a card is compared against all entries and there are no other entries, the error function will be called. This part happens in the block ```0x10caa```:
 
-![](/assets/2019-03-28-down_the_rabbit_hole_pt3/pciCheck7.png)
+{% include aligner.html images="/2019-03-28-down_the_rabbit_hole_pt3/pciCheck7.png" width=100 %}
 
 This jump goes to the ```printError``` function. I will change it to ```0x10de3``` so that there is no error and the program will continue like the card is authorized.
 
@@ -171,13 +155,13 @@ After this anticlimactic solution, it's time time to put this back into the imag
 
 To test if the modification works successfully, I used an Intel Wireless-N 135 card from my old laptop. I put the card in and tried to boot my machine. The result was expected (sorry for the potato quality):
 
-![](/assets/2019-03-28-down_the_rabbit_hole_pt3/photo-error.jpg)
+{% include aligner.html images="/2019-03-28-down_the_rabbit_hole_pt3/photo-error.jpg" width=100 %}
 
 Then I tore the machine down and connected the BIOS chip to the USB programmer:
 
-![](/assets/2019-03-28-down_the_rabbit_hole_pt3/photo-motherboard.jpg)
+{% include aligner.html images="/2019-03-28-down_the_rabbit_hole_pt3/photo-motherboard.jpg" width=100 %}
 
-![](/assets/2019-03-28-down_the_rabbit_hole_pt3/photo-usb.jpg)
+{% include aligner.html images="/2019-03-28-down_the_rabbit_hole_pt3/photo-usb.jpg" width=100 %}
 
 I dumped the current BIOS and patched it using UEFIPatch tool. I've created a pattern to patch the image:
 
@@ -187,11 +171,11 @@ I dumped the current BIOS and patched it using UEFIPatch tool. I've created a pa
 
 I erased the chip and then wrote the modified image back using the programmer's software:
 
-![](/assets/2019-03-28-down_the_rabbit_hole_pt3/usbProgrammer.png)
+{% include aligner.html images="/2019-03-28-down_the_rabbit_hole_pt3/usbProgrammer.png" width=100 %}
 
 After verifying the written image, I put everything back together and tried to boot the machine. The machine did boot! The wifi card was recognized and I was able to connect to my router. I could see the card in the ```lspci``` output:
 
-![](/assets/2019-03-28-down_the_rabbit_hole_pt3/lspci.png)
+{% include aligner.html images="/2019-03-28-down_the_rabbit_hole_pt3/lspci.png" width=100 %}
 
 # But wait, there's more?
 
@@ -216,4 +200,4 @@ No, just kidding :). I accomplished what I've set out to do and learned a lot in
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@ihavelotsofspac" />
 <meta name="twitter:title" content="Down the Rabbit Hole - Part III: Patching the Whitelist" />
-<meta name="twitter:image" content="https://erfur.github.io/assets/2019-03-28-down_the_rabbit_hole_pt3/pciCheck3.png" />
+<meta name="twitter:image" content="https://erfur.github.io/2019-03-28-down_the_rabbit_hole_pt3/pciCheck3.png" />

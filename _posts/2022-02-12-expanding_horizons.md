@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Expanding Horizons
-tags: development
+tags: dev
 ---
 
 I've always had the tendency to obsess over things. One great example of this is

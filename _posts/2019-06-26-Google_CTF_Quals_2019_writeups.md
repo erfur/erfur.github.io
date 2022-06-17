@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "[EN] Google CTF Quals 2019 writeups"
-categories: [reverse, ctf]
+tags: re ctf
 date: 2019.06.25
 ---
 
@@ -12,21 +12,21 @@ I've been eagerly waiting for this year's Google CTF because last year I couldn'
 
 # (sandbox) DevMaster 8000
 
-![](/assets/2019-06-26-Google_CTF_Quals_2019_writeups/devmaster8k-challenge.png)
+{% include aligner.html images="/2019-06-26-Google_CTF_Quals_2019_writeups/devmaster8k-challenge.png" width=100 %}
 
 We're given a binary builder platform for cloud that is slightly sandboxed. There are prebuilt binaries to connect and use the platform. Upon spawning a shell and checking uid and gids, I noticed that my sandbox is still in the root group:
 
-![](/assets/2019-06-26-Google_CTF_Quals_2019_writeups/devmaster8k-id.png)
+{% include aligner.html images="/2019-06-26-Google_CTF_Quals_2019_writeups/devmaster8k-id.png" width=100 %}
 
 This opens up possibilities, especially if we have suid binaries lying around. With a stroke of luck, I found the perfect binary `drop_privs` under `/home/user` that allows me to execute commands as any user:
 
-![](/assets/2019-06-26-Google_CTF_Quals_2019_writeups/devmaster8k-flag.png)
+{% include aligner.html images="/2019-06-26-Google_CTF_Quals_2019_writeups/devmaster8k-flag.png" width=100 %}
 
 The flag is `CTF{two-individually-secure-sandboxes-may-together-be-insecure}`
 
-# (rev) Dialtone
+# (re) Dialtone
 
-![](/assets/2019-06-26-Google_CTF_Quals_2019_writeups/dialtone-challenge.png)
+{% include aligner.html images="/2019-06-26-Google_CTF_Quals_2019_writeups/dialtone-challenge.png" width=100 %}
 
 Decompiling with GHIDRA, I saw pulseaudio functions being used. The program starts recording to `buffer`, then processes `buffer` into `buffer2` in function `x`, finally does some checks on `buffer2` in function `r` and checks the return value.
 
@@ -85,7 +85,7 @@ undefined8 main(undefined8 uParm1,undefined8 *puParm2)
 
 Function `x` was too complicated for me, so I tried to analyze `r` first. At this point I was thinking that the binary could be analyzing the frequencies of the recordings, and the first thing that came to my mind was DTMF tones. After checking the tone frequencies:
 
-![](/assets/2019-06-26-Google_CTF_Quals_2019_writeups/dialtone-dtmf.png)
+{% include aligner.html images="/2019-06-26-Google_CTF_Quals_2019_writeups/dialtone-dtmf.png" width=100 %}
 
 and seeing the exact numbers in the function `r`, it clicked. The code must be a sequence of DTMF dials. With this assumption, I decompiled and renamed the whole function:
 

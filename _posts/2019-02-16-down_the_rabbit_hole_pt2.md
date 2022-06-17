@@ -1,24 +1,9 @@
 ---
 layout: post
 title: "[EN] Down the Rabbit Hole - Part II: Analyzing an EFI Application with Radare2"
-category: rev
+tags: re
 date: 19.02.16
 ---
-<script>
-function toggle(obj) {
-  if (obj.src.search('before') != -1) {
-      obj.src = obj.src.replace('before', 'after');
-      obj.title = 'after';
-    } else {
-      obj.src = obj.src.replace('after', 'before');
-      obj.title = 'before';
-    }
-}
-</script>
-
-<!-- # [EN] Down the Rabbit Hole - Part II: Analyzing an EFI Application with Radare2 -->
-
-> *You want change? XOR with -1.*
 
 After dumping my laptop's BIOS and extracting its UEFI modules, I searched for the relevant error string and found an efi application named ```LenovoWmaPolicyDxe.efi```. It's time to analyze and understand this binary.
 
@@ -27,40 +12,6 @@ I've uploaded an untouched image carved from the official update iso from Lenovo
 > In this post I will analyze the generic structures and functions of the EFI application with radare2. Since I also wanted to introduce radare2, I will have a beginner-friendly approach. I added an appendix to list the commands I used in radare2. In the next and final post I will analyze and modify/remove the whitelist mechanism itself.
 
 <!-- > A little note first: I wanted this post to serve both as a reverse engineering article and an introduction to radare2. To achieve both goals in a non-annoying way, I added an appendix where I go into detail on how I used radare2's commands and features. And let me also say that I'm neither an experienced reverse engineer nor do I know how to use radare2 to its full extent. Any criticism and suggestions are welcome, feel free to reach out. -->
-
-- [Always be prepared](#always-be-prepared)
-- [Getting right into it](#getting-right-into-it)
-- [A *little* detour](#a-little-detour)
-  - [Entry function](#entry-function)
-    - [Calling convention in EFI applications](#calling-convention-in-efi-applications)
-    - [LocateProtocol function](#locateprotocol-function)
-    - [GUID struct](#guid-struct)
-    - [InstallProtocolInterface function](#installprotocolinterface-function)
-    - [CreateEventEx Function](#createeventex-function)
-  - [Standard functions](#standard-functions)
-    - [fcn.00011ca0 (strlen)](#fcn00011ca0-strlen)
-    - [fcn.00011128 (memset)](#fcn00011128-memset)
-    - [fcn.00011c64 (strncpy)](#fcn00011c64-strncpy)
-    - [fcn.00011264 (vsnprintf)](#fcn00011264-vsnprintf)
-    - [fcn.00011640 (snprintf)](#fcn00011640-snprintf)
-    - [fcn.000111ac (printGUID)](#fcn000111ac-printguid)
-    - [fcn.00011660 (strerror_r)](#fcn00011660-strerror_r)
-    - [fcn.00011140 (AllocatePoolWrapper)](#fcn00011140-allocatepoolwrapper)
-      - [AllocatePool function](#allocatepool-function)
-    - [fcn.0001116c (malloc)](#fcn0001116c-malloc)
-- [A step in the right direction](#a-step-in-the-right-direction)
-- [Appendix: Radare2 usage in detail](#appendix-radare2-usage-in-detail)
-  - [Starting r2](#starting-r2)
-  - [Analysis](#analysis)
-  - [Visual mode](#visual-mode)
-  - [Strings](#strings)
-  - [Jumping around](#jumping-around)
-  - [References](#references)
-  - [Functions](#functions)
-  - [Types](#types)
-  - [Function arguments and variables](#function-arguments-and-variables)
-  - [Creating and renaming flags](#creating-and-renaming-flags)
-  - [Callgraphs](#callgraphs)
 
 # Always be prepared
 
@@ -158,15 +109,15 @@ Any variable that's used in the entry0 function will probably be useful later. B
 
 From the latest [UEFI Specification document](http://www.uefi.org/sites/default/files/resources/UEFI%20Spec%202_7_A%20Sept%206.pdf):
 
-![](/assets/2019-02-16-down_the_rabbit_hole_pt2/calling-convention-1.png)
+{% include aligner.html images="/2019-02-16-down_the_rabbit_hole_pt2/calling-convention-1.png" width=100 %}
 
 The calling convention is specified for each architecture. Specification for x64 systems is:
 
-![](/assets/2019-02-16-down_the_rabbit_hole_pt2/calling-convention-2.png)
+{% include aligner.html images="/2019-02-16-down_the_rabbit_hole_pt2/calling-convention-2.png" width=100 %}
 
-![](/assets/2019-02-16-down_the_rabbit_hole_pt2/calling-convention-3.png)
+{% include aligner.html images="/2019-02-16-down_the_rabbit_hole_pt2/calling-convention-3.png" width=100 %}
 
-![](/assets/2019-02-16-down_the_rabbit_hole_pt2/calling-convention-4.png)
+{% include aligner.html images="/2019-02-16-down_the_rabbit_hole_pt2/calling-convention-4.png" width=100 %}
 
 
 
@@ -190,14 +141,14 @@ I created a custom header file named ```efi.h``` that r2 can parse. I will be us
 Now I can go through the function. 
 
 <figure>
-<img src="/assets/2019-02-16-down_the_rabbit_hole_pt2/entry0-1-before.png" title='before' onclick="toggle(this)">
+<img src="/assets/img/2019-02-16-down_the_rabbit_hole_pt2/entry0-1-before.png" title='before' onclick="toggle(this)">
 <figcaption style="text-align:center;font-size:10pt">Click on the image to see before/after analysis</figcaption>
 </figure>
 
 Unfortunately, r2 guessed the [function arguments](#function-arguments-and-variables) incorrectly (Hopefully it will improve in the future). The function ```fcn.000119a4``` is called immediately, which means that arguments ```ImageHandle``` and ```SystemTable``` are passed to it. Let me quickly take a look:
 
 <figure>
-<img src="/assets/2019-02-16-down_the_rabbit_hole_pt2/inittable-before.png" title='before' onclick="toggle(this)">
+<img src="/assets/img/2019-02-16-down_the_rabbit_hole_pt2/inittable-before.png" title='before' onclick="toggle(this)">
 <figcaption style="text-align:center;font-size:10pt">Click on the image to see before/after analysis</figcaption>
 </figure>
 
@@ -210,7 +161,7 @@ This function is a pretty small and straightforward one. It takes the ```SystemT
 Back to entry0. After naming these memory offsets, I saw that the function at ```SystemTable.BootServices+0x140```, which points to ```LocateProtocol``` function, is called four times.
 
 <figure>
-<img src="/assets/2019-02-16-down_the_rabbit_hole_pt2/entry0-2-before.png" title='before' onclick="toggle(this)">
+<img src="/assets/img/2019-02-16-down_the_rabbit_hole_pt2/entry0-2-before.png" title='before' onclick="toggle(this)">
 <figcaption style="text-align:center;font-size:10pt">Click on the image to see before/after analysis</figcaption>
 </figure>
 
@@ -218,7 +169,7 @@ If any of these blocks fail, the program exits with a negative value.
 
 ### LocateProtocol function
 
-![](/assets/2019-02-16-down_the_rabbit_hole_pt2/locateprotocol.png)
+{% include aligner.html images="/2019-02-16-down_the_rabbit_hole_pt2/locateprotocol.png" width=100 %}
 
 This means that RCX will hold the pointer to GUID for the protocol and R8 will hold the memory address that will keep the interface. To name these memory addresses, I need to know what protocol is being called. In UEFI, protocols are registered with GUIDs. First I need to know how GUIDs are kept in memory, then I will try to resolve them.
 
@@ -226,7 +177,7 @@ This means that RCX will hold the pointer to GUID for the protocol and R8 will h
 
 GUIDs are stored in the following struct:
 
-![](/assets/2019-02-16-down_the_rabbit_hole_pt2/guid.png)
+{% include aligner.html images="/2019-02-16-down_the_rabbit_hole_pt2/guid.png" width=100 %}
 
 To see the bytes in the correct order, I use formatted print:
 
@@ -249,7 +200,7 @@ E6F014AB-CB0E-456E-8AF7-7221EDB702F7  TpAcpiNvs
 Right after four LocateProtocol blocks, the last block of entry0 is executed:
 
 <figure>
-<img src="/assets/2019-02-16-down_the_rabbit_hole_pt2/entry0-3-before.png" title='before' onclick="toggle(this)">
+<img src="/assets/img/2019-02-16-down_the_rabbit_hole_pt2/entry0-3-before.png" title='before' onclick="toggle(this)">
 <figcaption style="text-align:center;font-size:10pt">Click on the image to see before/after analysis</figcaption>
 </figure>
 
@@ -257,9 +208,9 @@ First of all, I want to know the call being made. ```BootServices+0x80``` points
 
 ### InstallProtocolInterface function
 
-![](/assets/2019-02-16-down_the_rabbit_hole_pt2/installprotocolinterface-1.png)
-![](/assets/2019-02-16-down_the_rabbit_hole_pt2/installprotocolinterface-2.png)
-![](/assets/2019-02-16-down_the_rabbit_hole_pt2/installprotocolinterface-3.png)
+{% include aligner.html images="/2019-02-16-down_the_rabbit_hole_pt2/installprotocolinterface-1.png" width=100 %}
+{% include aligner.html images="/2019-02-16-down_the_rabbit_hole_pt2/installprotocolinterface-2.png" width=100 %}
+{% include aligner.html images="/2019-02-16-down_the_rabbit_hole_pt2/installprotocolinterface-3.png" width=100 %}
 
 So here's what is happening:
 
@@ -272,7 +223,7 @@ I named the handle ```SelfHandle```. After the call to InstallProtocol, the hand
 Now, at this point I have three unknown functions, two unknown protocols and no xref to my string. I will continue with ```fcn.00011960```.
 
 <figure>
-<img src="/assets/2019-02-16-down_the_rabbit_hole_pt2/createeventfunction-before.png" title='before' onclick="toggle(this)">
+<img src="/assets/img/2019-02-16-down_the_rabbit_hole_pt2/createeventfunction-before.png" title='before' onclick="toggle(this)">
 <figcaption style="text-align:center;font-size:10pt">Click on the image to see before/after analysis</figcaption>
 </figure>
 
@@ -280,8 +231,8 @@ Now, at this point I have three unknown functions, two unknown protocols and no 
 
 ### CreateEventEx Function
 
-![](/assets/2019-02-16-down_the_rabbit_hole_pt2/createeventex-1.png)
-![](/assets/2019-02-16-down_the_rabbit_hole_pt2/createeventex-2.png)
+{% include aligner.html images="/2019-02-16-down_the_rabbit_hole_pt2/createeventex-1.png" width=100 %}
+{% include aligner.html images="/2019-02-16-down_the_rabbit_hole_pt2/createeventex-2.png" width=100 %}
 
 In ```fcn.00011960``` this function is called with the arguments ```(0x200, 0x10, fcn.00010fc4, 0, 0x10470, &var_20h)```. ```fcn.00010fc4``` uses the UnknownProtocol1, so I do not know what it actually does. I will rename ```fcn.00011960``` to ```CreateEventFunction``` and ```fcn.00010fc4``` to ```UnknownProtocol1Function```.
 
@@ -291,20 +242,20 @@ I honestly have no idea what this event does, so I will skip it for now and carr
 
 ### fcn.00011ca0 (strlen)
 
-![](/assets/2019-02-16-down_the_rabbit_hole_pt2/strlen.png)
+{% include aligner.html images="/2019-02-16-down_the_rabbit_hole_pt2/strlen.png" width=100 %}
 
 Well, this one looks pretty straighforward. Counting bytes until the byte is equal to zero sounds like **strlen()**.
 
 ### fcn.00011128 (memset)
 
-![](/assets/2019-02-16-down_the_rabbit_hole_pt2/memset.png)
+{% include aligner.html images="/2019-02-16-down_the_rabbit_hole_pt2/memset.png" width=100 %}
 
 This one looks like **memset()**.
 
 
 ### fcn.00011c64 (strncpy)
 
-![](/assets/2019-02-16-down_the_rabbit_hole_pt2/strncpy.png)
+{% include aligner.html images="/2019-02-16-down_the_rabbit_hole_pt2/strncpy.png" width=100 %}
 
 Copying bytes from the address in rdx to the address in rcx, while checking for a null byte, then using memset() on the remaining bytes is exactly what happens when **strncpy()** is called.
 
@@ -313,13 +264,13 @@ Copying bytes from the address in rdx to the address in rcx, while checking for 
 This is one big function, however something as little as these lines give it away immediately:
 
 
-![](/assets/2019-02-16-down_the_rabbit_hole_pt2/vsnprintf-1.png) | ![](/assets/2019-02-16-down_the_rabbit_hole_pt2/vsnprintf-2.png)
+{% include aligner.html images="/2019-02-16-down_the_rabbit_hole_pt2/vsnprintf-2.png" width=100 %}
 
 These look like format string operators! I assume that I'm looking at a **printf** function. This function only has one xref (```fcn.00011640```) and that function looks like a wrapper function.
 
 ### fcn.00011640 (snprintf)
 
-![](/assets/2019-02-16-down_the_rabbit_hole_pt2/snprintf.png)
+{% include aligner.html images="/2019-02-16-down_the_rabbit_hole_pt2/snprintf.png" width=100 %}
 
 Judging by the arguments it's called with in xrefs, this function might be **snprintf()**. This makes me think that the previous function is probably **vsnprintf()**.
 
@@ -327,31 +278,31 @@ Looking at the global call graph, there are several functions that are only invo
 
 ### fcn.000111ac (printGUID)
 
-![](/assets/2019-02-16-down_the_rabbit_hole_pt2/printguid.png)
+{% include aligner.html images="/2019-02-16-down_the_rabbit_hole_pt2/printguid.png" width=100 %}
 
 The string gives this function away. This one must be a GUID print function.
 
 ### fcn.00011660 (strerror_r)
 
-![](/assets/2019-02-16-down_the_rabbit_hole_pt2/strerror.png)
+{% include aligner.html images="/2019-02-16-down_the_rabbit_hole_pt2/strerror.png" width=100 %}
 
 I've got lots of error codes and strings. It looks like this function prints the error string to the given buffer based on the status code. This function is probably a custom **strerror_r()**.
 
 ### fcn.00011140 (AllocatePoolWrapper)
 
-![](/assets/2019-02-16-down_the_rabbit_hole_pt2/allocatepoolwrapper.png)
+{% include aligner.html images="/2019-02-16-down_the_rabbit_hole_pt2/allocatepoolwrapper.png" width=100 %}
 
 ```BootService+0x40``` (which is ```AllocatePool```) is called in this function.
 
 #### AllocatePool function
 
-![](/assets/2019-02-16-down_the_rabbit_hole_pt2/allocatepool.png)
+{% include aligner.html images="/2019-02-16-down_the_rabbit_hole_pt2/allocatepool.png" width=100 %}
 
 This is basically a syscall for allocating memory. I will name this one ```AllocatePoolWrapper``` and look at the calling function.
 
 ### fcn.0001116c (malloc)
 
-![](/assets/2019-02-16-down_the_rabbit_hole_pt2/malloc.png)
+{% include aligner.html images="/2019-02-16-down_the_rabbit_hole_pt2/malloc.png" width=100 %}
 
 If the ```AllocatePoolWrapper``` succeeds and returns a buffer, the buffer is initialized to ```\x00``` by the ```BootServices+0x168``` which is ```SetMem```. This function looks a lot like **malloc()**.
 
@@ -387,7 +338,7 @@ The function list now looks like this:
 
 Also my [callgraph](#callgraphs) looks like this:
 
-![callgraph](/assets/2019-02-16-down_the_rabbit_hole_pt2/callgraph.png)
+{% include aligner.html images="/2019-02-16-down_the_rabbit_hole_pt2/callgraph.png" width=100 %}
 
 I analyzed and resolved most of the infrastructure. Then suddenly I had a thought:
 
@@ -482,3 +433,15 @@ Flags of any kind can be created with ```f [name] @[address]```. To remove a fla
 ## Callgraphs
 
 Graphs are generated with ```ag?``` commands. For example, interactive ascii art of global callgraph can be generated with ```agCv``` and graphviz dot model of global callgraph can be generated with ```agCd``` (which is what I used for the graph in this post).
+
+<script>
+function toggle(obj) {
+  if (obj.src.search('before') != -1) {
+      obj.src = obj.src.replace('before', 'after');
+      obj.title = 'after';
+    } else {
+      obj.src = obj.src.replace('after', 'before');
+      obj.title = 'before';
+    }
+}
+</script>

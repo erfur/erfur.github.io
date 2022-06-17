@@ -1,24 +1,17 @@
 ---
 layout: post
 title: "[EN] Facebook CTF 2019 writeups"
-categories: [reverse, ctf]
+tags: re ctf
 date: 2019.06.03
 ---
 
-- [Facebook CTF 2019 writeups](#facebook-ctf-2019-writeups)
-  - [(rev) imageprot](#rev-imageprot)
-  - [(rev) go_get_the_flag](#rev-go_get_the_flag)
-  - [(rev) SOMBRERO ROJO (pt1)](#rev-sombrero-rojo-pt1)
-
-# Facebook CTF 2019 writeups
-
 After a long time wasting away months of my life dealing with university, I was finally able to spend some quality time tackling some ctf challenges last weekend. Facebook CTF was fun and I hope to see it happening again next year. Here are the reverse challenges that we solved with my fellow team members.
 
-## (rev) imageprot
+## (re) imageprot
 
 This one is a rust binary. It has three main functions:
 
-```default
+```
 [0x0004fc10]> afl~imageprot
 0x000562f0  121 4718 -> 4699 sym.imageprot::main::h60a99eb3d3587835
 0x00055f40   27 604          sym.imageprot::decrypt::h56022ac7eed95389
@@ -32,7 +25,7 @@ The program first creates a list names ("vagrant", "gdb" etc.) that are used to 
 
 After the check, the program gets another url `https://httpbin.org/status/418` which is the HTTP response code of a teapot:
 
-```default
+```
 
     -=[ teapot ]=-
 
@@ -76,13 +69,13 @@ if __name__ == "__main__":
 
 output:
 
-![](/assets/2019-06-04-Facebook_CTF_2019_writeups/flag.jpg)
+{% include aligner.html images="/2019-06-04-Facebook_CTF_2019_writeups/flag.jpg" width=100 %}
 
-## (rev) go_get_the_flag
+## (re) go_get_the_flag
 
 This time it's a go binary. When it's run, the program asks for a password. Listing the function related to main:
 
-```default
+```
 [0x00452bc0]> afl~main
 0x00429950   35 900          sym.go.runtime.main
 0x0044e3b0    3 71           sym.go.runtime.main.func1
@@ -96,16 +89,16 @@ This time it's a go binary. When it's run, the program asks for a password. List
 
 First thing to check is the checkpassword function.
 
-![](/assets/2019-06-04-Facebook_CTF_2019_writeups/checkpassword.png)
+{% include aligner.html images="/2019-06-04-Facebook_CTF_2019_writeups/checkpassword.png" width=100 %}
 
 r2 already gives the password away:
 
-```default
+```
 $ ./ggtf s0_M4NY_Func710n2!
 fb{.60pcln74b_15_4w350m3}
 ```
 
-## (rev) SOMBRERO ROJO (pt1)
+## (re) SOMBRERO ROJO (pt1)
 
 The file arrives in a corrupt state. The endianness is set to big-endian in the header. After fixing the header the real challenge begins.
 
@@ -113,14 +106,14 @@ This binary has some relatively serious anti-reverse techniques. Different funct
 
 When first run, the program asks for arguments. Disassembling and debugging reveals that the argument is given to the function @0x400498 with another string `my_sUp3r_s3cret_p@$$w0rd1`. Trying to run the program with this string shows that this was a fake:
 
-```default
+```
 $ ./sombrero_rojo 'my_sUp3r_s3cret_p@$$w0rd1'
 Nope{Lolz_this_isnt_the_flag...Try again...}
 ```
 
 After getting rid of ptrace, strace output becomes more meaningful:
 
-```default
+```
 $ strace -e inject=ptrace:retval=0 -i ./sombrero_rojo 'my_sUp3r_s3cret_p@$$w0rd1'                  
 [00007f390383fbdb] execve("./sombrero_rojo", ["./sombrero_rojo", "my_sUp3r_s3cret_p@$$w0rd1"], 0x7ffe49ab1350 /* 50 vars */) = 0
 [000000000047a009] brk(NULL)            = 0x18bf000
@@ -141,11 +134,11 @@ $ strace -e inject=ptrace:retval=0 -i ./sombrero_rojo 'my_sUp3r_s3cret_p@$$w0rd1
 
 After ptrace, `/tmp/key.bin` is accessed. Looking around in the function of this call,
 
-![](/assets/2019-06-04-Facebook_CTF_2019_writeups/access.png)
+{% include aligner.html images="/2019-06-04-Facebook_CTF_2019_writeups/access.png" width=100 %}
 
 we found out that the file should contain `"\xfb\x00\x95\x17\x90\xf4"`. After creating this file, the program prints the flag itself:
 
- ```default
+ ```
 $ echo -n "\xfb\x00\x95\x17\x90\xf4" > /tmp/key.bin
 $ ./sombrero_rojo 
 fb{7h47_W4sn7_S0_H4Rd}
@@ -154,7 +147,7 @@ Ready for the next challenge?... press enter
 
 After pressing enter, the program exits and we see a new file next to it called "next_challenge.bin". However, the file is corrupted. **Unfortunately we were unable to solve the second part** as we weren't able to understand the decryption scheme. According to [this](https://github.com/Jinmo/ctfs/blob/master/2019/fbctf/rev/sombrero_rojo.md#part-2) writeup, it was an RC4 decryption and the key address was off by one byte. After fixing this mistake, the second binary is decrypted successfully and we get the flag after running it:
 
-```default
+```
 $ ./next_challenge.bin
 
 MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM

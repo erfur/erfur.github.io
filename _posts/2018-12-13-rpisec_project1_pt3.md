@@ -1,21 +1,17 @@
 ---
 layout: post
 title: "Savaş Oyunları: Format İpliklerinin Dönüşü Part III"
-category: pwn
+tags: pwn
 date: 18.12.13
 ---
 
-![imback](/assets/2018-12-13-rpisec_project1_pt3/imback.gif)
-
-*Başladığım işi bitirmek üzere geri döndüm. Geç olsun güç olmasın. (Bahaneler bahaneler...)*
-
-# Adminden kod çalıştırmaya
-
 Admin olmayı başardım ancak bu tek başına birşey ifade etmiyor. Çünkü program admin olan bir kullanıcıya tweetlerin adreslerini göstermekten başka bir fonksiyon sunmuyor. Programda zafiyetler var mı incelemem gerekecek.
+
+{% include aligner.html images="/2018-12-13-rpisec_project1_pt3/imback.gif" width=100 %}
 
 İlk aradığım zafiyet türü buffer overflow. Ancak programı yazan kişi gayet iyi yazmış, tüm inputlar bufferların uzunluğuna göre alınıyor. İkinci olarak printf tarzı fonksiyonlarda yanlış kullanım var mı diye ararken sym.print_menu altında dikkatimi şu kısım çekiyor:
 
-![1](/assets/2018-12-13-rpisec_project1_pt3/1.png)
+{% include aligner.html images="/2018-12-13-rpisec_project1_pt3/1.png" width=100 %}
 
 Bu kısım menüdeyken küçük penguenin yanına son girdiğimiz tweeti yazdırıyor. Ancak normal kullanıcı için sağdaki, admin olan kullanıcılar için ise soldaki blok çalışıyor. Küçük bir problem var, soldaki blokta tweetim printf fonksiyonuna ilk argüman olarak veriliyor. Bu da demektir ki:
 
@@ -118,7 +114,7 @@ io.interactive()
 
 Scriptim buraya kadar çalıştıktan sonra programdan çıkış yapmak istediğimde exit() fonksiyonunu çağırmaya çalışacak ve shellcode'uma düşecek.
 
-![voila](/assets/2018-12-13-rpisec_project1_pt3/2.png)
+{% include aligner.html images="/2018-12-13-rpisec_project1_pt3/2.png" width=100 %}
 
 Ve shellcode çalıştı. Projeyi sonunda tamamladım. Scriptin en son halini [githubda](https://gist.github.com/erfur/40809ac0184070341ee27279ab2402dc) bulabilirsiniz. İlk konular ile alakalı bir proje olduğu için güncel korumaların hepsi kapalıydı (ASLR dahil). İleride daha güncel yöntemlerin kullanıldığı projelerde görüşmek üzere.
 

@@ -1,14 +1,8 @@
 ---
 layout: post
 title: "Savaş Oyunları: Format İpliklerinin Dönüşü Part I"
-category: pwn
-date: 18.06.13
+tags: pwn
 ---
-
-*Az sonra okuyacaklarınız tamamen hayal ürünüdür ve gerçek hayatta 
-kullanılan hiçbir uygulama veya portla ilgisi yoktur.*
-
-## Girizgah
 
 Geçenlerde RPISEC'in hazırladığı "Modern Binary Exploitation" eğitimini 
 taradım. Hazırlanan içerik derste kullanılan slaytlar ve ödev olarak 
@@ -31,7 +25,7 @@ hazır bir halde bize sunmuşlar. Virtualbox'a ekleyip uğraşsız bir
 şekilde sistemi başlattım. Sistemin IP'sini aldıktan sonra ssh üzerinden
 proje 1 kullanıcısına giriş yaptım. (project1:project1start)
 
-{% include aligner.html images="/assets/2018-06-13-rpisec_project1_pt1/0login.png" %}
+{% include aligner.html images="/2018-06-13-rpisec_project1_pt1/0login.png" width=100 %}
 
 Programımız /levels/project1/ dizini altında, project1_priv
 kullanıcısının sahipliğinde ve suid biti açık. Amaç programı
@@ -41,18 +35,18 @@ kullanarak /home/project1_priv/.pass dosyasından bayrağı okumak.
 
 Programı açtığımda ilk olarak username sorgusuyla karşılaşıyorum.
 
-{% include aligner.html images="/assets/2018-06-13-rpisec_project1_pt1/1username.png" %}
+{% include aligner.html images="/2018-06-13-rpisec_project1_pt1/1username.png" width=100 %}
 
 Kullanıcı adı girdikten sonra program benden tuz istiyor. Yemek yapmaya
 mı geldik? Pardon, program benden şifreleme için benden salt değeri
 istiyormuş (Kendime not: açken daha eğlenceli şeylerle uğraş).
 
-{% include aligner.html images="/assets/2018-06-13-rpisec_project1_pt1/2salt.png" %}
+{% include aligner.html images="/2018-06-13-rpisec_project1_pt1/2salt.png" width=100 %}
 
 Programı tuzladıktan sonra program bana bir parola üretiyor ve daha 
 sonra beni ana menüye atıyor.
 
-{% include aligner.html images="/assets/2018-06-13-rpisec_project1_pt1/3mainmenu.png" %}
+{% include aligner.html images="/2018-06-13-rpisec_project1_pt1/3mainmenu.png" width=100 %}
 
 Basit bir ana menüyle karşılaşıyorum. 1 ile tw33t yazıp zincire ekliyor,
 2 ile tw33t zincirimize bakabiliyor, 4 ile (3 nerede?) programın afişini
@@ -63,7 +57,7 @@ karşılaştırdığımda bir şeylerin eksik olduğunu hissediyorum. Belli ki
 bazı özellikler direk kullanıma sunulmamış. Mesela menüde 3'ü seçtiğimde
 program bana parola soruyor. 
 
-{% include aligner.html images="/assets/2018-06-13-rpisec_project1_pt1/4enterpass.png" %}
+{% include aligner.html images="/2018-06-13-rpisec_project1_pt1/4enterpass.png" width=100 %}
 
 Bu parolanın nereden geldiği veya doğru girdiğimde neyle karşılaşacağım
 belli değil.
@@ -75,20 +69,18 @@ Masum kullanıcı rolümü buraya kadar oynuyor ve cebimden neşteri
 geldi. Imajda bize sunulan araçlardan birini açıyorum. radare2 beni her
 zamanki fallarından biriyle karşılıyor.
 
-{% include aligner.html images="/assets/2018-06-13-rpisec_project1_pt1/5radare.png" %}
+{% include aligner.html images="/2018-06-13-rpisec_project1_pt1/5radare.png" width=100 %}
 
 Analizden sonra (aaaa) ilk olarak program hakkında bilgi edinmek amaçlı
 i, ii ve il komutlarını çalıştırıyorum. 
 
-{% include aligner.html images="/assets/2018-06-13-rpisec_project1_pt1/6i.png" %}
-
-{% include aligner.html images="/assets/2018-06-13-rpisec_project1_pt1/7bininfo.png" %}
+{% include aligner.html images="/2018-06-13-rpisec_project1_pt1/6i.png" width=50 %}
 
 32 bit bir ELF dosyası, kütüphane olarak libc kullanıyor ve günlük
 kullandığımız fonksiyonları içe aktarıyor. Daha sonra programdaki tüm
 fonksiyonları listeliyorum (afl).
 
-{% include aligner.html images="/assets/2018-06-13-rpisec_project1_pt1/9memset.png" %}
+{% include aligner.html images="/2018-06-13-rpisec_project1_pt1/9memset.png" width=100 %}
 
 Aralarda ilginç fonksiyon isimleri ile karşılaşıyorum. Şöyle bir
 listelersem:
@@ -104,7 +96,7 @@ Ancak önce main fonksiyonuna bir göz atıp programın genel işleyişi
 hakkında biraz daha bilgi edinmek istiyorum. (s main) ve (VV)
 komutlarından sonra karşıma main fonksiyonunun akış şeması çıkıyor.
 
-{% include aligner.html images="/assets/2018-06-13-rpisec_project1_pt1/8main.png" %}
+{% include aligner.html images="/2018-06-13-rpisec_project1_pt1/8main.png" width=50 %}
 
 ### Ey main bize neyledin?
 
@@ -112,7 +104,7 @@ Main fonksiyonunun başında fonksiyonun argümanları kontrol ediliyor.
 Eğer argc == 0 değilse argümanlar memset() fonksiyonu ile sıfırlanıyor.
 Bu işlemden sonra akış bir dizi fonksiyonlar üzerinden devam ediyor.
 
-{% include aligner.html images="/assets/2018-06-13-rpisec_project1_pt1/10functions.png" %}
+{% include aligner.html images="/2018-06-13-rpisec_project1_pt1/10functions.png" width=100 %}
 
  - print_banner
  - gen_pass
@@ -127,7 +119,7 @@ get_unum() fonksiyonuyla kullanıcıdan unsigned int alınıyor ve bu sayı
 arasındaysa 0x8049a24 adresindeki fonksiyon listesinden istenen
 fonksiyona atlanıyor. 
 
-{% include aligner.html images="/assets/2018-06-13-rpisec_project1_pt1/11menufunctions.png" %}
+{% include aligner.html images="/2018-06-13-rpisec_project1_pt1/11menufunctions.png" width=100 %}
 
 Bu fonksiyonlar da sırasıyla:
 
@@ -139,7 +131,7 @@ Bu fonksiyonlar da sırasıyla:
  - 5 print_exit
  - 6 ???
 
-{% include aligner.html images="/assets/2018-06-13-rpisec_project1_pt1/12mysterioustructions.png" %}
+{% include aligner.html images="/2018-06-13-rpisec_project1_pt1/12mysterioustructions.png" width=100 %}
 
 Son sırada bulunan adreste bir takım işlemler yapılıyor. Bu işlemler
 programda bulunan is_admin ve debug_mode isimli değişkenleri kullanıyor.
