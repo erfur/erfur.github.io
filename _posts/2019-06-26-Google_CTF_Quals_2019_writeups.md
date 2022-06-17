@@ -1,0 +1,198 @@
+---
+layout: post
+title: "[EN] Google CTF Quals 2019 writeups"
+tags: re ctf
+date: 2019.06.25
+---
+
+I've been eagerly waiting for this year's Google CTF because last year I couldn't even solve one challenge. I tormented my soul for three days straight trying to solve the infamous 'keygenme'(I was so close). Entering this CTF I wanted to be able to see at least one flag, and I'm happy to say that I did. It ain't much, but it's honest work.
+
+- [(sandbox) DevMaster 8000](#sandbox-devmaster-8000)
+- [(rev) Dialtone](#rev-dialtone)
+
+# (sandbox) DevMaster 8000
+
+{% include aligner.html images="/2019-06-26-Google_CTF_Quals_2019_writeups/devmaster8k-challenge.png" width=100 %}
+
+We're given a binary builder platform for cloud that is slightly sandboxed. There are prebuilt binaries to connect and use the platform. Upon spawning a shell and checking uid and gids, I noticed that my sandbox is still in the root group:
+
+{% include aligner.html images="/2019-06-26-Google_CTF_Quals_2019_writeups/devmaster8k-id.png" width=100 %}
+
+This opens up possibilities, especially if we have suid binaries lying around. With a stroke of luck, I found the perfect binary `drop_privs` under `/home/user` that allows me to execute commands as any user:
+
+{% include aligner.html images="/2019-06-26-Google_CTF_Quals_2019_writeups/devmaster8k-flag.png" width=100 %}
+
+The flag is `CTF{two-individually-secure-sandboxes-may-together-be-insecure}`
+
+# (re) Dialtone
+
+{% include aligner.html images="/2019-06-26-Google_CTF_Quals_2019_writeups/dialtone-challenge.png" width=100 %}
+
+Decompiling with GHIDRA, I saw pulseaudio functions being used. The program starts recording to `buffer`, then processes `buffer` into `buffer2` in function `x`, finally does some checks on `buffer2` in function `r` and checks the return value.
+
+```c
+undefined8 main(undefined8 uParm1,undefined8 *puParm2)
+
+{
+  int iVar1;
+  long paObj;
+  undefined8 uVar2;
+  uint *puVar3;
+  char *pcVar4;
+  undefined1 *puVar5;
+  undefined buffer [32768];
+  undefined buffer2 [131076];
+  undefined4 local_24;
+  undefined4 local_20;
+  undefined local_1c;
+  uint local_18;
+  int ret;
+  
+  puVar5 = ss.3811;
+  pcVar4 = "record";
+  paObj = pa_simple_new(0,*puParm2,2,0,"record",ss.3811,0,0,&local_18);
+  if (paObj == 0) {
+    uVar2 = pa_strerror((ulong)local_18);
+    fprintf(stderr,"pa_simple_new() failed: %s\n",uVar2);
+    uVar2 = 1;
+  }
+  else {
+    local_24 = 0;
+    local_20 = 0;
+    local_1c = 0;
+    do {
+      puVar3 = &local_18;
+      iVar1 = pa_simple_read(paObj,buffer,0x8000);
+      if (iVar1 < 0) {
+        uVar2 = pa_strerror((ulong)local_18);
+        fprintf(stderr,"pa_simple_read() failed: %s\n",uVar2);
+        return 1;
+      }
+      x(buffer,buffer2,buffer2);
+      ret = r(&local_24,buffer2,(int)buffer2,(char *)puVar3,(int)pcVar4,(int)puVar5);
+      if (ret < 0) {
+        fwrite("FAILED\n",1,7,stderr);
+        return 1;
+      }
+    } while (ret != 0);
+    fwrite("SUCCESS\n",1,8,stderr);
+    pa_simple_free(paObj);
+    uVar2 = 0;
+  }
+  return uVar2;
+}
+```
+
+Function `x` was too complicated for me, so I tried to analyze `r` first. At this point I was thinking that the binary could be analyzing the frequencies of the recordings, and the first thing that came to my mind was DTMF tones. After checking the tone frequencies:
+
+{% include aligner.html images="/2019-06-26-Google_CTF_Quals_2019_writeups/dialtone-dtmf.png" width=100 %}
+
+and seeing the exact numbers in the function `r`, it clicked. The code must be a sequence of DTMF dials. With this assumption, I decompiled and renamed the whole function:
+
+```c
+void r(void *dialTone,void *buffer)
+
+{
+  bool bVar1;
+  double lowFreq [4];
+  double highFreq [5];
+  int yCoord;
+  double maxFreq2;
+  int yCoordFinal;
+  uint xCoord;
+  double maxFreq;
+  uint xCoordFinal;
+  
+  *(int *)dialTone = *(int *)dialTone + 1;
+  if (*(int *)dialTone < 0x15) {
+    highFreq[0] = (double)f(buffer,0x4b9);
+    highFreq[1] = (double)f(buffer,0x538);
+    highFreq[2] = (double)f(buffer,0x5c5);
+    highFreq[3] = (double)f(buffer,0x661);
+    xCoordFinal = 0xffffffff;
+    maxFreq = 1.00000000;
+    xCoord = 0;
+    while ((int)xCoord < 4) {
+      if (maxFreq < highFreq[(long)(int)xCoord]) {
+        xCoordFinal = xCoord;
+        maxFreq = highFreq[(long)(int)xCoord];
+      }
+      xCoord = xCoord + 1;
+    }
+    lowFreq[0] = (double)f(buffer,0x2b9);
+    lowFreq[1] = (double)f(buffer,0x302);
+    lowFreq[2] = (double)f(buffer,0x354);
+    f(buffer,0x3ad);
+    yCoordFinal = -1;
+    maxFreq2 = 1.00000000;
+    yCoord = 0;
+    while (yCoord < 4) {
+      if (maxFreq2 < lowFreq[(long)yCoord]) {
+        yCoordFinal = yCoord;
+        maxFreq2 = lowFreq[(long)yCoord];
+      }
+      yCoord = yCoord + 1;
+    }
+    if (*(char *)((long)dialTone + 8) == '\0') {
+      if ((-1 < (int)xCoordFinal) && (-1 < yCoordFinal)) {
+        xCoordFinal = yCoordFinal << 2 | xCoordFinal;
+        bVar1 = false;
+        switch(*(undefined4 *)((long)dialTone + 4)) {
+        case 0:
+          bVar1 = xCoordFinal == 9;
+          break;
+        case 1:
+          bVar1 = xCoordFinal == 5;
+          break;
+        case 2:
+          bVar1 = xCoordFinal == 10;
+          break;
+        case 3:
+          bVar1 = xCoordFinal == 6;
+          break;
+        case 4:
+          bVar1 = xCoordFinal == 9;
+          break;
+        case 5:
+          bVar1 = xCoordFinal == 8;
+          break;
+        case 6:
+          bVar1 = xCoordFinal == 1;
+          break;
+        case 7:
+          bVar1 = xCoordFinal == 0xd;
+          break;
+        case 8:
+          if (xCoordFinal == 0) {
+            return;
+          }
+        }
+        if (bVar1) {
+          *(int *)((long)dialTone + 4) = *(int *)((long)dialTone + 4) + 1;
+          *(undefined4 *)dialTone = 0;
+          *(undefined *)((long)dialTone + 8) = 1;
+        }
+      }
+    }
+    else {
+      if (((int)xCoordFinal < 0) && (yCoordFinal < 0)) {
+        *(undefined *)((long)dialTone + 8) = 0;
+        *(undefined4 *)dialTone = 0;
+      }
+    }
+  }
+  return;
+}
+```
+
+Extracting the sequence from the switch-case statement:
+
+```python
+tones = [1,2,3,'A',4,5,6,'B',7,8,9,'C','*',0,'#','D']
+for i in [9,5,10,6,9,8,1,0xd,0]:
+  print(tones[i], end='')
+ 
+859687201
+```
+
+The flag is `CTF{859687201}`

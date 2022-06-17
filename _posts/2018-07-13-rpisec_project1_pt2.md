@@ -1,0 +1,283 @@
+---
+layout: post
+title: "Savaş Oyunları: Format İpliklerinin Dönüşü Part II"
+tags: pwn
+date: 18.07.13
+---
+
+Önceki yazıda tw33tchainz programının altını üstüne getirdik.
+Disassembler'da incelediğimiz programın kullanıcıya gösterilmeyen ilginç
+prosedürler içerdiğini keşfettik. Programın çifte standart uyguladığını,
+admin isek debug modunu açabildiğimizi gördük. Peki nasıl admin olunur?
+Fonksiyonları hatırlayıp, daha detaylı inceleyip görelim.
+
+_Not: Önceki yazıdaki radare2'yi ssh üzerinden bize verilen
+sanal imaja bağlanıp kullanmıştım. Eski sürüm olduğu için birçok
+özellikten mahrum kaldım. Bu sefer tw33tchainz dosyasını indirip kendi
+makinamda analize devam edeceğim. radare2'yi mümkün olduğunca en son
+sürümde kullanmaya çalışın. Çok aktif bir geliştirme sürecinde olduğu
+için uygulamaya her sürümde önemli özellikler ekleniyor._
+
+ - print_banner
+ - gen_pass
+ - gen_user
+ - print_banner
+ - print_menu
+ - get_unum
+
+## print_banner()
+
+Program çıktının renkli olması için printf ile escape sequence
+bastırdıktan sonra print_banner() fonksiyonunu çağırıyor. Bu fonksiyonda
+da program afişini bastırıyor.
+
+{% include aligner.html images="/2018-07-13-rpisec_project1_pt2/0print_banner.png" width=100 %}
+
+Daha sonra gen_pass() fonksiyonu çağrılıyor.
+
+## gen_pass()
+
+{% include aligner.html images="/2018-07-13-rpisec_project1_pt2/1gen_pass.png" width=100 %}
+
+Bu fonksiyonda /dev/urandom'dan 16 byte okunup obj.secretpass adresine
+yazılıyor. İleride kullanmamız gerecek bir detaya benziyor.
+
+Sırada gen_user() fonksiyonu var. 
+
+## gen_user()
+
+{% include aligner.html images="/2018-07-13-rpisec_project1_pt2/2gen_user1.png" width=100 %}
+
+Fonksiyon ilk olarak bellekteki iki alana memset() ile belli byte 
+değerleri yazıyor:
+
+{% highlight c %}
+memset(0x804d0d0, '\xba', 0x10);
+memset(obj.user, '\xcc', 0x10);
+{% endhighlight %}
+
+Daha sonra ekrana "Enter Username:" yazdırıp fgets() ile input alıyor:
+
+{% include aligner.html images="/2018-07-13-rpisec_project1_pt2/3gen_user2.png" width=100 %}
+
+Verdiğimiz input obj.user adresine yazılıyor. Ardından program 
+"Enter Salt:" yazdıktan sonra bizden salt değerini istiyor:
+
+{% include aligner.html images="/2018-07-13-rpisec_project1_pt2/4gen_user3.png" width=100 %}
+
+Bu sefer girilen inputu da 0x804d0d0 adresine yazdıktan sonra local_18 
+adresi stack'e yazılıp hash() fonksiyonu çağrılıyor. "Generated
+Password:" mesajı ekrana bastırıldıyor ve hemen ardından local_18 adresi
+tekrar stack'e yazılıp print_pass() fonksiyonu çağrılıyor. Son
+olarak da obj.user ve 0x804d0d0 adresleri memset() ile tekrar
+dolduruluyor.
+
+Şimdi hash() fonksiyonunu inceleyip programın bize ürettiği parolayı
+nasıl ürettiğini öğrenelim.
+
+### hash()
+
+{% include aligner.html images="/2018-07-13-rpisec_project1_pt2/5hash.png" width=100 %}
+
+Oldukça basit bir fonksiyonla karşılaşıyoruz. local_4h adresinde bir
+sayaç değeri var ve sol alttaki bloğu 16 kere çalıştırıyor. Bu blokta
+aşağıdaki işlem gerçekleşiyor:
+
+{% highlight python %}
+arg_8h = obj.user ^ (0x804d0d0 + obj.secretpass)
+{% endhighlight %}
+
+Bu işlem her byte için ayrı ayrı gerçekleşiyor. Sonuçta elde edilen
+parola print_pass() fonksiyonuna veriliyor.
+
+### print_pass()
+
+{% include aligner.html images="/2018-07-13-rpisec_project1_pt2/6print_pass.png" width=100 %}
+
+print_pass() fonksiyonunda elde edilen parolanın dörder byte'lık bloklar
+halinde tersine çevrildiğini görüyoruz. Bu işlemden sonra parolamız hex
+halinde bastırılıyor.
+
+Programın incelediğimiz yere kadar yaptıklarının çıktısı aşağıdaki gibi:
+
+{% include aligner.html images="/2018-07-13-rpisec_project1_pt2/7sofar.png" width=100 %}
+
+Enter'a bastıktan sonra program bizi ana menüye alıyor. 
+
+# Sal admini artık!
+
+Ana menüden erişebileceğimiz fonksiyonları da hatırlayalım:
+
+ - 0 getchar
+ - 1 do_tweet
+ - 2 view_chainz
+ - 3 maybe_admin
+ - 4 print_banner
+ - 5 print_exit
+ - 6 ???
+
+Direkt en ilgi çeken fonksiyona girelim ve admin olmak için ne istiyormuş
+görelim:
+
+{% include aligner.html images="/2018-07-13-rpisec_project1_pt2/8maybe_admin.png" width=100 %}
+
+Program bizden bir parola istiyor ama hangi parola olduğu belli değil.
+Programın kendi ürettiği parolayı denedim ancak işe yaramadı (O kadar
+kolay olsaydı bu kadar uğraşmazdık demi?). Kodları inceleyip durumu
+açıklığa kavuşturalım:
+
+{% include aligner.html images="/2018-07-13-rpisec_project1_pt2/9maybe_admin_r2.png" width=100 %}
+
+Yukarıdaki kodun C'de karşılığı şöyle:
+
+{% highlight c %}
+memset(local_19h, '\x00', 0x11);
+printf("Enter password: ");
+fgets(local_19h, 0x11, stdin);
+if(memcmp(local_19h, obj.secretpass, 0x10) == 0) {
+	puts("Authenticated");
+	obj.is_admin = 1;
+} else {
+	puts("Nope");
+	obj.is_admin = 0;
+}
+{% endhighlight %}
+
+Girdiğimiz parola obj.secretpass ile aynı ise is_admin değişkeni 1
+olacak. obj.secretpass değeri /dev/urandom'dan okunan 16 byte'tan
+ibaretti. Peki bu değeri nasıl ele geçirebiliriz? hash() fonksiyonuki
+işleme tekrar bakarsak:
+
+{% highlight c %}
+arg_8h = obj.user ^ (0x804d0d0 + obj.secretpass) /*
+ hash                  salt                       */
+{% endhighlight %}
+
+Eğer username ve salt değerlerini akıllıca girersek programın bize
+ürettiği parola üzerinden secretpass'i ele geçirebiliriz. Programın
+yazarı burada bize bir iyilik yapıp fgets() kullanmış. Bu fonksiyon
+(man fgets) inputu sadece newline('\n') ve EOF görünce sonlandırıyor.
+Yani hem username hem de salt değeri olarak 
+"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+kullanabiliriz. Böylece:
+
+{% highlight python %}
+hash[i] = 0 ^ (0 + secretpass[i]) = secretpass[i]
+{% endhighlight %}
+
+olacak ve secretpass'i tereyağından kıl çeker gibi okuyabileceğiz.
+
+# Alet çantası nerde?
+
+Bahsettiğim işlemleri elle yapmak zor olmasa da ileride olayların
+karmaşıklaşacağını öngördüğümüz için işi araçlarla otomatize etmemiz
+gerekiyor.
+
+"Bir tersine mühendis ancak kullandığı araçlar kadar güçlüdür." - erfur
+
+Çantayı karıştırıp içinden python ve pwntools'u çıkaralım. pwntools ile
+programın girdi ve çıktılarını kolaylıkla kontrol edebiliyoruz.
+Öncelikle scripte bir giriş yapalım:
+
+{% highlight python %}
+#!/usr/bin/python2
+from pwn import *
+
+binary = ELF("./tw33tchainz")
+io = binary.process()
+{% endhighlight %}
+
+Elimizdeki programı yükleyip çalıştırmak için gerekli kod bu kadar.
+Bundan sonra program ile etkileşim kısmını hallediyor olacağız.
+
+{% highlight python %}
+userstr = "\x00"*16
+# Enter Username:
+io.recv()
+io.send(userstr)
+
+saltstr = "\x00"*16
+# Enter Salt:
+io.recv()
+io.send(saltstr)
+{% endhighlight %}
+
+Belirlediğimiz kullanıcı adı ve salt değerini verdikten sonra programın
+oluşturduğu parolayı parse etmemiz gerekiyor. Programın her çalıştığında
+çıktıyı aynı şekilde verdiğini bildiğimiz için işimiz kolay.
+
+{% highlight python %}
+io.recvuntil("Generated Password:\n")
+hashstr = io.recvline().strip()
+log.info("Got hash: {}".format(hashstr))
+io.sendline("\n")
+{% endhighlight %}
+
+Şu anda hashstr secretpass'in ters halini tutuyor. Küçük bir for
+döngüsüyle düzeltelim:
+
+{% highlight markdown %}
+Örnek parola:
+   df5c94a02bdf1f6872b37b50ee5705a9
+    v        v         v         v
+[df5c94a0][2bdf1f68][72b37b50][ee5705a9]
+    v         v         v         v
+[a0945cdf][681fdf2b][507bb372][a90557ee]
+    v         v         v        v
+   a0945cdf681fdf2b507bb372a90557ee
+{% endhighlight %}
+
+İşlemi python koduna çevirdiğimizde ise:
+
+{% highlight python %}
+hashstr2 = []
+for i in range(0, len(hashstr), 8):
+	hashstr2.append(int(hashstr[i+6:i+8], 16))
+	hashstr2.append(int(hashstr[i+4:i+6], 16))
+	hashstr2.append(int(hashstr[i+2:i+4], 16))
+	hashstr2.append(int(hashstr[i:i+2], 16))
+
+log.info("Fixed hash: {}".format("".join([hex(i)[2:] for i in hashstr2])))
+
+secretpass = ""
+for i in range(16):
+	secretpass += chr(((hashstr2[i]^ord(userstr[i])) - ord(saltstr[i]))
+	& 0xff)
+
+log.info("secretpass: {}".format(secretpass))
+{% endhighlight %}
+
+secretpass hazır olduğuna göre menüye girip maybe_admin() fonksiyonuna
+tekrar kafa tutabiliriz.
+
+{% highlight python %}
+log.info(io.recv())
+io.sendline("3") #maybe_admin()
+io.recv()
+io.sendline(secretpass)
+io.interactive()
+{% endhighlight %}
+
+Scriptimiz programa secretpassi verdikten sonra kontrolü bize
+bırakacak. Böylece programı admin olarak istediğimiz gibi
+kullanabileceğiz. Şimdi scripti denemenin vakti geldi.
+
+{% highlight python %}
+$ ./solve.py
+{% endhighlight %}
+
+{% include aligner.html images="/2018-07-13-rpisec_project1_pt2/10admin.png" width=100 %}
+
+Admin olmayı başardık ve menüde yeni bir girdi belirdi: "6: Turn debug
+mode on". Debug modunu açıp programı kullandığımızda "View chainz"
+menüsünde attığımız tweetlerin hafızadaki adreslerini görebiliyoruz:
+
+{% include aligner.html images="/2018-07-13-rpisec_project1_pt2/11addresses.png" width=100 %}
+
+Bu adresleri exploit geliştirme aşamasında kullanmamız gerekebilir.
+
+İkinci yazının sonuna geldik. Üçüncü ve (umuyorum ki) son yazıda
+programdaki zafiyetleri inceleyip program üzerinden kod çal̙̣̘̕ı͏̻̜ş̡̻͇͚t͉͓͉̹͙ı̦̲̲͝r̙m̩̝͍ͅa͚̟̖y͍̲͇̞̭ı̶͔̰͓̫ d̨̡̹̲̹͘é͈̻̱̘͙͖̩̝͈͝n̛͜͏̷͈͓̟̪̰̬͓̞
+e̛̬̻̝͚̳͖̰͉͚̟͡y͈̻͖͎̯̮̘̦̤͙͓͍͇͘͘̕͡e̵͔̭̺̙͈͎̪̤͇̯̦̞͞ͅc̸̢̧̺̰͕̜̱̪̞͎͈͉̘̤̣̠ͅͅe̵̶̝͖̰͙̤̰̲͓͜͞ğ̶̨̹̠͕̖͟͜͠��
+
+Segmentation fault (core dumped)
