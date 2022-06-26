@@ -3,13 +3,13 @@ baseurl: "/"
 url: "https://erfur.github.io"
 
 # THEME-SPECIFIC CONFIGURATION
-title: "erfur's bits 'n pieces"                         # site's title
+title: "erfur's bits and pieces"                         # site's title
 description: "check back in 2 seconds"                  # used by search engines
 avatar: assets/img/logo.svg                             # Empty for no avatar in navbar
 favicon: assets/favicon.ico                             # Icon displayed in the tab
 
 # Header and footer text
-header_text: "bits 'n pieces reloaded"
+header_text: "bits and pieces reloaded"
 header_feature_image: assets/img/banner.png
 footer_text: ""
 
@@ -21,7 +21,7 @@ color_image: /assets/img/lineart.png                    # A bit transparent for 
 # Features
 # More in the _data folder for share buttons, author and language
 # For layout customization, go to the "_sass > base" folder, and check "_variables.scss"
-katex: true                                             # Enable if using math markup
+katex: false                                             # Enable if using math markup
 mermaid: true                                           # Enable mermaid-js for sequence and diagrams
 google_analytics:                                       # Tracking ID, e.g. "UA-000000-01"
 cookie_consent: false                                   # To respect the usage of cookies
