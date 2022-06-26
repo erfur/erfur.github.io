@@ -146,7 +146,8 @@ header {
   h5 { color: var(--h5); }
   h6 { color: var(--h6); }
 
-  text-align: justify;
+  text-align: left;
+  hyphens: auto;
 
   a {
     :visited {

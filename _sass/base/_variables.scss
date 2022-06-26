@@ -1,12 +1,12 @@
 /* TYPOGRAPHY */
-$font-family-main: 'Source Sans Pro', Helvetica, Arial, sans-serif;
-$font-family-headings: 'Source Sans Pro', Helvetica, Arial, sans-serif;
-$font-family-logo: 'Source Sans Pro', Helvetica, Arial, sans-serif;
-$font-size: 1.25em;
+$font-family-main: 'Hack NF', Helvetica, Arial, sans-serif;
+$font-family-headings: 'Hack NF', Helvetica, Arial, sans-serif;
+$font-family-logo: 'Fixedsys Excelsior', Helvetica, Arial, sans-serif;
+$font-size: 1em;
 
-$monospace: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, sans-serif !default;
-$font-size-code: 0.85em !default;
-$font-height-code: 1.1em !default;
+$monospace: 'Fixedsys Excelsior', Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, sans-serif !default;
+$font-size-code: 1em !default;
+$font-height-code: 1.05em !default;
 $border-radius: 4px !default;
 
 /* PADDING */
@@ -105,7 +105,7 @@ html[data-theme="dark"] {
   --base05: #cdd9e5; // Default Foreground, Caret, Delimiters, Operators
   --base06: #e7f3f4; // Light Foreground (Not often used)
   --base07: #ffffff; // Light Background (Not often used)
-  --base08: #d40059; // Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted
+  --base08: #c75d89; // Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted
   --base09: #ff5c00; // Integers, Boolean, Constants, XML Attributes, Markup Link Url
   --base0a: #d9b600; // Classes, Markup Bold, Search Text Background
   --base0b: #6bac00; // Strings, Inherited Class, Markup Code, Diff Inserted
