@@ -48,14 +48,14 @@ a.toc-link {
     right: calc((100% - 90rem - 4rem) / 2)
 }
 
-@media (max-width: 65em) {
-    .toc {
-        // transform: translateX(-100%);
-        // right: 0;
-        visibility: hidden;
-        width: 0;
-    }
-}
+// @media (max-width: 65em) {
+//     .toc {
+//         // transform: translateX(-100%);
+//         // right: 0;
+//         visibility: hidden;
+//         width: 0;
+//     }
+// }
 
 .is-collapsible {
     max-height: 1000px;
