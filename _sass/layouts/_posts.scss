@@ -1,8 +1,33 @@
 .comments {
-  @extend %padding-post;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  float: left;
+  // @extend %padding-post;
+  // border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  // float: left;
+  // width: auto;
+  padding: 3%
+}
+
+.post-columns {
+  display: flex;
+  // flex-wrap: wrap;
+  margin-right: 1em;
+  margin-left: 1em;
+  margin-top: 0;
+  width: auto;
+  max-width: 1600px !important;
+  margin-bottom: 0;;
+}
+
+.col1 {
+  max-width: 300px;
+  // width: 100%;
+}
+
+.col2 {
+  flex-grow: 1;
+  order: 0;
+  max-width: 800px;
   width: 100%;
+  box-sizing: border-box;
 }
 
 article {
