@@ -19,7 +19,7 @@ because I didn't understand most of the words. This time I was able to breeze
 through them and after completing the game I wanted to take a look under the
 hood.
 
-{% include aligner.html images="/frida-mysterypi-pt1/mpi1.png" width=100 %}
+{% include aligner.html images="/mysterypi-frida-pt1/mpi1.png" width=100 %}
 
 I already decided to approach it as a project, so I set myself up with some
 goals. The game **doesn't allow resizing in windowed mode** and its fixed at a
@@ -53,13 +53,13 @@ These files are used as plaintext databases for the assets, menu and level
 layouts etc. Even all of the objects' coordinates on the screen can be found in
 these files.
 
-{% include aligner.html images="/frida-mysterypi-pt1/rsrc.png" width=50 %}
+{% include aligner.html images="/mysterypi-frida-pt1/rsrc.png" width=50 %}
 
 The game saves player data, highscores and options in `ProgramData\SpinTop
 Games\Mystery PI\PopCapv1005`. These files have the same format as the ones in
 `Resources.dll`, which means that they are in plaintext.
 
-{% include aligner.html images="/frida-mysterypi-pt1/playerfile.png" width=100 %}
+{% include aligner.html images="/mysterypi-frida-pt1/playerfile.png" width=100 %}
 
 [MSL]: https://sqlprotocoldoc.blob.core.windows.net/productionsqlarchives/MS-MSL/%5bMS-MSL%5d.pdf
 
@@ -75,7 +75,7 @@ the bread and butter of Frida, so I put it to use by hooking the `fopen`
 function called inside. I didn't want to hook every single `fopen` call so I
 hooked the instruction that calls it.
 
-{% include aligner.html images="/frida-mysterypi-pt1/fopen1.png" width=100 %}
+{% include aligner.html images="/mysterypi-frida-pt1/fopen1.png" width=100 %}
 
 Since the function call is not complete when the hook triggers, the `args`
 argument of `onEnter` callback would not provide a correct view of the function
@@ -93,7 +93,7 @@ Interceptor.attach(ptr("0x405BDC"), {
 })
 ```
 
-{% include aligner.html images="/frida-mysterypi-pt1/fopen2.gif" width=100 %}
+{% include aligner.html images="/mysterypi-frida-pt1/fopen2.gif" width=100 %}
 
 After this simple hook, I wanted to spice things up with a call to the game's
 own functions. For that I chose to work out how to toggle fullscreen.
@@ -110,7 +110,7 @@ SDL_Surface * SDL_SetVideoMode (int width, int height, int bpp, Uint32 flags)
 Looking for this call in the game's main function resulted in a couple functions
 that are called back-to-back. 
 
-{% include aligner.html images="/frida-mysterypi-pt1/fullscreen.png" width=60 %}
+{% include aligner.html images="/mysterypi-frida-pt1/fullscreen.png" width=60 %}
 
 Looking the values being passed, I determined the values required to enable
 fullscreen. I put these calls in the exports so that I can toggle fullscreen at
@@ -144,7 +144,7 @@ api = script.exports
 api.set_display(int(cmd[1]))
 ```
 
-{% include aligner.html images="/frida-mysterypi-pt1/fullscreen21.gif" width=100 %}
+{% include aligner.html images="/mysterypi-frida-pt1/fullscreen21.gif" width=100 %}
 
 ## live-patching the windowed mode
 
@@ -168,7 +168,7 @@ Interceptor.attach(ptr(0x0046B6E0), {
 });
 ```
 
-{% include aligner.html images="/frida-mysterypi-pt1/scale11.gif" width=100 %}
+{% include aligner.html images="/mysterypi-frida-pt1/scale11.gif" width=100 %}
 
 The output shows that the game is still running at 800x600, combined with the
 fact that coordinates are hardcoded in `.mse` files, it is obvious that the game
@@ -198,12 +198,12 @@ At this point I had a general conception of what I wanted to do, but no idea of
 how to do it in practise. From what I gathered in SDL tutorials, objects are
 "blitted" onto a "surface" in each loop iteration:
 
-{% include aligner.html images="/frida-mysterypi-pt1/sdl1.png" width=80 %}
+{% include aligner.html images="/mysterypi-frida-pt1/sdl1.png" width=80 %}
 
 Then the surface is "flipped", meaning that it is updated in the hardware to be
 shown on the display.
 
-{% include aligner.html images="/frida-mysterypi-pt1/sdl2.png" width=40 %}
+{% include aligner.html images="/mysterypi-frida-pt1/sdl2.png" width=40 %}
 
 My first approach was to hook the blit operations and scale each surface, and
 for simplicity I chose to scale everything by two and have a clean 1600x1200
@@ -372,7 +372,7 @@ Interceptor.attach(ptr(0x004665C0), {
 })
 ```
 
-{% include aligner.html images="/frida-mysterypi-pt1/darken.gif" width=100 %}
+{% include aligner.html images="/mysterypi-frida-pt1/darken.gif" width=100 %}
 
 As it is shown, the js implementation is painfully slow, though this is not a
 surprise. Next step was to try scaling the blitted image, however here I ran
@@ -470,7 +470,7 @@ SDL_SoftStretch(SDL_Surface *src, const SDL_Rect *srcrect,
 By calling this function right before `SDL_Flip`, I was able to achieve the
 scaling without a discernible performance penalty.
 
-{% include aligner.html images="/frida-mysterypi-pt1/scale2.gif" width=100 %}
+{% include aligner.html images="/mysterypi-frida-pt1/scale2.gif" width=100 %}
 
 Remember how I couldn't find a stretch function in SDL1.2 api? Well, to my
 surprise, I stumbled upon the function `SDL_SoftStretch` in SDL1.2 code:
@@ -668,7 +668,7 @@ typedef struct SDL_MouseButtonEvent {
 
 `SDL_WaitEvent` is called at the beginning of each loop:
 
-{% include aligner.html images="/frida-mysterypi-pt1/gamemain.png" width=70 %}
+{% include aligner.html images="/mysterypi-frida-pt1/gamemain.png" width=70 %}
 
 I hooked the function to modify the mouse input coordinates on-the-fly.
 
@@ -732,7 +732,7 @@ Interceptor.attach(ptr(0x00462160), {
 With the input patched, the goal was completely achieved and I was able to
 experience the game in glorious 1600x1200 resolution.
 
-{% include aligner.html images="/frida-mysterypi-pt1/final1.gif" width=100 %}
+{% include aligner.html images="/mysterypi-frida-pt1/final1.gif" width=100 %}
 
 And that concludes part one. The final polished code can be found on
 [github](https://github.com/erfur/mysterypi-frida). I hope to be back with the
