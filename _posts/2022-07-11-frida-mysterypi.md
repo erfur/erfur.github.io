@@ -53,7 +53,7 @@ These files are used as plaintext databases for the assets, menu and level
 layouts etc. Even all of the objects' coordinates on the screen can be found in
 these files.
 
-{% include aligner.html images="/frida-mysterypi/rsrc.png" width=100 %}
+{% include aligner.html images="/frida-mysterypi/rsrc.png" width=50 %}
 
 The game saves player data, highscores and options in `ProgramData\SpinTop
 Games\Mystery PI\PopCapv1005`. These files have the same format as the ones in
@@ -110,7 +110,7 @@ SDL_Surface * SDL_SetVideoMode (int width, int height, int bpp, Uint32 flags)
 Looking for this call in the game's main function resulted in a couple functions
 that are called back-to-back. 
 
-{% include aligner.html images="/frida-mysterypi/fullscreen.png" width=100 %}
+{% include aligner.html images="/frida-mysterypi/fullscreen.png" width=60 %}
 
 Looking the values being passed, I determined the values required to enable
 fullscreen. I put these calls in the exports so that I can toggle fullscreen at
@@ -198,12 +198,12 @@ At this point I had a general conception of what I wanted to do, but no idea of
 how to do it in practise. From what I gathered in SDL tutorials, objects are
 "blitted" onto a "surface" in each loop iteration:
 
-{% include aligner.html images="/frida-mysterypi/sdl1.png" width=100 %}
+{% include aligner.html images="/frida-mysterypi/sdl1.png" width=80 %}
 
 Then the surface is "flipped", meaning that it is updated in the hardware to be
 shown on the display.
 
-{% include aligner.html images="/frida-mysterypi/sdl2.png" width=100 %}
+{% include aligner.html images="/frida-mysterypi/sdl2.png" width=40 %}
 
 My first approach was to hook the blit operations and scale each surface, and
 for simplicity I chose to scale everything by two and have a clean 1600x1200
@@ -671,7 +671,7 @@ typedef struct SDL_MouseButtonEvent {
 
 `SDL_WaitEvent` is called at the beginning of each loop:
 
-{% include aligner.html images="/frida-mysterypi/gamemain.png" width=100 %}
+{% include aligner.html images="/frida-mysterypi/gamemain.png" width=70 %}
 
 I hooked the function to modify the mouse input coordinates on-the-fly.
 
