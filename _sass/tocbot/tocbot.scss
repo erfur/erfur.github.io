@@ -73,7 +73,7 @@ a.toc-link {
 }
 
 .is-active-link {
-    font-weight: 700
+    // font-weight: 700
 }
 
 .toc-link::before {
@@ -81,7 +81,7 @@ a.toc-link {
     content: ' ';
     display: inline-block;
     height: inherit;
-    left: 0;
+    left: -3px;
     margin-top: -1px;
     position: absolute;
     width: 3px;
