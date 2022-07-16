@@ -737,5 +737,5 @@ experience the game in glorious 1600x1200 resolution.
 
 {% include aligner.html images="/frida-mysterypi/final1.gif" width=100 %}
 
-That concludes the part one. The final script will make its way to a github
-repo. I hope to be back with the rest of this series soon.
+And that concludes part one. The final polished script should make its way to a
+github repo sometime. I hope to be back with the rest of this series soon.
