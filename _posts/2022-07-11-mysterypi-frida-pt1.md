@@ -734,5 +734,6 @@ experience the game in glorious 1600x1200 resolution.
 
 {% include aligner.html images="/frida-mysterypi-pt1/final1.gif" width=100 %}
 
-And that concludes part one. The final polished script should make its way to a
-github repo sometime. I hope to be back with the rest of this series soon.
+And that concludes part one. The final polished code can be found on
+[github](https://github.com/erfur/mysterypi-frida). I hope to be back with the
+rest of this series soon.
