@@ -1,14 +1,15 @@
 ---
 layout: post
-title: Adding new features to an old game using Frida, Part I
+title: Adding new features to an old game with Frida, Part I
 tags: re frida
 ---
 
-I've been interested in dynamic instrumentation for a long while now. This
-interest however, has not been turned into practical experience until very
-recently; when I finally decided to use Frida seriously on a project. I wanted
-to explore what Frida had to offer, while working on a project that I can
-showcase.
+Dynamic instrumentation has been a thing I kept distant for a long while. For
+some reason I tend to solve everything with static approach, which costs me so
+much time and effort to get simple things done. So I was looking to get my hands
+dirty and recently I finally decided to use Frida seriously on a project. I
+wanted to explore what Frida had to offer, while working on a reverse
+engineering project.
 
 The opportunity presented itself when I got my hands on a game that I played in
 my childhood: Mystery PI from SpinTop Games (and released by PopCap Games). It's
@@ -20,37 +21,37 @@ hood.
 
 {% include aligner.html images="/frida-mysterypi/mpi1.png" width=100 %}
 
-I already wanted to approach it as a project, so I set myself up with some
-goals. The game doesn't allow resizing in windowed mode and its fixed at a a
+I already decided to approach it as a project, so I set myself up with some
+goals. The game **doesn't allow resizing in windowed mode** and its fixed at a
 800x600 resolution, so I wanted to enable resizing in windowed mode as the first
 step. Of course the next step was to enable more "hints" :). Then finally, I
 wanted to implement some sort of multiplayer feature just for the kick of it.
 
 As of writing this, the first goal is achieved. In this first post of (what I
 think is going to be) three, I'll walk through the basics of the game's
-implementation and how I instrumented it with Frida to scale its window.
+implementation and how I instrumented it with Frida to scale its video output.
 
 ## initial analysis
 
-Initial analysis (quickly skimming through strings) shows that the game is built
-on SDL. Since the game is released in 2007, it is a strong possibility that its
-not SDL2 but an older version. Later analysis shows that it's SDL1.2 (patch
-level 9).
+Initial analysis (quickly skimming through strings) revealed that the game is
+built on SDL. Since the game is released in 2007, it is a strong possibility
+that its not SDL2 but an older version. Later analysis showed that it's SDL1.2
+(patch level 9).
 
 First thing to notice is that there are almost no dependencies. Most of the
 libraries are statically linked and stripped, making the initial phase a bit
 hard. I'm also guilty of not having used a plugin to automatically name library
 functions. Though it wasn't that bad of a nuisance to go through since most of
-SDL functions reference at least one error string, therefore really trivial to
-figure out which is which. I named them manually as I went along.
+SDL functions reference at least one error string, therefore it was really
+trivial to figure out which is which. I named them manually as I went along.
 
 The game comes with a library named `Resources.dll`. Opening it up with GHIDRA
-revealed pretty much every asset the game uses. Then I used `pefile` to dump all
-the resources. The dump includes images, sounds, fonts and even some xml files
-that I later learned is in [MSL] (Mapping Specification Language) format. These
-files are used as plaintext databases for the assets, menu and level layouts
-etc. Even all of the objects' coordinates on the screen can be found in these
-files.
+revealed pretty much every asset the game used. Then I used `pefile` to dump all
+the resources. The dump consists of images, sounds, fonts and even some xml
+files that I later learned is in [MSL] (Mapping Specification Language) format.
+These files are used as plaintext databases for the assets, menu and level
+layouts etc. Even all of the objects' coordinates on the screen can be found in
+these files.
 
 {% include aligner.html images="/frida-mysterypi/rsrc.png" width=100 %}
 
@@ -64,22 +65,21 @@ Games\Mystery PI\PopCapv1005`. These files have the same format as the ones in
 
 ## warming up
 
-I haven't used frida for native instrumentation before (except for the time I
-used gum-devkit to build a harness), so I wanted to hook some simple
-functionality to get used to the syntax and the capabilities.
+I haven't used frida for native instrumentation before, so I wanted to hook some
+simple functionality to get used to the api and the capabilities.
 
 ### hooking fopen
 
 I found the function the game uses to save player files. The Interceptor api is
-the bread and butter of Frida, so let's put it to use by hooking the `fopen`
-function called inside. Now, I don't want to hook every single `fopen` call so
-I hooked the instruction that calls it.
+the bread and butter of Frida, so I put it to use by hooking the `fopen`
+function called inside. I didn't want to hook every single `fopen` call so I
+hooked the instruction that calls it.
 
 {% include aligner.html images="/frida-mysterypi/fopen1.png" width=100 %}
 
-Since the function call is not completed yet, the `args` argument of `onEnter`
-callback would not provide a correct view of the function arguments. Instead I
-fetched the pointer straight from `eax` register:
+Since the function call is not complete when the hook triggers, the `args`
+argument of `onEnter` callback would not provide a correct view of the function
+arguments. Instead I fetched the pointer straight from `eax` register:
 
 ```js
 // hook fopen while saving a player
@@ -136,7 +136,8 @@ rpc.exports = {
 }
 ```
 
-The exports can be called from python side with a couple lines:
+The exports can be called from python side with a couple lines (notice that api
+names are converted into snake case automatically):
 
 ```python
 api = script.exports
@@ -149,15 +150,13 @@ api.set_display(int(cmd[1]))
 
 The `SDL_SetVideoMode` call is also used to set the resolution. It is possible
 to force the game into a custom resolution by hooking this function and playing
-with the parameters. I tested it with 1600x1200 resolution.
+with the parameters. I set the resolution to 1600x1200.
 
 ```js
 Interceptor.attach(ptr(0x0046B6E0), {
     onEnter: function (args) {
         args[0] = ptr(1600);
         args[1] = ptr(1200);
-        // add resizable flag
-        // args[3] = ptr(0x00000010);
         send({
             hook_name: "SDL_SetVideoMode",
             width: args[0],
@@ -172,9 +171,9 @@ Interceptor.attach(ptr(0x0046B6E0), {
 {% include aligner.html images="/frida-mysterypi/scale11.gif" width=100 %}
 
 The output shows that the game is still running at 800x600, combined with the
-fact that coordinates are hardcoded in `.mse` files, it is painfully obvious
-that the game wouldn't be cooperative in my quest. After this I focused solely
-on the video subsystem.
+fact that coordinates are hardcoded in `.mse` files, it is obvious that the game
+wouldn't be cooperative in my quest. After that I focused solely on the video
+subsystem.
 
 Since setting the resolution by itself is not enough, the video output should
 also match. My first thought was if the video subsystem supported scaling the
@@ -351,7 +350,7 @@ class SDLRect {
 }
 ```
 
-Using these two classes, I tested if its working with `darken` first.
+Using these two classes, I tested if it worked with `darken` first.
 
 ```js
 // SDL_BlitSurface
@@ -376,9 +375,9 @@ Interceptor.attach(ptr(0x004665C0), {
 {% include aligner.html images="/frida-mysterypi/darken.gif" width=100 %}
 
 As it is shown, the js implementation is painfully slow, though this is not a
-surprise. Next step is to try scaling the blitted image, however here I ran into
-a number of problems that took me longer than I expected to resolve. I'll just
-sum them up:
+surprise. Next step was to try scaling the blitted image, however here I ran
+into a number of problems that took me longer than I expected to resolve. I'll
+just sum them up:
 
 - The target surface isn't always the display surface, meaning that the canvas
   may not be big enough to hold the scaled surface.
@@ -413,11 +412,11 @@ though I couldn't get that to work (turns out I was using a nonexistent type for
 a typedef and compiler errors weren't really descriptive of the error), so I
 eventually took the second route.
 
-I cloned the git repository and found `SDL_BlitScaled` in SDL_stretch.c. This
+I cloned SDL git repository and found `SDL_BlitScaled` in SDL_stretch.c. This
 function is the same as `SDL_BlitSurface` except that it can handle different
 sized destination rectangles and it can scale the given source surface up or
-down onto the destination surface. However, calling this function directly is
-not the best approach here because:
+down onto the destination surface. However, calling this function directly
+wasn't the best approach here because:
 
 - The function is a top-level function and it has many external calls.
 - I'm only looking to scale a static surface, no clipping calculations required.
@@ -433,8 +432,8 @@ remaining dependencies:
 - Changed main structs like `SDL_Surface` and `SDL_Rect` with the ones from
   SDL1.2 as there are important type changes that affect the offsets.
 
-It took me some time to get together a build environment. I tried MinGW and
-cygwin but 32bit build environments gave me more of headaches than solutions.
+It took me some time to get together a build environment. I tried mingw and
+cygwin but 32bit build environments gave me more headaches than solutions.
 Finally I found everything packaged and ready-to-go in the llvm package
 [here](https://github.com/mstorsjo/llvm-mingw/releases). I automated the process
 with a simple script (yes I'm using bash in windows):
@@ -476,8 +475,8 @@ scaling without a discernible performance penalty.
 
 {% include aligner.html images="/frida-mysterypi/scale2.gif" width=100 %}
 
-In the meantime, to my surprise, I stumbled upon the function `SDL_SoftStretch`
-in SDL1.2 code:
+Remember how I couldn't find a stretch function in SDL1.2 api? Well, to my
+surprise, I stumbled upon the function `SDL_SoftStretch` in SDL1.2 code:
 
 ```cpp
 /** @internal Not in public API at the moment - do not use! */
@@ -485,11 +484,11 @@ extern DECLSPEC int SDLCALL SDL_SoftStretch(SDL_Surface *src, SDL_Rect *srcrect,
                                     SDL_Surface *dst, SDL_Rect *dstrect);
 ```
 
-I wasn't able to find this before because it's not referenced in anywhere else
-in the code and I wasn't looking for this name until I found it in SDL2 code.
-What's better is that this function made its way into the game's binary; I found
-its offset and added it with the name `stretchOld` as an alternative to the SDL2
-function.
+I think I wasn't able to find this before because it's not referenced in
+anywhere else in the code and I wasn't looking for this name until I found it in
+SDL2 code. What's better is that this function made its way into the game's
+binary; I found its offset and added it with the name `stretchOld` as an
+alternative to the SDL2 function.
 
 This is the the final state of the scale hooks:
 
@@ -567,7 +566,28 @@ I added a couple methods to use them in the `Surface` class:
     }
 ```
 
-Then hooked `SDL_Flip` to call the methods on the main surface:
+I also implemented a class to access the current video device:
+
+```js
+class VideoDevice {
+    constructor() {
+        this.currentVideo = ptr(0x004EFD40).readPointer();
+        this.wmName = this.currentVideo.add(81*4).readPointer().readAnsiString();
+        this.visibleSurface = new Surface(this.currentVideo.add(78*4).readPointer());
+        this.screenSurface = new Surface(this.currentVideo.add(76*4).readPointer());
+        this.iconifyPtr = this.currentVideo.add(65*4).readPointer();
+        this.iconifyFcn = new NativeFunction(this.iconifyPtr, "int", ["pointer"]);
+        this.fullscreenPtr = this.currentVideo.add(4*4).readPointer();
+        this.fullscreenFcn = new NativeFunction(this.fullscreenPtr, "int", ["pointer", "int"]);
+    }
+
+    iconify() {
+        this.iconifyFcn(this.currentVideo);
+    }
+}
+```
+
+Then hooked `SDL_Flip` to call the methods on the visible surface:
 
 ```js
 // SDL_Flip
@@ -584,10 +604,11 @@ Interceptor.attach(ptr(0x0046C810), {
 });
 ```
 
-The visual side of things is done, though we're not quite done yet. Currently
-the game logic works at 800x600 resolution and only the output is scaled to
-1600x1200. This means that the reported mouse input coordinates will be out of
-bounds and the game will not be able to handle it correctly.
+The visual side of things was done, though I wasn't quite done yet. At that
+point the game logic was working at 800x600 resolution and only *the output* was
+scaled to 1600x1200. This meant that the reported mouse input coordinates would
+be out of bounds and the game would not be able to handle them correctly,
+therefore I had to scale down the mouse coordinates.
 
 ## taking care of the mouse coordinates
 
@@ -715,3 +736,6 @@ With the input patched, the goal was completely achieved and I was able to
 experience the game in glorious 1600x1200 resolution.
 
 {% include aligner.html images="/frida-mysterypi/final1.gif" width=100 %}
+
+That concludes the part one. The final script will make its way to a github
+repo. I hope to be back with the rest of this series soon.
