@@ -445,17 +445,14 @@ set -e
 
 PATH="$PWD/compiler/bin:$PATH"
 
+WORKDIR="$PWD"
 SDLDIR="./SDL/src/video/"
-DYNAPIPATH="./SDL/src/dynapi/SDL_dynapi.h"
 
 [ -e "./SDL" ] || git clone https://github.com/libsdl-org/SDL
 
-cp SDL_stretch.c $SDLDIR/stretch.c
-
-sed -i "s/#define SDL_DYNAMIC_API 1/#define SDL_DYNAMIC_API 0/g" $DYNAPIPATH
-
 pushd $SDLDIR
-clang -m32 -Ofast -c -o stretch.o stretch.c -I ../../include
+git apply "$WORKDIR/sdl2.patch" || echo "error or already applied"
+clang -m32 -Ofast -c -o stretch.o SDL_stretch.c -I ../../include
 clang -m32 -Ofast -shared -v -o stretch.dll stretch.o
 popd
 
