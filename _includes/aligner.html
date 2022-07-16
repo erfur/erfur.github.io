@@ -7,9 +7,9 @@
 {% endif %}
 
 <div class="aligner">
-    <div class="row">
+    <div class="imgrow">
         {% for image in images %}
-        <div {% if column %} style="flex: {{ column }}%" {% else %} class="column" {% endif %}  >
+        <div {% if column %} style="flex: {{ column }}%" {% else %} class="imgcolumn" {% endif %}  >
             <img {% if images.size == 1 %}class="single"{% endif %}
                  src="{{ image | prepend: 'assets/img/' | relative_url }}"
                  alt="{{ image | prepend: '/' | split: '/' | last }}"
