@@ -487,7 +487,7 @@ SDL2 code. What's better is that this function made its way into the game's
 binary; I found its offset and added it with the name `stretchOld` as an
 alternative to the SDL2 function.
 
-This is the the final state of the scale hooks:
+This is the final state of the scale hooks:
 
 ```js
 class SoftStretch {
