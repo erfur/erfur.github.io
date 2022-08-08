@@ -66,6 +66,9 @@
       const analyticsName = '{{ site.google_analytics }}';
     </script>
 
+    <!-- video.js -->
+    <link href="https://vjs.zencdn.net/7.20.1/video-js.css" rel="stylesheet" />
+
     {% if site.cookie_consent %}
         <span id="cookie-notice"><span>{{ site.data.language.str_cookie_disclaimer | default: "We would like to use third party cookies and scripts to improve the functionality of this website." }}
           </span><a id="cookie-notice-accept" class="button">{{ site.data.language.str_cookie_approve | default: "Approve" }}</a>
