@@ -7,7 +7,10 @@ tags: pwn android
 I had an old Android tablet dusting away. I wanted to repurpose it but with a
 little twist: I wanted to root it with my own code, instead of using a root app
 like KingRoot or Framaroot. In the end I got root with a known exploit (it's
-even included in Framaroot). Here's my writeup (and a little retrospective).
+even included in Framaroot). The final exploit is on [github]. Here's my writeup
+(and a little retrospective).
+
+[github]: https://github.com/erfur/gm-etab4-root
 
 ## the past
 
