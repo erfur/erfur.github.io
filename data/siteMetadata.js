@@ -8,6 +8,7 @@ const siteMetadata = {
   theme: 'system', // system, dark or light
   siteUrl: 'https://erfur.github.io',
   siteRepo: 'https://github.com/erfur/erfur.github.io',
+  repoBranch: 'bits-and-pieces',
   siteLogo: '/static/images/logo.png',
   socialBanner: '/static/images/twitter-card.png',
   // mastodon: 'https://mastodon.social/@mastodonuser',
