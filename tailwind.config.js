@@ -29,8 +29,10 @@ module.exports = {
         13: '3.25rem',
         14: '3.5rem',
       },
-      fontFamily: {
-        sans: ['var(--font-space-grotesk)', ...fontFamily.sans],
+      fontSize: {
+        sm: '1rem',
+        base: '1.125rem',
+        lg: '1.25rem',
       },
       colors: {
         primary: colors.pink,
