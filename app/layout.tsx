@@ -2,6 +2,8 @@ import 'css/tailwind.css'
 import 'pliny/search/algolia.css'
 
 import { Space_Grotesk } from 'next/font/google'
+import Fixedsys_Excelsior from 'next/font/local'
+import Hack_NF from 'next/font/local'
 import { Analytics, AnalyticsConfig } from 'pliny/analytics'
 import { SearchProvider, SearchConfig } from 'pliny/search'
 import Header from '@/components/Header'
@@ -15,6 +17,17 @@ const space_grotesk = Space_Grotesk({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-space-grotesk',
+})
+
+const fixedsys_excelsior = Fixedsys_Excelsior({
+  src: './fonts/Fixedsys/FSEX302.ttf',
+  weight: 'normal',
+  variable: '--font-fixedsys-excelsior',
+})
+
+const hack_nf = Hack_NF({
+  src: './fonts/Hack/Hack Regular Nerd Font Complete.ttf',
+  variable: '--font-hack-nf',
 })
 
 export const metadata: Metadata = {
@@ -61,7 +74,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang={siteMetadata.language}
-      className={`${space_grotesk.variable} scroll-smooth`}
+      className={`${fixedsys_excelsior.variable} ${hack_nf.variable} scroll-smooth`}
       suppressHydrationWarning
     >
       <link rel="apple-touch-icon" sizes="76x76" href="/static/favicons/apple-touch-icon.png" />

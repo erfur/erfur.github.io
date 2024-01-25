@@ -33,3 +33,8 @@ input:-webkit-autofill:focus {
 .katex-display {
   overflow: auto hidden;
 }
+
+h2,h3,h4,h5,h6 {
+  @apply font-sans;
+}
+

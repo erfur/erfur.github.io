@@ -14,7 +14,15 @@ module.exports = {
   ],
   darkMode: 'class',
   theme: {
+    fontFamily: {
+      hack: ['var(--font-hack-nf)', ...fontFamily.sans],
+    },
     extend: {
+      fontFamily: {
+        sans: ['var(--font-fixedsys-excelsior)', ...fontFamily.sans],
+        // serif: ['var(--font-hack-nf)', ...fontFamily.serif],
+        mono: ['var(--font-hack-nf)', ...fontFamily.mono],
+      },
       lineHeight: {
         11: '2.75rem',
         12: '3rem',
