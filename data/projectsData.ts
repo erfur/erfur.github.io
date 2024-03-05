@@ -7,9 +7,14 @@ interface Project {
 
 const projectsData: Project[] = [
   {
-    title: 'lasso',
+    title: 'linjector-rs',
     description: `Code injection on Android without ptrace`,
-    //imgSrc: '/static/images/google.png',
+    href: 'https://www.github.com/erfur/linjector-rs',
+  },
+  {
+    title: 'lasso',
+    description: `PoC app for linjector-rs`,
+    imgSrc: '/static/images/projects/lasso-banner.jpg',
     href: 'https://www.github.com/erfur/lasso',
   },
 ]
