@@ -2,8 +2,10 @@ import 'css/tailwind.css'
 import 'pliny/search/algolia.css'
 
 import { Space_Grotesk } from 'next/font/google'
-import Fixedsys_Excelsior from 'next/font/local'
-import Hack_NF from 'next/font/local'
+import IbmPlexMono from 'next/font/local'
+// import Hack_NF from 'next/font/local'
+import JetBrainsMono from 'next/font/local'
+import PT_Sans from 'next/font/local'
 import { Analytics, AnalyticsConfig } from 'pliny/analytics'
 import { SearchProvider, SearchConfig } from 'pliny/search'
 import Header from '@/components/Header'
@@ -13,21 +15,21 @@ import siteMetadata from '@/data/siteMetadata'
 import { ThemeProviders } from './theme-providers'
 import { Metadata } from 'next'
 
-const space_grotesk = Space_Grotesk({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-space-grotesk',
-})
-
-const fixedsys_excelsior = Fixedsys_Excelsior({
-  src: './fonts/Fixedsys/FSEX302.ttf',
+const ibm_plex_mono = IbmPlexMono({
+  src: './fonts/IBMPlexMono-Bold.ttf',
   weight: 'normal',
-  variable: '--font-fixedsys-excelsior',
+  variable: '--font-ibm-plex-mono',
 })
 
-const hack_nf = Hack_NF({
-  src: './fonts/Hack/Hack Regular Nerd Font Complete.ttf',
-  variable: '--font-hack-nf',
+const jetbrains_mono = JetBrainsMono({
+  src: './fonts/JetBrainsMono.ttf',
+  weight: 'normal',
+  variable: '--font-jetbrains-mono',
+})
+
+const pt_sans = PT_Sans({
+  src: './fonts/PTSans-Regular.ttf',
+  variable: '--font-pt-sans',
 })
 
 export const metadata: Metadata = {
@@ -74,7 +76,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang={siteMetadata.language}
-      className={`${fixedsys_excelsior.variable} ${hack_nf.variable} scroll-smooth`}
+      className={`${ibm_plex_mono.variable} ${pt_sans.variable} ${jetbrains_mono.variable} scroll-smooth`}
       suppressHydrationWarning
     >
       <link rel="apple-touch-icon" sizes="76x76" href="/static/favicons/apple-touch-icon.png" />
@@ -90,7 +92,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProviders>
           <Analytics analyticsConfig={siteMetadata.analytics as AnalyticsConfig} />
           <SectionContainer>
-            <div className="flex h-screen flex-col justify-between font-sans">
+            <div className="flex h-screen flex-col justify-between font-ui">
               <SearchProvider searchConfig={siteMetadata.search as SearchConfig}>
                 <Header />
                 <main className="mb-auto">{children}</main>
