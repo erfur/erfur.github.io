@@ -15,52 +15,58 @@ module.exports = {
   darkMode: 'class',
   theme: {
     extend: {
-      lineHeight: {
-        11: '2.75rem',
-        12: '3rem',
-        13: '3.25rem',
-        14: '3.5rem',
-      },
       fontFamily: {
-        sans: ['var(--font-space-grotesk)', ...fontFamily.sans],
+        ui: ['var(--font-ibm-plex-mono)', ...fontFamily.mono],
+        sans: ['var(--font-pt-sans)', ...fontFamily.sans],
+        mono: ['var(--font-jetbrains-mono)', ...fontFamily.mono],
       },
       colors: {
-        primary: colors.pink,
+        primary: colors.indigo,
         gray: colors.gray,
+      },
+      fontSize: {
+        base: '1.05rem',
+        sm: '0.9rem',
       },
       typography: ({ theme }) => ({
         DEFAULT: {
           css: {
+            p: {
+              fontSize: '1.25rem',
+            },
+            'ul, ol': {
+              fontSize: '1.2rem',
+            },
             a: {
-              color: theme('colors.primary.500'),
+              color: theme('colors.indigo.500'),
               '&:hover': {
-                color: `${theme('colors.primary.600')}`,
+                color: `${theme('colors.indigo.900')}`,
               },
-              code: { color: theme('colors.primary.400') },
+              fontSize: '1.25rem',
             },
-            'h1,h2': {
-              fontWeight: '700',
+            'h1,h2,h3,h4,h5,h6': {
+              fontFamily: 'var(--font-fixedsys-excelsior)',
               letterSpacing: theme('letterSpacing.tight'),
-            },
-            h3: {
-              fontWeight: '600',
             },
             code: {
               color: theme('colors.indigo.500'),
+              fontSize: '0.95rem',
             },
           },
         },
         invert: {
           css: {
             a: {
-              color: theme('colors.primary.500'),
+              color: theme('colors.indigo.400'),
               '&:hover': {
-                color: `${theme('colors.primary.400')}`,
+                color: `${theme('colors.indigo.200')}`,
               },
-              code: { color: theme('colors.primary.400') },
+            },
+            code: {
+              color: theme('colors.indigo.400'),
             },
             'h1,h2,h3,h4,h5,h6': {
-              color: theme('colors.gray.100'),
+              color: theme('colors.gray.300'),
             },
           },
         },

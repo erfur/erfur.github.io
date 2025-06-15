@@ -1,0 +1,306 @@
+---
+title: Code injection on Android without ptrace
+tags: ['dev', 'android']
+date: '2024-03-05'
+---
+
+## Table of Contents
+
+<TOCInline toc={props.toc} exclude="Table of Contents" toHeading={2} />
+
+In the last few years, I've been participating in Hacktoberfest. It's a fun way to create or contribute to open source projects and every year I try to come up with a project that will take approximately a month to complete. This time I wanted to fulfill a long-standing promise to a friend and develop a project in rust.
+
+I came up with the idea to port [linux_injector](https://github.com/namazso/linux_injector). The project has a simple premise: injecting code into a process without using ptrace. To achieve that, it uses `/proc/mem` to write code directly into memory, allowing running threads to pick up the code and execute it. Of course it's not that simple, there is a bit of nuance to achieve reliable execution. The project is developed for x86_64 linux systems and I wanted to spice things up a bit by targeting arm64 and Android.
+
+The code can be found here: [erfur\/linjector\-rs\: Code injection on Android without ptrace](https://github.com/erfur/linjector-rs "erfur/linjector-rs: Code injection on Android without ptrace")
+
+## How it works
+
+<div class='flex items-center justify-center'>
+    <img src="/static/images/linjector-rs/injection-1.drawio.svg" />
+</div>
+
+The injection process consists of a few steps. First step is to choose a function to hijack. As implemented in the original project, `malloc` is the one of the most common targets. The address of malloc is found by reading `/proc/maps`, finding the base address of libc and calculating the current virtual address of malloc by adding its offset to the base address.
+
+<div class='flex items-center justify-center'>
+    <figure>
+        ![first-stage-shellcode](/static/images/linjector-rs/injector-logic.drawio.svg)
+        <figcaption class='flex items-center justify-center'>Injector logic</figcaption>
+    </figure>
+</div>
+
+After finding its address, the target function is overwritten with the first-stage shellcode. The shellcode is responsible for creating a new memory region, synchronizing threads and finally executing the second-stage shellcode.
+
+<div class='flex items-center justify-center'>
+    <figure>
+        ![first-stage-shellcode](/static/images/linjector-rs/first-stage-shellcode.drawio.svg)
+        <figcaption class='flex items-center justify-center'>First stage shellcode</figcaption>
+    </figure>
+</div>
+
+Since malloc can be executed by multiple threads, the shellcode must make use of atomic operations to ensure that only one thread will execute the rest of the code. In addition to that, once a new memory map is allocated, the shellcode must notify the injecting process about the address. For these purposes, a variable from the target process is hijacked to be used both as a synchronization primitive and as a communication channel. The original implementation uses `timezone` from libc.
+
+After the new map is allocated, the shellcode updates the control variable, writes a self-jump instruction to the new map and jumps to it, waiting for the second-stage shellcode to be written by the injector.
+
+Once the control variable is updated with the address of the new map, the injector first writes a self-jump instruction to the hijacked function in order to limit the execution area of the blocked threads. Then, it writes the original bytes of the hijacked function and variable and this lets the threads continue their original execution. Finally, the second-stage shellcode is written to the new map to be executed by the hijacked thread.
+
+<div class='flex items-center justify-center'>
+    <figure>
+        ![second-stage-shellcode](/static/images/linjector-rs/second-stage-shellcode.drawio.svg)
+        <figcaption class='flex items-center justify-center'>Second stage shellcode</figcaption>
+    </figure>
+</div>
+
+The second-stage shellcode can be one of three types: a shellcode loader, a `raw-dlopen` shellcode that uses dlopen to load a shared library from the filesystem, or a `memfd-dlopen` shellcode that calls dlopen on a memfd file with the contents supplied by the user.
+
+For my project I focused on `raw-dlopen` as it allows the user to inject a shared library, allowing more complex code to be injected.
+
+## Developing in Rust
+
+Aside from the obvious advantages of Rust, I want to focus on the individual crates I've used to develop the project.
+
+The injection depends on hijacking a function and a variable in the target process. To find the addresses, the injector needs to parse the elf file of the target process. Two of the crates I tested are:
+
+- [m4b/goblin: An impish, cross-platform binary parsing crate, written in Rust](https://github.com/m4b/goblin)
+- [cole14/rust-elf: Library for parsing ELF files for Rust](https://github.com/cole14/rust-elf)
+
+Originally I wanted to parse the mapped libraries, but I wasn't able to achieve that with either of the crates. Eventually I gave up and used goblin to parse the libraries by finding their paths in `/proc/maps` then parsing their files. To fetch information from `/proc/maps`, I used this crate:
+
+- [rbspy\/proc\-maps\: Read virtual memory maps from another process](https://github.com/rbspy/proc-maps)
+
+For logging, I used the `log` crate and the `android_logger` crate to output logs to logcat. Then at one point I also added the `simple_logger` crate to have an option to use stdout.
+
+The most important part of the project is the shellcode. Fortunately I found this wonderful crate to generate shellcode:
+
+- [CensoredUsername\/dynasm\-rs\: A dynasm\-like tool for rust\.](https://github.com/CensoredUsername/dynasm-rs "CensoredUsername/dynasm-rs: A dynasm-like tool for rust.")
+
+The crate has x86, x86_64 and aarch64 support. The dynamic generation capabilities of it allowed me to write shellcodes in a readable way and emit them at runtime. The documentation and the examples were also very helpful.
+
+Finally, to compile the code for Android, I used the cargo extension:
+
+- [bbqsrc\/cargo\-ndk\: Compile Rust projects against the Android NDK without hassle](https://github.com/bbqsrc/cargo-ndk "bbqsrc/cargo-ndk: Compile Rust projects against the Android NDK without hassle") 
+
+All in all, with the crates I used, I was able to develop the project without any major issues.
+
+## Porting shellcodes to aarch64
+
+While porting the shellcodes was straightforward for the most part, there were a couple of things that I had to figure out.
+
+With x86 being a CISC architecture, it is possible to synchronize the threads using a single instruction like `lock btsq`. However, aarch64 does not provide such functionality in a single instruction. Instead, I had to use a combination of `ldxrb` and `stxrb` to achieve the same result ([ARMv8\-A synchronization primitives](https://developer.arm.com/documentation/100934/0100/Exclusive-access-instructions "ARMv8-A synchronization primitives")). The threads are synchronized by reading and setting the lowest bit of the control variable.
+
+```
+; .arch aarch64
+; ->start:
+; ldr x6, ->var_addr
+; ldxrb w1, [x6]     // read the bit (exclusive)
+; cbnz w1, ->start   // if the bit is set already, jump to start
+
+; mov w2, 0x1        // set the bit
+; stxrb w1, w2, [x6] // write the bit back (exclusive)
+; cbnz w1, ->start   // if the write failed, jump to start to try again
+```
+
+The second issue was with the cache. In arm architecture, there are seperate caches for data and instructions. When writing code to memory, it is important to flush the instruction cache to ensure that the new code is fetched and executed. Since the first-stage shellcode updates the new map with a self-jump instruction, I added an instruction cache flush after the modification.
+
+```
+; ldr w1, ->self_jmp
+; str w1, [x0]          // write self loop instruction to the new map
+
+; dsb ish               // memory barrier
+; isb                   // instruction synchronization barrier
+
+; .align 4
+; ->self_jmp:
+; b ->self_jmp
+```
+
+The first-stage shellcode written with dynasm-rs looks like this:
+
+```rust
+pub fn main_shellcode(var_addr: usize, alloc_len: usize) -> Result<Vec<u8>, InjectionError> {
+    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+
+    dynasm!(ops
+        ; .arch aarch64
+
+        ; ->start:
+        // check if the bit is set
+        ; ldr x6, ->var_addr
+        ; ldxrb w1, [x6]
+        ; cbnz w1, ->start
+
+        // set the bit
+        ; mov w2, 0x1
+        ; stxrb w1, w2, [x6]
+        ; cbnz w1, ->start
+
+        // save the registers
+        ; sub sp, sp, #0x100
+        ; stp x0, x1, [sp, #0x0]
+        ; stp x2, x3, [sp, #0x10]
+        ; stp x4, x5, [sp, #0x20]
+        ; stp x6, x7, [sp, #0x30]
+        ; stp x8, x9, [sp, #0x40]
+        ; stp x10, x11, [sp, #0x50]
+        ; stp x12, x13, [sp, #0x60]
+        ; stp x14, x15, [sp, #0x70]
+        ; stp x16, x17, [sp, #0x80]
+        ; stp x18, x19, [sp, #0x90]
+        ; stp x20, x21, [sp, #0xa0]
+        ; stp x22, x23, [sp, #0xb0]
+        ; stp x24, x25, [sp, #0xc0]
+        ; stp x26, x27, [sp, #0xd0]
+        ; stp x28, x29, [sp, #0xe0]
+        ; stp x30, xzr, [sp, #0xf0]
+
+        // mmap call
+        ; mov x0, #0x0                  // addr       (NULL)
+        ; mov x1, alloc_len as _        // len        (0x1000)
+        ; mov x2, #0x7                  // prot       (RWX)
+        ; mov x3, #0x22                 // flags      (MAP_PRIVATE | MAP_ANONYMOUS)
+        ; mvn x4, xzr                   // fd         (-1)
+        ; mov x5, #0x0                  // offset     (ignored)
+        ; mov x8, #0xde                 // syscall no (mmap)
+        ; svc #0x0                      // syscall
+
+        // write self loop instruction to the new map
+        ; ldr w1, ->self_jmp
+        ; str w1, [x0]
+
+        // flush cache
+        ; dsb ish
+        ; isb
+
+        // save mmap addr (with bit set to keep the other threads spinning)
+        ; orr x0, x0, #0x1
+        ; str x0, [x6, #0x0]
+
+        // turn off the bit
+        ; eor x0, x0, #0x1
+
+        // jump to the new map
+        ; br x0
+
+        ; .align 4
+        ; ->minus_one:
+        ; .qword -1 as _
+
+        ; .align 4
+        ; ->var_addr:
+        ; .qword var_addr as _
+
+        ; .align 4
+        ; ->alloc_len:
+        ; .qword alloc_len as _
+
+        ; .align 4
+        ; ->self_jmp:
+        ; b ->self_jmp
+    );
+
+    match ops.finalize() {
+        Ok(shellcode) => Ok(shellcode.to_vec()),
+        Err(_) => Err(InjectionError::ShellcodeError),
+    }
+}
+```
+
+The second-stage shellcode for `raw-dlopen` was easy to implement in aarch64:
+
+```rust
+pub fn raw_dlopen_shellcode(
+    dlopen_addr: usize,
+    dlopen_path: String,
+    jmp_addr: usize,
+) -> Result<Vec<u8>, InjectionError> {
+    let mut ops = dynasmrt::aarch64::Assembler::new().unwrap();
+
+    // dlopen flags RTLD_NOW
+    let dlopen_flags: usize = 0x2;
+    let dlopen_path_bytes: &[u8] = dlopen_path.as_bytes();
+
+    dynasm!(ops
+        ; .arch aarch64
+
+        // load args
+        ; adr x0, ->dlopen_path
+        ; ldr x1, ->dlopen_flags
+
+        // call dlopen
+        ; ldr x8, ->dlopen
+        ; blr x8
+
+        // if dlopen fails, crash
+        ; cbz x0, ->crash
+
+        // load the original args
+        ; ldp x0, x1, [sp, #0x0]
+        ; ldp x2, x3, [sp, #0x10]
+        ; ldp x4, x5, [sp, #0x20]
+        ; ldp x6, x7, [sp, #0x30]
+        ; ldp x8, x9, [sp, #0x40]
+        ; ldp x10, x11, [sp, #0x50]
+        ; ldp x12, x13, [sp, #0x60]
+        ; ldp x14, x15, [sp, #0x70]
+        ; ldp x16, x17, [sp, #0x80]
+        ; ldp x18, x19, [sp, #0x90]
+        ; ldp x20, x21, [sp, #0xa0]
+        ; ldp x22, x23, [sp, #0xb0]
+        ; ldp x24, x25, [sp, #0xc0]
+        ; ldp x26, x27, [sp, #0xd0]
+        ; ldp x28, x29, [sp, #0xe0]
+        ; ldp x30, xzr, [sp, #0xf0]
+        ; add sp, sp, #0x100
+
+        // jump to the original function
+        ; ldr x8, ->oldfun
+        ; br x8
+
+        ; ->crash:
+        ; brk #0x1
+
+        ; .align 4
+        ; ->dlopen_path:
+        ; .bytes dlopen_path_bytes
+        ; .bytes [0x0]
+
+        ; .align 4
+        ; ->dlopen_flags:
+        ; .qword dlopen_flags as _
+
+        ; .align 4
+        ; ->dlopen:
+        ; .qword dlopen_addr as _
+
+        ; .align 4
+        ; ->oldfun:
+        ; .qword jmp_addr as _
+    );
+
+    match ops.finalize() {
+        Ok(shellcode) => Ok(shellcode.to_vec()),
+        Err(_) => Err(InjectionError::ShellcodeError),
+    }
+}
+```
+
+## Injecting libraries on Android
+
+There isn't really anything different about code injection on Android than on Linux, except for one small detail. There is a limitation introduced by SELinux for loading shared libraries on Android. In recent versions, SELinux doesn't allow dlopen to load external shared libraries. To bypass that, I had to use `chcon` to change the context of the shared library to `u:object_r:apk_data_file:s0`. The injectable library is also copied into `/data/local/tmp` to ensure that the target application process can access it. Once the file is copied and the context is updated, it can be loaded without any issues.
+
+## Demo
+
+My end goal for the project was to be able to inject Frida gadget into processes. Here's a demo:
+
+<video controls>
+    <source
+        src="/static/images/linjector-rs/demo.mp4"
+        type="video/mp4"
+    />
+</video>
+
+## Conclusion
+
+It was a great learning experience to develop this project. Writing and debugging Rust code and learning about the peculiarities of aarch64 and Android were very interesting. Even though the `/proc/mem` approach is not as reliable as ptrace, it might come in handy when dealing with anti-debugging techniques.
+
+I'm planning to continue working on the project and add more features. I'm also open to any suggestions or contributions. If you have any ideas or want to contribute, feel free to open an issue or a pull request on the project's repository.
