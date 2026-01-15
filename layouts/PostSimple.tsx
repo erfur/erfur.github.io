@@ -24,10 +24,7 @@ export default function PostLayout({ content, next, prev, children }: LayoutProp
       <article className="mx-auto max-w-2xl">
         {/* Header */}
         <header className="pb-8 pt-4">
-          <time
-            dateTime={date}
-            className="text-sm text-gray-500 dark:text-gray-400"
-          >
+          <time dateTime={date} className="text-sm text-gray-500 dark:text-gray-400">
             {formatDate(date, siteMetadata.locale)}
           </time>
           <h1 className="mt-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl">
@@ -36,9 +33,7 @@ export default function PostLayout({ content, next, prev, children }: LayoutProp
         </header>
 
         {/* Content */}
-        <div className="prose prose-gray max-w-none dark:prose-invert">
-          {children}
-        </div>
+        <div className="prose prose-gray max-w-none dark:prose-invert">{children}</div>
 
         {/* Footer */}
         <footer className="mt-12 border-t border-gray-200 pt-8 dark:border-gray-800">
@@ -51,7 +46,7 @@ export default function PostLayout({ content, next, prev, children }: LayoutProp
                   className="group rounded-lg border border-gray-200 p-4 transition-colors hover:border-gray-300 hover:bg-gray-50 dark:border-gray-700 dark:hover:border-gray-600 dark:hover:bg-gray-800/50"
                 >
                   <span className="text-xs text-gray-500 dark:text-gray-400">Previous</span>
-                  <p className="mt-1 font-medium text-gray-900 group-hover:text-primary-600 dark:text-gray-100 dark:group-hover:text-primary-400 transition-colors">
+                  <p className="mt-1 font-medium text-gray-900 transition-colors group-hover:text-primary-600 dark:text-gray-100 dark:group-hover:text-primary-400">
                     {prev.title}
                   </p>
                 </Link>
@@ -62,7 +57,7 @@ export default function PostLayout({ content, next, prev, children }: LayoutProp
                   className="group rounded-lg border border-gray-200 p-4 text-right transition-colors hover:border-gray-300 hover:bg-gray-50 dark:border-gray-700 dark:hover:border-gray-600 dark:hover:bg-gray-800/50 sm:col-start-2"
                 >
                   <span className="text-xs text-gray-500 dark:text-gray-400">Next</span>
-                  <p className="mt-1 font-medium text-gray-900 group-hover:text-primary-600 dark:text-gray-100 dark:group-hover:text-primary-400 transition-colors">
+                  <p className="mt-1 font-medium text-gray-900 transition-colors group-hover:text-primary-600 dark:text-gray-100 dark:group-hover:text-primary-400">
                     {next.title}
                   </p>
                 </Link>

@@ -124,12 +124,12 @@ export default function ListLayoutWithTags({
             <li key={path}>
               <Link
                 href={`/${path}`}
-                className="group flex items-baseline gap-4 rounded-lg px-2 py-3 -mx-2 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800/50"
+                className="group -mx-2 flex items-baseline gap-4 rounded-lg px-2 py-3 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800/50"
               >
-                <span className="font-medium text-gray-900 group-hover:text-primary-600 dark:text-gray-100 dark:group-hover:text-primary-400 transition-colors">
+                <span className="font-medium text-gray-900 transition-colors group-hover:text-primary-600 dark:text-gray-100 dark:group-hover:text-primary-400">
                   {title}
                 </span>
-                <span className="hidden sm:flex gap-1.5 shrink-0">
+                <span className="hidden shrink-0 gap-1.5 sm:flex">
                   {tags?.slice(0, 2).map((tag) => (
                     <span key={tag} className="text-xs text-gray-400 dark:text-gray-500">
                       #{tag}

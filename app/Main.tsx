@@ -18,26 +18,21 @@ export default function Home({ posts }) {
 
       {/* Posts list */}
       <ul className="space-y-1">
-        {!posts.length && (
-          <p className="text-gray-500 dark:text-gray-400">No posts found.</p>
-        )}
+        {!posts.length && <p className="text-gray-500 dark:text-gray-400">No posts found.</p>}
         {posts.slice(0, MAX_DISPLAY).map((post) => {
           const { slug, date, title, tags } = post
           return (
             <li key={slug}>
               <Link
                 href={`/blog/${slug}`}
-                className="group flex items-baseline gap-4 rounded-lg px-2 py-3 -mx-2 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800/50"
+                className="group -mx-2 flex items-baseline gap-4 rounded-lg px-2 py-3 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800/50"
               >
-                <span className="font-medium text-gray-900 group-hover:text-primary-600 dark:text-gray-100 dark:group-hover:text-primary-400 transition-colors">
+                <span className="font-medium text-gray-900 transition-colors group-hover:text-primary-600 dark:text-gray-100 dark:group-hover:text-primary-400">
                   {title}
                 </span>
-                <span className="hidden sm:flex gap-1.5 shrink-0">
+                <span className="hidden shrink-0 gap-1.5 sm:flex">
                   {tags.slice(0, 2).map((tag) => (
-                    <span
-                      key={tag}
-                      className="text-xs text-gray-400 dark:text-gray-500"
-                    >
+                    <span key={tag} className="text-xs text-gray-400 dark:text-gray-500">
                       #{tag}
                     </span>
                   ))}
@@ -56,10 +51,10 @@ export default function Home({ posts }) {
 
       {/* All posts link */}
       {posts.length > MAX_DISPLAY && (
-        <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-800">
+        <div className="mt-8 border-t border-gray-200 pt-6 dark:border-gray-800">
           <Link
             href="/blog"
-            className="text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
+            className="text-sm font-medium text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
           >
             View all posts &rarr;
           </Link>
@@ -68,7 +63,7 @@ export default function Home({ posts }) {
 
       {/* Newsletter */}
       {siteMetadata.newsletter?.provider && (
-        <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800">
+        <div className="mt-12 border-t border-gray-200 pt-8 dark:border-gray-800">
           <NewsletterForm />
         </div>
       )}

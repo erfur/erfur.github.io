@@ -15,12 +15,7 @@ export default function Projects() {
 
       <div className="grid gap-4">
         {projectsData.map((d) => (
-          <Card
-            key={d.title}
-            title={d.title}
-            description={d.description}
-            href={d.href}
-          />
+          <Card key={d.title} title={d.title} description={d.description} href={d.href} />
         ))}
       </div>
     </div>

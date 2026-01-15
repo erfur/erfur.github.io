@@ -12,12 +12,10 @@ const Header = () => {
       <Link
         href="/"
         aria-label={siteMetadata.headerTitle}
-        className="flex items-center gap-2 text-gray-900 hover:text-primary-600 dark:text-gray-100 dark:hover:text-primary-400 transition-colors"
+        className="flex items-center gap-2 text-gray-900 transition-colors hover:text-primary-600 dark:text-gray-100 dark:hover:text-primary-400"
       >
         <Logo className="h-8 w-8" />
-        <span className="text-lg font-semibold tracking-tight">
-          {siteMetadata.headerTitle}
-        </span>
+        <span className="text-lg font-semibold tracking-tight">{siteMetadata.headerTitle}</span>
       </Link>
       <nav className="flex items-center gap-1 sm:gap-2">
         {headerNavLinks
@@ -31,7 +29,7 @@ const Header = () => {
               {link.title}
             </Link>
           ))}
-        <div className="flex items-center gap-1 ml-2 pl-2 border-l border-gray-200 dark:border-gray-700">
+        <div className="ml-2 flex items-center gap-1 border-l border-gray-200 pl-2 dark:border-gray-700">
           <SearchButton />
           <ThemeSwitch />
         </div>

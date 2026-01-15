@@ -32,12 +32,8 @@ export default function AuthorLayout({ children, content }: Props) {
             />
           )}
           <h2 className="mt-4 text-lg font-semibold text-gray-900 dark:text-gray-100">{name}</h2>
-          {occupation && (
-            <p className="text-sm text-gray-500 dark:text-gray-400">{occupation}</p>
-          )}
-          {company && (
-            <p className="text-sm text-gray-500 dark:text-gray-400">{company}</p>
-          )}
+          {occupation && <p className="text-sm text-gray-500 dark:text-gray-400">{occupation}</p>}
+          {company && <p className="text-sm text-gray-500 dark:text-gray-400">{company}</p>}
           <div className="mt-4 flex gap-3">
             <SocialIcon kind="github" href={github} size={5} />
             <SocialIcon kind="twitter" href={twitter} size={5} />
@@ -47,9 +43,7 @@ export default function AuthorLayout({ children, content }: Props) {
         </div>
 
         {/* Bio */}
-        <div className="prose prose-gray max-w-none flex-1 dark:prose-invert">
-          {children}
-        </div>
+        <div className="prose prose-gray max-w-none flex-1 dark:prose-invert">{children}</div>
       </div>
     </div>
   )

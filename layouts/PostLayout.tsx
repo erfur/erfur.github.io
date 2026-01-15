@@ -45,7 +45,7 @@ export default function PostLayout({ content, authorDetails, next, prev, childre
                     <Link
                       key={tag}
                       href={`/tags/${tag}`}
-                      className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                      className="transition-colors hover:text-primary-600 dark:hover:text-primary-400"
                     >
                       #{tag}
                     </Link>
@@ -60,22 +60,20 @@ export default function PostLayout({ content, authorDetails, next, prev, childre
         </header>
 
         {/* Content */}
-        <div className="prose prose-gray max-w-none dark:prose-invert">
-          {children}
-        </div>
+        <div className="prose prose-gray max-w-none dark:prose-invert">{children}</div>
 
         {/* Footer */}
         <footer className="mt-12 border-t border-gray-200 pt-8 dark:border-gray-800">
           <div className="flex items-center justify-between text-sm">
             <Link
               href={editUrl(filePath)}
-              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+              className="text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
             >
               View on GitHub
             </Link>
             <Link
               href={`/${basePath}`}
-              className="font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
+              className="font-medium text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
             >
               &larr; All posts
             </Link>
@@ -90,7 +88,7 @@ export default function PostLayout({ content, authorDetails, next, prev, childre
                   className="group rounded-lg border border-gray-200 p-4 transition-colors hover:border-gray-300 hover:bg-gray-50 dark:border-gray-700 dark:hover:border-gray-600 dark:hover:bg-gray-800/50"
                 >
                   <span className="text-xs text-gray-500 dark:text-gray-400">Previous</span>
-                  <p className="mt-1 font-medium text-gray-900 group-hover:text-primary-600 dark:text-gray-100 dark:group-hover:text-primary-400 transition-colors">
+                  <p className="mt-1 font-medium text-gray-900 transition-colors group-hover:text-primary-600 dark:text-gray-100 dark:group-hover:text-primary-400">
                     {prev.title}
                   </p>
                 </Link>
@@ -101,7 +99,7 @@ export default function PostLayout({ content, authorDetails, next, prev, childre
                   className="group rounded-lg border border-gray-200 p-4 text-right transition-colors hover:border-gray-300 hover:bg-gray-50 dark:border-gray-700 dark:hover:border-gray-600 dark:hover:bg-gray-800/50 sm:col-start-2"
                 >
                   <span className="text-xs text-gray-500 dark:text-gray-400">Next</span>
-                  <p className="mt-1 font-medium text-gray-900 group-hover:text-primary-600 dark:text-gray-100 dark:group-hover:text-primary-400 transition-colors">
+                  <p className="mt-1 font-medium text-gray-900 transition-colors group-hover:text-primary-600 dark:text-gray-100 dark:group-hover:text-primary-400">
                     {next.title}
                   </p>
                 </Link>
