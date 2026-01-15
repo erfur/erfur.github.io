@@ -1,5 +1,4 @@
 // @ts-check
-const { fontFamily } = require('tailwindcss/defaultTheme')
 const colors = require('tailwindcss/colors')
 
 /** @type {import("tailwindcss/types").Config } */
@@ -16,13 +15,12 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        ui: ['var(--font-ibm-plex-mono)', ...fontFamily.mono],
-        sans: ['var(--font-pt-sans)', ...fontFamily.sans],
-        mono: ['var(--font-jetbrains-mono)', ...fontFamily.mono],
+        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        mono: ['var(--font-jetbrains-mono)', 'Menlo', 'monospace'],
       },
       colors: {
-        primary: colors.indigo,
-        gray: colors.gray,
+        primary: colors.sky,
+        gray: colors.slate,
       },
       fontSize: {
         base: '1.05rem',
@@ -31,42 +29,51 @@ module.exports = {
       typography: ({ theme }) => ({
         DEFAULT: {
           css: {
+            fontFamily: theme('fontFamily.sans'),
             p: {
-              fontSize: '1.25rem',
+              fontSize: '1.1rem',
+              lineHeight: '1.75',
             },
             'ul, ol': {
-              fontSize: '1.2rem',
+              fontSize: '1.05rem',
             },
             a: {
-              color: theme('colors.indigo.500'),
+              color: theme('colors.primary.600'),
               '&:hover': {
-                color: `${theme('colors.indigo.900')}`,
+                color: `${theme('colors.primary.700')}`,
               },
-              fontSize: '1.25rem',
+              fontSize: '1.1rem',
+              transition: 'color 150ms ease',
             },
             'h1,h2,h3,h4,h5,h6': {
-              fontFamily: 'var(--font-fixedsys-excelsior)',
-              letterSpacing: theme('letterSpacing.tight'),
+              fontFamily: theme('fontFamily.sans'),
+              fontWeight: '700',
+              letterSpacing: '-0.025em',
             },
             code: {
-              color: theme('colors.indigo.500'),
-              fontSize: '0.95rem',
+              fontFamily: theme('fontFamily.mono'),
+              color: theme('colors.primary.600'),
+              fontSize: '0.9rem',
+              fontWeight: '400',
+            },
+            'pre code': {
+              fontFamily: theme('fontFamily.mono'),
             },
           },
         },
         invert: {
           css: {
             a: {
-              color: theme('colors.indigo.400'),
+              color: theme('colors.primary.400'),
               '&:hover': {
-                color: `${theme('colors.indigo.200')}`,
+                color: `${theme('colors.primary.300')}`,
               },
             },
             code: {
-              color: theme('colors.indigo.400'),
+              color: theme('colors.primary.400'),
             },
             'h1,h2,h3,h4,h5,h6': {
-              color: theme('colors.gray.300'),
+              color: theme('colors.gray.200'),
             },
           },
         },

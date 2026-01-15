@@ -1,8 +1,8 @@
 /** @type {import("pliny/config").PlinyConfig } */
 const siteMetadata = {
-  title: 'erfur\'s bits and pieces',
+  title: "erfur's Bits & Pieces",
   author: 'erfur',
-  headerTitle: 'BITS & PIECES',
+  headerTitle: "erfur's Bits & Pieces",
   description: '',
   language: 'en-us',
   theme: 'system', // system, dark or light

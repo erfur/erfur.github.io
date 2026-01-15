@@ -12,39 +12,45 @@ export default function AuthorLayout({ children, content }: Props) {
   const { name, avatar, occupation, company, email, twitter, linkedin, github } = content
 
   return (
-    <>
-      <div className="divide-y divide-gray-200 dark:divide-gray-700">
-        <div className="space-y-2 pb-8 pt-6 md:space-y-5">
-          <h1 className="md:leading-14 text-3xl font-extrabold leading-9 tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl sm:leading-10 md:text-6xl">
-            About
-          </h1>
+    <div className="mx-auto max-w-2xl">
+      <header className="pb-8 pt-4">
+        <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+          Contact
+        </h1>
+      </header>
+
+      <div className="flex flex-col gap-8 sm:flex-row sm:items-start">
+        {/* Profile card */}
+        <div className="flex flex-col items-center sm:items-start">
+          {avatar && (
+            <Image
+              src={avatar}
+              alt="avatar"
+              width={120}
+              height={120}
+              className="h-24 w-24 rounded-full"
+            />
+          )}
+          <h2 className="mt-4 text-lg font-semibold text-gray-900 dark:text-gray-100">{name}</h2>
+          {occupation && (
+            <p className="text-sm text-gray-500 dark:text-gray-400">{occupation}</p>
+          )}
+          {company && (
+            <p className="text-sm text-gray-500 dark:text-gray-400">{company}</p>
+          )}
+          <div className="mt-4 flex gap-3">
+            <SocialIcon kind="github" href={github} size={5} />
+            <SocialIcon kind="twitter" href={twitter} size={5} />
+            {email && <SocialIcon kind="mail" href={`mailto:${email}`} size={5} />}
+            {linkedin && <SocialIcon kind="linkedin" href={linkedin} size={5} />}
+          </div>
         </div>
-        <div className="items-start space-y-2 xl:grid xl:grid-cols-3 xl:gap-x-8 xl:space-y-0">
-          <div className="flex flex-col items-center space-x-2 pt-8">
-            {avatar && (
-              <Image
-                src={avatar}
-                alt="avatar"
-                width={192}
-                height={192}
-                className="h-48 w-48 rounded-full"
-              />
-            )}
-            <h3 className="pb-2 pt-4 text-2xl font-bold leading-8 tracking-tight">{name}</h3>
-            <div className="text-gray-500 dark:text-gray-400">{occupation}</div>
-            <div className="text-gray-500 dark:text-gray-400">{company}</div>
-            <div className="flex space-x-3 pt-6">
-              <SocialIcon kind="mail" href={`mailto:${email}`} />
-              <SocialIcon kind="github" href={github} />
-              <SocialIcon kind="linkedin" href={linkedin} />
-              <SocialIcon kind="twitter" href={twitter} />
-            </div>
-          </div>
-          <div className="prose max-w-none pb-8 pt-8 dark:prose-invert xl:col-span-2">
-            {children}
-          </div>
+
+        {/* Bio */}
+        <div className="prose prose-gray max-w-none flex-1 dark:prose-invert">
+          {children}
         </div>
       </div>
-    </>
+    </div>
   )
 }
