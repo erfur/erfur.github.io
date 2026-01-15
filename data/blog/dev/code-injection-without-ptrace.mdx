@@ -4,10 +4,6 @@ tags: ['dev', 'android']
 date: '2024-03-05'
 ---
 
-## Table of Contents
-
-<TOCInline toc={props.toc} exclude="Table of Contents" toHeading={2} />
-
 In the last few years, I've been participating in Hacktoberfest. It's a fun way to create or contribute to open source projects and every year I try to come up with a project that will take approximately a month to complete. This time I wanted to fulfill a long-standing promise to a friend and develop a project in rust.
 
 I came up with the idea to port [linux_injector](https://github.com/namazso/linux_injector). The project has a simple premise: injecting code into a process without using ptrace. To achieve that, it uses `/proc/mem` to write code directly into memory, allowing running threads to pick up the code and execute it. Of course it's not that simple, there is a bit of nuance to achieve reliable execution. The project is developed for x86_64 linux systems and I wanted to spice things up a bit by targeting arm64 and Android.

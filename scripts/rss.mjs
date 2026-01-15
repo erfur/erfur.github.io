@@ -48,10 +48,12 @@ async function generateRSS(config, allBlogs, page = 'feed.xml') {
     const slugger = new GithubSlugger()
     for (const tag of Object.keys(tagData)) {
       const filteredPosts = allBlogs.filter((post) =>
-        post.tags.map((t) => {
-          slugger.reset()
-          return slugger.slug(t)
-        }).includes(tag)
+        post.tags
+          .map((t) => {
+            slugger.reset()
+            return slugger.slug(t)
+          })
+          .includes(tag)
       )
       const rss = generateRss(config, filteredPosts, `tags/${tag}/${page}`)
       const rssPath = path.join('public', 'tags', tag)
