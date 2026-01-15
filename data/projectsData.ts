@@ -12,6 +12,16 @@ const projectsData: Project[] = [
     href: 'https://www.github.com/erfur/linjector-rs',
   },
   {
+    title: 'gm-etab4-root',
+    description: `Root exploit for the General Mobile E-Tab4 tablet`,
+    href: 'https://www.github.com/erfur/gm-etab4-root',
+  },
+  {
+    title: 'mysterypi-frida',
+    description: `Frida scripts and notes for the Mystery PI reverse engineering project`,
+    href: 'https://www.github.com/erfur/mysterypi-frida',
+  },
+  {
     title: 'lasso',
     description: `PoC app for linjector-rs`,
     imgSrc: '/static/images/projects/lasso-banner.jpg',
