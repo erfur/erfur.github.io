@@ -107,23 +107,38 @@ export function TableOfContentsDesktop({ toc }: TableOfContentsProps) {
   const activeId = useActiveHeading(toc)
 
   return (
-    <aside className="hidden xl:block">
-      <div className="sticky top-24">
+    <aside className="fixed right-4 top-24 z-10 hidden xl:block">
+      {isCollapsed ? (
         <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="mb-4 flex w-full items-center justify-between text-sm font-semibold text-gray-900 transition-colors hover:text-primary-600 dark:text-gray-100 dark:hover:text-primary-400"
+          onClick={() => setIsCollapsed(false)}
+          className="rounded-lg border border-gray-200 bg-white p-2 text-gray-600 shadow-sm transition-colors hover:bg-gray-50 hover:text-primary-600 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-primary-400"
+          title="Show table of contents"
         >
-          <span>On this page</span>
-          <svg
-            className={`h-4 w-4 transition-transform ${isCollapsed ? '' : 'rotate-180'}`}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 6h16M4 12h16M4 18h7"
+            />
           </svg>
         </button>
-        {!isCollapsed && (
+      ) : (
+        <div className="w-56 rounded-lg border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-700 dark:bg-gray-900">
+          <button
+            onClick={() => setIsCollapsed(true)}
+            className="mb-3 flex w-full items-center justify-between text-sm font-semibold text-gray-900 transition-colors hover:text-primary-600 dark:text-gray-100 dark:hover:text-primary-400"
+          >
+            <span>On this page</span>
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
           <nav className="space-y-2">
             <button
               onClick={scrollToTop}
@@ -150,8 +165,8 @@ export function TableOfContentsDesktop({ toc }: TableOfContentsProps) {
               )
             })}
           </nav>
-        )}
-      </div>
+        </div>
+      )}
     </aside>
   )
 }

@@ -39,8 +39,8 @@ export default function PostLayout({
   return (
     <SectionContainer>
       <ScrollTopAndComment />
-      <div className="xl:grid xl:grid-cols-[1fr_200px] xl:gap-8">
-        <article className="mx-auto max-w-2xl xl:mx-0">
+      <div>
+        <article className="mx-auto max-w-2xl">
           {/* Header */}
           <header className="pb-8 pt-4">
             <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
