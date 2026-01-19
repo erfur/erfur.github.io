@@ -111,38 +111,36 @@ export function TableOfContentsDesktop({ toc }: TableOfContentsProps) {
       {isCollapsed ? (
         <button
           onClick={() => setIsCollapsed(false)}
-          className="rounded-lg border border-gray-200 bg-white p-2 text-gray-600 shadow-sm transition-colors hover:bg-gray-50 hover:text-primary-600 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-primary-400"
-          title="Show table of contents"
+          className="rounded-full bg-slate-100 p-2 text-slate-600 transition-all hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+          aria-label="Show table of contents"
         >
-          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 6h16M4 12h16M4 18h7"
+              fillRule="evenodd"
+              d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1z"
+              clipRule="evenodd"
             />
           </svg>
         </button>
       ) : (
-        <div className="w-56 rounded-lg border border-gray-200 bg-white p-4 shadow-lg dark:border-gray-700 dark:bg-gray-900">
+        <div className="w-56 rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
           <button
             onClick={() => setIsCollapsed(true)}
-            className="mb-3 flex w-full items-center justify-between text-sm font-semibold text-gray-900 transition-colors hover:text-primary-600 dark:text-gray-100 dark:hover:text-primary-400"
+            className="mb-3 flex w-full items-center justify-between text-sm font-semibold text-slate-900 transition-all hover:text-slate-600 dark:text-slate-100 dark:hover:text-slate-400"
           >
             <span>On this page</span>
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
               <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
+                fillRule="evenodd"
+                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                clipRule="evenodd"
               />
             </svg>
           </button>
           <nav className="space-y-2">
             <button
               onClick={scrollToTop}
-              className="block text-left text-sm text-gray-600 transition-colors hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400"
+              className="block text-left text-sm text-slate-600 transition-all hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
             >
               Top
             </button>
@@ -152,12 +150,12 @@ export function TableOfContentsDesktop({ toc }: TableOfContentsProps) {
                 <a
                   key={item.url}
                   href={item.url}
-                  className={`block text-sm transition-colors hover:text-primary-600 dark:hover:text-primary-400 ${
+                  className={`block text-sm transition-all hover:text-slate-900 dark:hover:text-slate-200 ${
                     item.depth !== 2 ? 'pl-3' : ''
                   } ${
                     isActive
-                      ? 'font-medium text-primary-600 dark:text-primary-400'
-                      : 'text-gray-600 dark:text-gray-400'
+                      ? 'font-medium text-slate-900 dark:text-slate-100'
+                      : 'text-slate-600 dark:text-slate-400'
                   }`}
                 >
                   {item.value}
