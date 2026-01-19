@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface TocItem {
   value: string
@@ -16,8 +16,37 @@ const scrollToTop = () => {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
+function useActiveHeading(toc: TocItem[]) {
+  const [activeId, setActiveId] = useState<string>('')
+
+  useEffect(() => {
+    const headingIds = toc.map((item) => item.url.slice(1)) // Remove '#'
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // Find the first visible heading
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveId(entry.target.id)
+          }
+        })
+      },
+      { rootMargin: '-80px 0px -80% 0px' } // Trigger when heading is near top
+    )
+
+    headingIds.forEach((id) => {
+      const el = document.getElementById(id)
+      if (el) observer.observe(el)
+    })
+
+    return () => observer.disconnect()
+  }, [toc])
+
+  return activeId
+}
+
 export function TableOfContentsMobile({ toc }: TableOfContentsProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const activeId = useActiveHeading(toc)
 
   return (
     <div className="mb-6 xl:hidden">
@@ -47,20 +76,25 @@ export function TableOfContentsMobile({ toc }: TableOfContentsProps) {
             >
               Top
             </button>
-            {toc.map((item) => (
-              <a
-                key={item.url}
-                href={item.url}
-                onClick={() => setIsOpen(false)}
-                className={`block text-sm transition-colors hover:text-primary-600 dark:hover:text-primary-400 ${
-                  item.depth === 2
-                    ? 'text-gray-600 dark:text-gray-400'
-                    : 'pl-3 text-gray-500 dark:text-gray-500'
-                }`}
-              >
-                {item.value}
-              </a>
-            ))}
+            {toc.map((item) => {
+              const isActive = activeId === item.url.slice(1)
+              return (
+                <a
+                  key={item.url}
+                  href={item.url}
+                  onClick={() => setIsOpen(false)}
+                  className={`block text-sm transition-colors hover:text-primary-600 dark:hover:text-primary-400 ${
+                    item.depth !== 2 ? 'pl-3' : ''
+                  } ${
+                    isActive
+                      ? 'font-medium text-primary-600 dark:text-primary-400'
+                      : 'text-gray-600 dark:text-gray-400'
+                  }`}
+                >
+                  {item.value}
+                </a>
+              )
+            })}
           </nav>
         </div>
       )}
@@ -69,33 +103,54 @@ export function TableOfContentsMobile({ toc }: TableOfContentsProps) {
 }
 
 export function TableOfContentsDesktop({ toc }: TableOfContentsProps) {
+  const [isCollapsed, setIsCollapsed] = useState(true)
+  const activeId = useActiveHeading(toc)
+
   return (
     <aside className="hidden xl:block">
       <div className="sticky top-24">
-        <h2 className="mb-4 text-sm font-semibold text-gray-900 dark:text-gray-100">
-          On this page
-        </h2>
-        <nav className="space-y-2">
-          <button
-            onClick={scrollToTop}
-            className="block text-left text-sm text-gray-600 transition-colors hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400"
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="mb-4 flex w-full items-center justify-between text-sm font-semibold text-gray-900 transition-colors hover:text-primary-600 dark:text-gray-100 dark:hover:text-primary-400"
+        >
+          <span>On this page</span>
+          <svg
+            className={`h-4 w-4 transition-transform ${isCollapsed ? '' : 'rotate-180'}`}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
           >
-            Top
-          </button>
-          {toc.map((item) => (
-            <a
-              key={item.url}
-              href={item.url}
-              className={`block text-sm transition-colors hover:text-primary-600 dark:hover:text-primary-400 ${
-                item.depth === 2
-                  ? 'text-gray-600 dark:text-gray-400'
-                  : 'pl-3 text-gray-500 dark:text-gray-500'
-              }`}
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        {!isCollapsed && (
+          <nav className="space-y-2">
+            <button
+              onClick={scrollToTop}
+              className="block text-left text-sm text-gray-600 transition-colors hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400"
             >
-              {item.value}
-            </a>
-          ))}
-        </nav>
+              Top
+            </button>
+            {toc.map((item) => {
+              const isActive = activeId === item.url.slice(1)
+              return (
+                <a
+                  key={item.url}
+                  href={item.url}
+                  className={`block text-sm transition-colors hover:text-primary-600 dark:hover:text-primary-400 ${
+                    item.depth !== 2 ? 'pl-3' : ''
+                  } ${
+                    isActive
+                      ? 'font-medium text-primary-600 dark:text-primary-400'
+                      : 'text-gray-600 dark:text-gray-400'
+                  }`}
+                >
+                  {item.value}
+                </a>
+              )
+            })}
+          </nav>
+        )}
       </div>
     </aside>
   )
