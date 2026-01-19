@@ -107,7 +107,7 @@ export function TableOfContentsDesktop({ toc }: TableOfContentsProps) {
   const activeId = useActiveHeading(toc)
 
   return (
-    <aside className="fixed right-4 top-24 z-10 hidden xl:block">
+    <aside className="fixed left-[calc(50%+22rem)] top-24 z-10 hidden xl:block">
       {isCollapsed ? (
         <button
           onClick={() => setIsCollapsed(false)}

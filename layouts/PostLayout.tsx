@@ -73,7 +73,9 @@ export default function PostLayout({
           {toc && toc.length > 0 && <TableOfContentsMobile toc={toc} />}
 
           {/* Content */}
-          <div className="prose prose-gray max-w-none dark:prose-invert">{children}</div>
+          <div className="prose prose-gray max-w-none text-justify dark:prose-invert">
+            {children}
+          </div>
 
           {/* Footer */}
           <footer className="mt-12 border-t border-gray-200 pt-8 dark:border-gray-800">
