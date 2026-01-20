@@ -31,11 +31,13 @@ const Header = () => {
               {link.title}
             </Link>
           ))}
-        <div className="ml-2 flex items-center gap-1 border-l border-gray-200 pl-2 dark:border-gray-700">
+        <div className="ml-2 flex items-center border-l border-gray-200 pl-2 dark:border-gray-700">
           <SocialIcon kind="github" href={siteMetadata.github} size={5} />
-          <ThemeSwitch />
         </div>
-        <MobileNav />
+        <div className="flex items-center border-l border-gray-200 pl-2 dark:border-gray-700">
+          <ThemeSwitch />
+          <MobileNav />
+        </div>
       </nav>
     </header>
   )
