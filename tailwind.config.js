@@ -30,7 +30,7 @@ module.exports = {
       typography: ({ theme }) => ({
         DEFAULT: {
           css: {
-            fontFamily: theme('fontFamily.sans'),
+            fontFamily: theme('fontFamily.sans').join(', '),
             p: {
               fontSize: '1.1rem',
               lineHeight: '1.75',
@@ -47,18 +47,18 @@ module.exports = {
               transition: 'color 150ms ease',
             },
             'h1,h2,h3,h4,h5,h6': {
-              fontFamily: theme('fontFamily.heading'),
+              fontFamily: theme('fontFamily.heading').join(', '),
               fontWeight: '700',
               letterSpacing: '-0.025em',
             },
             code: {
-              fontFamily: theme('fontFamily.mono'),
+              fontFamily: theme('fontFamily.mono').join(', '),
               color: theme('colors.primary.600'),
               fontSize: '0.9rem',
               fontWeight: '400',
             },
             'pre code': {
-              fontFamily: theme('fontFamily.mono'),
+              fontFamily: theme('fontFamily.mono').join(', '),
             },
           },
         },
