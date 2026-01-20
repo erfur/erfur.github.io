@@ -14,7 +14,7 @@ export default function AuthorLayout({ children, content }: Props) {
   return (
     <div className="mx-auto max-w-2xl">
       <header className="pb-8 pt-4">
-        <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+        <h1 className="font-heading text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
           Contact
         </h1>
       </header>
@@ -31,7 +31,7 @@ export default function AuthorLayout({ children, content }: Props) {
               className="h-24 w-24 rounded-full"
             />
           )}
-          <h2 className="mt-4 text-lg font-semibold text-gray-900 dark:text-gray-100">{name}</h2>
+          <h2 className="mt-4 font-heading text-lg font-semibold text-gray-900 dark:text-gray-100">{name}</h2>
           {occupation && <p className="text-sm text-gray-500 dark:text-gray-400">{occupation}</p>}
           {company && <p className="text-sm text-gray-500 dark:text-gray-400">{company}</p>}
           <div className="mt-4 flex gap-3">

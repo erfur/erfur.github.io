@@ -1,7 +1,7 @@
 import 'css/tailwind.css'
 import 'pliny/search/algolia.css'
 
-import { Inter, JetBrains_Mono } from 'next/font/google'
+import { Roboto, Roboto_Slab, JetBrains_Mono } from 'next/font/google'
 import { Analytics, AnalyticsConfig } from 'pliny/analytics'
 import { SearchProvider, SearchConfig } from 'pliny/search'
 import Header from '@/components/Header'
@@ -11,10 +11,17 @@ import siteMetadata from '@/data/siteMetadata'
 import { ThemeProviders } from './theme-providers'
 import { Metadata } from 'next'
 
-const inter = Inter({
+const roboto = Roboto({
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-inter',
+  variable: '--font-roboto',
+  weight: ['400', '500', '700'],
+})
+
+const robotoSlab = Roboto_Slab({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-roboto-slab',
 })
 
 const jetbrainsMono = JetBrains_Mono({
@@ -67,7 +74,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang={siteMetadata.language}
-      className={`${inter.variable} ${jetbrainsMono.variable} scroll-smooth`}
+      className={`${roboto.variable} ${robotoSlab.variable} ${jetbrainsMono.variable} scroll-smooth`}
       suppressHydrationWarning
     >
       <link rel="apple-touch-icon" sizes="76x76" href="/static/favicons/apple-touch-icon.png" />

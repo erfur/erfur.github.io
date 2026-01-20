@@ -15,7 +15,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-roboto)', 'system-ui', 'sans-serif'],
+        heading: ['var(--font-roboto-slab)', 'Georgia', 'serif'],
         mono: ['var(--font-jetbrains-mono)', 'Menlo', 'monospace'],
       },
       colors: {
@@ -46,7 +47,7 @@ module.exports = {
               transition: 'color 150ms ease',
             },
             'h1,h2,h3,h4,h5,h6': {
-              fontFamily: theme('fontFamily.sans'),
+              fontFamily: theme('fontFamily.heading'),
               fontWeight: '700',
               letterSpacing: '-0.025em',
             },

@@ -27,7 +27,7 @@ export default function PostLayout({ content, next, prev, children }: LayoutProp
           <time dateTime={date} className="text-sm text-gray-500 dark:text-gray-400">
             {formatDate(date, siteMetadata.locale)}
           </time>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl">
+          <h1 className="mt-2 font-heading text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl">
             {title}
           </h1>
         </header>
