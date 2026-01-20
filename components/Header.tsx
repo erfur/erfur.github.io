@@ -15,7 +15,9 @@ const Header = () => {
         className="flex items-center gap-2 text-gray-900 transition-colors hover:text-primary-600 dark:text-gray-100 dark:hover:text-primary-400"
       >
         <Logo className="h-8 w-8" />
-        <span className="text-lg font-semibold tracking-tight">{siteMetadata.headerTitle}</span>
+        <span className="font-heading text-lg font-semibold tracking-tight">
+          {siteMetadata.headerTitle}
+        </span>
       </Link>
       <nav className="flex items-center gap-1 sm:gap-2">
         {headerNavLinks

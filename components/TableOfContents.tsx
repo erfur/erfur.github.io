@@ -52,7 +52,7 @@ export function TableOfContentsMobile({ toc }: TableOfContentsProps) {
     <div className="mb-6 xl:hidden">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-center justify-between rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+        className="flex w-full items-center justify-between rounded-lg border border-gray-200 px-4 py-2 font-heading text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
       >
         <span>On this page</span>
         <svg
@@ -126,7 +126,7 @@ export function TableOfContentsDesktop({ toc }: TableOfContentsProps) {
         <div className="w-56 rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
           <button
             onClick={() => setIsCollapsed(true)}
-            className="mb-3 flex w-full items-center justify-between text-sm font-semibold text-slate-900 transition-all hover:text-slate-600 dark:text-slate-100 dark:hover:text-slate-400"
+            className="mb-3 flex w-full items-center justify-between font-heading text-sm font-semibold text-slate-900 transition-all hover:text-slate-600 dark:text-slate-100 dark:hover:text-slate-400"
           >
             <span>On this page</span>
             <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
