@@ -31,7 +31,9 @@ export default function AuthorLayout({ children, content }: Props) {
               className="h-24 w-24 rounded-full"
             />
           )}
-          <h2 className="mt-4 font-heading text-lg font-semibold text-gray-900 dark:text-gray-100">{name}</h2>
+          <h2 className="mt-4 font-heading text-lg font-semibold text-gray-900 dark:text-gray-100">
+            {name}
+          </h2>
           {occupation && <p className="text-sm text-gray-500 dark:text-gray-400">{occupation}</p>}
           {company && <p className="text-sm text-gray-500 dark:text-gray-400">{company}</p>}
           <div className="mt-4 flex gap-3">
