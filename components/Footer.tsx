@@ -8,7 +8,6 @@ export default function Footer() {
       <div className="mx-auto flex w-full max-w-2xl flex-col items-center justify-between gap-4 py-6 sm:flex-row">
         <div className="flex items-center gap-4">
           <SocialIcon kind="github" href={siteMetadata.github} size={5} />
-          <SocialIcon kind="twitter" href={siteMetadata.twitter} size={5} />
           {siteMetadata.email && (
             <SocialIcon kind="mail" href={`mailto:${siteMetadata.email}`} size={5} />
           )}
