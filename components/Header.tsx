@@ -4,7 +4,7 @@ import Logo from '@/data/logo.svg'
 import Link from './Link'
 import MobileNav from './MobileNav'
 import ThemeSwitch from './ThemeSwitch'
-import SearchButton from './SearchButton'
+import SocialIcon from '@/components/social-icons'
 
 const Header = () => {
   return (
@@ -32,7 +32,7 @@ const Header = () => {
             </Link>
           ))}
         <div className="ml-2 flex items-center gap-1 border-l border-gray-200 pl-2 dark:border-gray-700">
-          <SearchButton />
+          <SocialIcon kind="github" href={siteMetadata.github} size={5} />
           <ThemeSwitch />
         </div>
         <MobileNav />
