@@ -32,23 +32,24 @@ module.exports = {
           css: {
             fontFamily: theme('fontFamily.sans').join(', '),
             p: {
-              fontSize: '1.1rem',
-              lineHeight: '1.75',
+              fontSize: '1rem',
+              lineHeight: '1.6',
             },
             'ul, ol': {
-              fontSize: '1.05rem',
+              fontSize: '1rem',
             },
             a: {
               color: theme('colors.primary.600'),
               '&:hover': {
                 color: `${theme('colors.primary.700')}`,
               },
-              fontSize: '1.1rem',
+              fontSize: '1rem',
+              fontWeight: '400',
               transition: 'color 150ms ease',
             },
             'h1,h2,h3,h4,h5,h6': {
               fontFamily: theme('fontFamily.heading').join(', '),
-              fontWeight: '700',
+              fontWeight: '400',
               letterSpacing: '-0.025em',
             },
             code: {

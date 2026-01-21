@@ -64,7 +64,7 @@ export default function PostLayout({
                 </>
               )}
             </div>
-            <h1 className="mt-2 font-heading text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl">
+            <h1 className="mt-2 font-heading text-3xl font-normal tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl">
               {title}
             </h1>
           </header>

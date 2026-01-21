@@ -11,7 +11,7 @@ const Card = ({
 }) => {
   const content = (
     <>
-      <h2 className="font-heading font-semibold text-gray-900 transition-colors group-hover:text-primary-600 dark:text-gray-100 dark:group-hover:text-primary-400">
+      <h2 className="font-heading font-normal text-gray-900 transition-colors group-hover:text-primary-600 dark:text-gray-100 dark:group-hover:text-primary-400">
         {title}
       </h2>
       <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{description}</p>

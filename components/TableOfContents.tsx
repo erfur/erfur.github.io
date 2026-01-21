@@ -126,7 +126,7 @@ export function TableOfContentsDesktop({ toc }: TableOfContentsProps) {
         <div className="max-h-[calc(100vh-15rem)] w-56 overflow-y-auto rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
           <button
             onClick={() => setIsCollapsed(true)}
-            className="mb-3 flex w-full items-center justify-between font-heading text-sm font-semibold text-slate-900 transition-all hover:text-slate-600 dark:text-slate-100 dark:hover:text-slate-400"
+            className="mb-3 flex w-full items-center justify-between font-heading text-sm font-normal text-slate-900 transition-all hover:text-slate-600 dark:text-slate-100 dark:hover:text-slate-400"
           >
             <span>On this page</span>
             <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
