@@ -26,7 +26,7 @@ const Header = () => {
             <Link
               key={link.title}
               href={link.href}
-              className="hidden rounded-md px-3 py-1.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100 sm:block"
+              className="hidden rounded-md px-3 py-1.5 font-heading text-sm font-normal text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100 sm:block"
             >
               {link.title}
             </Link>
