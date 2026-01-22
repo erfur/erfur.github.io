@@ -54,12 +54,23 @@ module.exports = {
             },
             code: {
               fontFamily: theme('fontFamily.mono').join(', '),
-              color: theme('colors.primary.600'),
+              color: theme('colors.gray.700'),
+              backgroundColor: theme('colors.gray.100'),
               fontSize: '0.9rem',
               fontWeight: '400',
+              padding: '0.125rem 0.25rem',
+              borderRadius: '0.25rem',
+            },
+            'code::before': {
+              content: 'none',
+            },
+            'code::after': {
+              content: 'none',
             },
             'pre code': {
               fontFamily: theme('fontFamily.mono').join(', '),
+              backgroundColor: 'transparent',
+              padding: '0',
             },
           },
         },
@@ -72,7 +83,8 @@ module.exports = {
               },
             },
             code: {
-              color: theme('colors.primary.400'),
+              color: theme('colors.gray.300'),
+              backgroundColor: theme('colors.gray.700'),
             },
             'h1,h2,h3,h4,h5,h6': {
               color: theme('colors.gray.200'),
