@@ -34,6 +34,28 @@ module.exports = {
             p: {
               fontSize: '1rem',
               lineHeight: '1.6',
+              marginTop: '0.75em',
+              marginBottom: '0.75em',
+            },
+            img: {
+              marginTop: '1em',
+              marginBottom: '0.5em',
+              borderRadius: '0.375rem',
+              border: `1px solid ${theme('colors.gray.200')}`,
+              boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.03)',
+            },
+            figure: {
+              marginTop: '1em',
+              marginBottom: '1em',
+            },
+            'figure > img': {
+              marginTop: '0',
+              marginBottom: '0',
+            },
+            figcaption: {
+              marginTop: '0.375em',
+              fontSize: '0.875rem',
+              color: theme('colors.gray.500'),
             },
             'ul, ol': {
               fontSize: '1rem',
@@ -88,6 +110,12 @@ module.exports = {
             },
             'h1,h2,h3,h4,h5,h6': {
               color: theme('colors.gray.200'),
+            },
+            img: {
+              borderColor: theme('colors.gray.700'),
+            },
+            figcaption: {
+              color: theme('colors.gray.400'),
             },
           },
         },
