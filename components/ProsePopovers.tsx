@@ -186,7 +186,7 @@ const Popover = forwardRef<
       role="dialog"
       aria-label={state.kind === 'text' ? 'Footnote' : 'Link actions'}
       style={style}
-      className={`not-prose absolute z-20 w-max rounded-2xl bg-slate-100 p-4 text-sm dark:bg-slate-800 ${
+      className={`not-prose absolute z-20 w-max rounded-2xl border border-slate-200 bg-slate-100 p-4 text-sm dark:border-slate-700 dark:bg-slate-800 ${
         pos.mode === 'gutter' ? '' : 'left-0 right-0 mx-auto max-w-full'
       }`}
     >

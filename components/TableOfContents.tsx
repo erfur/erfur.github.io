@@ -122,7 +122,7 @@ export function TableOfContentsDesktop({ toc, title }: TableOfContentsProps) {
           (isCollapsed ? (
             <button
               onClick={() => setIsCollapsed(false)}
-              className="rounded-full bg-slate-100 p-2 text-slate-600 transition-all hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+              className="rounded-full border border-slate-200 bg-slate-100 p-2 text-slate-600 transition-all hover:bg-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
               aria-label="Show table of contents"
             >
               <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -134,7 +134,7 @@ export function TableOfContentsDesktop({ toc, title }: TableOfContentsProps) {
               </svg>
             </button>
           ) : (
-            <div className="max-h-[calc(100vh-15rem)] w-56 overflow-y-auto rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
+            <div className="max-h-[calc(100vh-15rem)] w-56 overflow-y-auto rounded-2xl border border-slate-200 bg-slate-100 p-4 dark:border-slate-700 dark:bg-slate-800">
               <button
                 onClick={() => setIsCollapsed(true)}
                 className="mb-3 flex w-full items-center justify-between font-heading text-sm font-normal text-slate-900 transition-all hover:text-slate-600 dark:text-slate-100 dark:hover:text-slate-400"
@@ -179,7 +179,7 @@ export function TableOfContentsDesktop({ toc, title }: TableOfContentsProps) {
         {showScrollTop && (
           <button
             onClick={scrollToTop}
-            className="rounded-full bg-slate-100 p-2 text-slate-600 transition-all hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+            className="rounded-full border border-slate-200 bg-slate-100 p-2 text-slate-600 transition-all hover:bg-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
             aria-label="Scroll to top"
           >
             <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
