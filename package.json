@@ -8,7 +8,9 @@
     "build": "cross-env INIT_CWD=$PWD NODE_OPTIONS='--experimental-worker' next build && cross-env NODE_OPTIONS='--experimental-json-modules' node ./scripts/postbuild.mjs",
     "serve": "next start",
     "analyze": "cross-env ANALYZE=true next build",
-    "lint": "next lint --fix --dir pages --dir app --dir components --dir lib --dir layouts --dir scripts"
+    "lint": "next lint --fix --dir pages --dir app --dir components --dir lib --dir layouts --dir scripts",
+    "test": "jest --watch",
+    "test:run": "jest"
   },
   "dependencies": {
     "@next/bundle-analyzer": "14.0.3",
@@ -42,6 +44,10 @@
   },
   "devDependencies": {
     "@svgr/webpack": "^8.0.1",
+    "@testing-library/jest-dom": "^6",
+    "@testing-library/react": "^14",
+    "@testing-library/user-event": "^14",
+    "@types/jest": "^29",
     "@types/mdx": "^2.0.5",
     "@types/react": "^18.2.14",
     "@typescript-eslint/eslint-plugin": "^6.1.0",
@@ -52,6 +58,8 @@
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^5.0.0",
     "husky": "^8.0.0",
+    "jest": "^29",
+    "jest-environment-jsdom": "^29",
     "lint-staged": "^13.0.0",
     "prettier": "^3.0.0",
     "prettier-plugin-tailwindcss": "^0.4.1",
