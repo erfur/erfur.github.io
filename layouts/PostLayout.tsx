@@ -31,8 +31,7 @@ export default function PostLayout({
   toc,
   children,
 }: LayoutProps) {
-  const { path, slug, date, title, tags } = content
-  const basePath = path.split('/')[0]
+  const { slug, date, title, tags } = content
 
   return (
     <SectionContainer>
@@ -73,24 +72,15 @@ export default function PostLayout({
           {/* Content */}
           <div className="prose prose-gray max-w-none dark:prose-invert">{children}</div>
 
-          {/* Footer */}
-          <footer className="mt-12 border-t border-gray-200 pt-8 dark:border-gray-800">
-            <div className="flex items-center justify-end text-sm">
-              <Link
-                href={`/${basePath}`}
-                className="font-medium text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
-              >
-                &larr; All posts
-              </Link>
+          {/* Comments */}
+          {siteMetadata.comments?.provider && (
+            <div
+              className="mt-12 border-t border-gray-200 pt-8 dark:border-gray-800"
+              id="comment"
+            >
+              <Comments slug={slug} />
             </div>
-
-            {/* Comments */}
-            {siteMetadata.comments?.provider && (
-              <div className="mt-12" id="comment">
-                <Comments slug={slug} />
-              </div>
-            )}
-          </footer>
+          )}
         </article>
 
         {/* Desktop Table of Contents sidebar */}
