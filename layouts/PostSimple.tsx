@@ -37,33 +37,6 @@ export default function PostLayout({ content, next, prev, children }: LayoutProp
 
         {/* Footer */}
         <footer className="mt-12 border-t border-gray-200 pt-8 dark:border-gray-800">
-          {/* Prev/Next navigation */}
-          {(next || prev) && (
-            <nav className="grid gap-4 sm:grid-cols-2">
-              {prev && prev.path && (
-                <Link
-                  href={`/${prev.path}`}
-                  className="group rounded-lg border border-gray-200 p-4 transition-colors hover:border-gray-300 hover:bg-gray-50 dark:border-gray-700 dark:hover:border-gray-600 dark:hover:bg-gray-800/50"
-                >
-                  <span className="text-xs text-gray-500 dark:text-gray-400">Previous</span>
-                  <p className="mt-1 font-medium text-gray-900 transition-colors group-hover:text-primary-600 dark:text-gray-100 dark:group-hover:text-primary-400">
-                    {prev.title}
-                  </p>
-                </Link>
-              )}
-              {next && next.path && (
-                <Link
-                  href={`/${next.path}`}
-                  className="group rounded-lg border border-gray-200 p-4 text-right transition-colors hover:border-gray-300 hover:bg-gray-50 dark:border-gray-700 dark:hover:border-gray-600 dark:hover:bg-gray-800/50 sm:col-start-2"
-                >
-                  <span className="text-xs text-gray-500 dark:text-gray-400">Next</span>
-                  <p className="mt-1 font-medium text-gray-900 transition-colors group-hover:text-primary-600 dark:text-gray-100 dark:group-hover:text-primary-400">
-                    {next.title}
-                  </p>
-                </Link>
-              )}
-            </nav>
-          )}
 
           {/* Comments */}
           {siteMetadata.comments?.provider && (
