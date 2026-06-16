@@ -67,24 +67,21 @@ export default function PostLayout({
           </header>
 
           {/* Mobile Table of Contents */}
-          {toc && toc.length > 0 && <TableOfContentsMobile toc={toc} />}
+          {toc && toc.length > 0 && <TableOfContentsMobile toc={toc} title={title} />}
 
           {/* Content */}
           <div className="prose prose-gray max-w-none dark:prose-invert">{children}</div>
 
           {/* Comments */}
           {siteMetadata.comments?.provider && (
-            <div
-              className="mt-12 border-t border-gray-200 pt-8 dark:border-gray-800"
-              id="comment"
-            >
+            <div className="mt-12 border-t border-gray-200 pt-8 dark:border-gray-800" id="comment">
               <Comments slug={slug} />
             </div>
           )}
         </article>
 
         {/* Desktop Table of Contents sidebar */}
-        {toc && toc.length > 0 && <TableOfContentsDesktop toc={toc} />}
+        {toc && toc.length > 0 && <TableOfContentsDesktop toc={toc} title={title} />}
       </div>
     </SectionContainer>
   )

@@ -10,6 +10,7 @@ interface TocItem {
 
 interface TableOfContentsProps {
   toc: TocItem[]
+  title: string
 }
 
 const scrollToTop = () => {
@@ -44,7 +45,7 @@ function useActiveHeading(toc: TocItem[]) {
   return activeId
 }
 
-export function TableOfContentsMobile({ toc }: TableOfContentsProps) {
+export function TableOfContentsMobile({ toc, title }: TableOfContentsProps) {
   const [isOpen, setIsOpen] = useState(false)
   const activeId = useActiveHeading(toc)
 
@@ -67,6 +68,15 @@ export function TableOfContentsMobile({ toc }: TableOfContentsProps) {
       {isOpen && (
         <div className="mt-2 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/50">
           <nav className="space-y-1">
+            <button
+              onClick={() => {
+                scrollToTop()
+                setIsOpen(false)
+              }}
+              className="block text-left text-sm font-medium text-gray-900 transition-colors hover:text-primary-600 dark:text-gray-100 dark:hover:text-primary-400"
+            >
+              {title}
+            </button>
             {toc.map((item) => {
               const isActive = activeId === item.url.slice(1)
               return (
@@ -93,7 +103,7 @@ export function TableOfContentsMobile({ toc }: TableOfContentsProps) {
   )
 }
 
-export function TableOfContentsDesktop({ toc }: TableOfContentsProps) {
+export function TableOfContentsDesktop({ toc, title }: TableOfContentsProps) {
   const [isCollapsed, setIsCollapsed] = useState(true)
   const [showScrollTop, setShowScrollTop] = useState(false)
   const activeId = useActiveHeading(toc)
@@ -138,6 +148,12 @@ export function TableOfContentsDesktop({ toc }: TableOfContentsProps) {
               </svg>
             </button>
             <nav className="space-y-2">
+              <button
+                onClick={scrollToTop}
+                className="block text-left text-sm font-medium text-slate-900 transition-all hover:text-primary-600 dark:text-slate-100 dark:hover:text-primary-400"
+              >
+                {title}
+              </button>
               {toc.map((item) => {
                 const isActive = activeId === item.url.slice(1)
                 return (
