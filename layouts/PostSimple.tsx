@@ -37,7 +37,6 @@ export default function PostLayout({ content, next, prev, children }: LayoutProp
 
         {/* Footer */}
         <footer className="mt-12 border-t border-gray-200 pt-8 dark:border-gray-800">
-
           {/* Comments */}
           {siteMetadata.comments?.provider && (
             <div className="mt-12" id="comment">
