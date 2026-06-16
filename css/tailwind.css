@@ -33,3 +33,14 @@ input:-webkit-autofill:focus {
 .katex-display {
   overflow: auto hidden;
 }
+
+/* Footnotes are shown via popovers (components/ProsePopovers.tsx); hide the generated list. */
+.prose [data-footnotes] {
+  display: none;
+}
+
+/* Footnote markers trigger popovers instead of jumping. */
+.prose a[data-footnote-ref] {
+  text-decoration: none;
+  cursor: pointer;
+}
