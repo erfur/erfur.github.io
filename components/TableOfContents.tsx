@@ -118,63 +118,64 @@ export function TableOfContentsDesktop({ toc, title }: TableOfContentsProps) {
   return (
     <aside className="fixed left-[calc(50%+25rem)] top-24 z-10 hidden xl:block">
       <div className="flex flex-col items-start gap-3">
-        {isCollapsed ? (
-          <button
-            onClick={() => setIsCollapsed(false)}
-            className="rounded-full bg-slate-100 p-2 text-slate-600 transition-all hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-            aria-label="Show table of contents"
-          >
-            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path
-                fillRule="evenodd"
-                d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </button>
-        ) : (
-          <div className="max-h-[calc(100vh-15rem)] w-56 overflow-y-auto rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
+        {toc.length > 0 &&
+          (isCollapsed ? (
             <button
-              onClick={() => setIsCollapsed(true)}
-              className="mb-3 flex w-full items-center justify-between font-heading text-sm font-normal text-slate-900 transition-all hover:text-slate-600 dark:text-slate-100 dark:hover:text-slate-400"
+              onClick={() => setIsCollapsed(false)}
+              className="rounded-full bg-slate-100 p-2 text-slate-600 transition-all hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+              aria-label="Show table of contents"
             >
-              <span>On this page</span>
-              <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path
                   fillRule="evenodd"
-                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                  d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1z"
                   clipRule="evenodd"
                 />
               </svg>
             </button>
-            <nav className="space-y-2">
+          ) : (
+            <div className="max-h-[calc(100vh-15rem)] w-56 overflow-y-auto rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
               <button
-                onClick={scrollToTop}
-                className="block text-left text-sm text-slate-600 transition-all hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
+                onClick={() => setIsCollapsed(true)}
+                className="mb-3 flex w-full items-center justify-between font-heading text-sm font-normal text-slate-900 transition-all hover:text-slate-600 dark:text-slate-100 dark:hover:text-slate-400"
               >
-                {title}
+                <span>On this page</span>
+                <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path
+                    fillRule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
               </button>
-              {toc.map((item) => {
-                const isActive = activeId === item.url.slice(1)
-                return (
-                  <a
-                    key={item.url}
-                    href={item.url}
-                    className={`block text-sm transition-all hover:text-slate-900 dark:hover:text-slate-200 ${
-                      item.depth !== 2 ? 'pl-3' : ''
-                    } ${
-                      isActive
-                        ? 'font-medium text-slate-900 dark:text-slate-100'
-                        : 'text-slate-600 dark:text-slate-400'
-                    }`}
-                  >
-                    {item.value}
-                  </a>
-                )
-              })}
-            </nav>
-          </div>
-        )}
+              <nav className="space-y-2">
+                <button
+                  onClick={scrollToTop}
+                  className="block text-left text-sm text-slate-600 transition-all hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
+                >
+                  {title}
+                </button>
+                {toc.map((item) => {
+                  const isActive = activeId === item.url.slice(1)
+                  return (
+                    <a
+                      key={item.url}
+                      href={item.url}
+                      className={`block text-sm transition-all hover:text-slate-900 dark:hover:text-slate-200 ${
+                        item.depth !== 2 ? 'pl-3' : ''
+                      } ${
+                        isActive
+                          ? 'font-medium text-slate-900 dark:text-slate-100'
+                          : 'text-slate-600 dark:text-slate-400'
+                      }`}
+                    >
+                      {item.value}
+                    </a>
+                  )
+                })}
+              </nav>
+            </div>
+          ))}
         {showScrollTop && (
           <button
             onClick={scrollToTop}

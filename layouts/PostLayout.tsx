@@ -80,8 +80,8 @@ export default function PostLayout({
           )}
         </article>
 
-        {/* Desktop Table of Contents sidebar */}
-        {toc && toc.length > 0 && <TableOfContentsDesktop toc={toc} title={title} />}
+        {/* Desktop sidebar: TOC (when present) + back-to-top button */}
+        <TableOfContentsDesktop toc={toc || []} title={title} />
       </div>
     </SectionContainer>
   )
