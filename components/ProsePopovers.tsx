@@ -55,6 +55,7 @@ export default function ProsePopovers({ className, children }: Props) {
 
   const onClick = useCallback((e: React.MouseEvent) => {
     if (popoverRef.current?.contains(e.target as Node)) return // ignore clicks inside the popover
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
     const a = (e.target as HTMLElement).closest('a') as HTMLAnchorElement | null
     if (!a) return
 
@@ -84,11 +85,14 @@ export default function ProsePopovers({ className, children }: Props) {
       setPopover(null)
     }
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setPopover(null)
+    const onResize = () => setPopover(null)
     document.addEventListener('mousedown', onDown)
     document.addEventListener('keydown', onKey)
+    window.addEventListener('resize', onResize)
     return () => {
       document.removeEventListener('mousedown', onDown)
       document.removeEventListener('keydown', onKey)
+      window.removeEventListener('resize', onResize)
     }
   }, [popover])
 
@@ -106,6 +110,8 @@ const Popover = forwardRef<
 >(function Popover({ state, containerRef }, ref) {
   const [pos, setPos] = useState<{ top: number; mode: 'gutter' | 'inline' } | null>(null)
   const [copied, setCopied] = useState(false)
+  const copyTimer = useRef<ReturnType<typeof setTimeout>>()
+  useEffect(() => () => clearTimeout(copyTimer.current), [])
 
   useLayoutEffect(() => {
     const container = containerRef.current
@@ -125,7 +131,8 @@ const Popover = forwardRef<
     try {
       await navigator.clipboard.writeText(state.url)
       setCopied(true)
-      setTimeout(() => setCopied(false), 1500)
+      clearTimeout(copyTimer.current)
+      copyTimer.current = setTimeout(() => setCopied(false), 1500)
     } catch {
       /* clipboard unavailable */
     }
@@ -143,6 +150,7 @@ const Popover = forwardRef<
     <div
       ref={ref}
       role="dialog"
+      aria-label={state.kind === 'text' ? 'Footnote' : 'Link actions'}
       style={style}
       className={`not-prose absolute z-20 rounded-2xl bg-slate-100 p-4 text-sm shadow-lg dark:bg-slate-800 ${
         pos.mode === 'gutter' ? 'w-56' : 'left-0 right-0'
