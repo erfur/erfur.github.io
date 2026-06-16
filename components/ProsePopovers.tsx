@@ -40,6 +40,34 @@ export function extractFootnotes(container: HTMLElement): Map<string, string> {
   return map
 }
 
+// Copy text to the clipboard, with a legacy fallback for insecure contexts
+// (e.g. viewing the dev server over a LAN IP) where navigator.clipboard is unavailable.
+export async function copyText(text: string): Promise<boolean> {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text)
+      return true
+    }
+  } catch {
+    // fall through to the legacy path
+  }
+  try {
+    const ta = document.createElement('textarea')
+    ta.value = text
+    ta.setAttribute('readonly', '')
+    ta.style.position = 'fixed'
+    ta.style.top = '0'
+    ta.style.opacity = '0'
+    document.body.appendChild(ta)
+    ta.select()
+    const ok = document.execCommand('copy')
+    document.body.removeChild(ta)
+    return ok
+  } catch {
+    return false
+  }
+}
+
 export default function ProsePopovers({ className, children }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const popoverRef = useRef<HTMLDivElement>(null)
@@ -128,14 +156,11 @@ const Popover = forwardRef<
 
   const onCopy = async () => {
     if (state.kind !== 'link') return
-    try {
-      await navigator.clipboard.writeText(state.url)
-      setCopied(true)
-      clearTimeout(copyTimer.current)
-      copyTimer.current = setTimeout(() => setCopied(false), 1500)
-    } catch {
-      /* clipboard unavailable */
-    }
+    const ok = await copyText(state.url)
+    if (!ok) return
+    setCopied(true)
+    clearTimeout(copyTimer.current)
+    copyTimer.current = setTimeout(() => setCopied(false), 1500)
   }
 
   if (!pos) return null
