@@ -140,19 +140,20 @@ const Popover = forwardRef<
 
   if (!pos) return null
 
-  // Desktop: anchored to the right of the gutter, width grows with the viewport.
-  // Narrow: sized to content, capped at the column width (see className below).
+  // Both modes size to their content (w-fit). The max width is what changes:
+  // desktop grows with the viewport (clamp) and is anchored to the gutter;
+  // narrow is capped at the column width.
   const style =
     pos.mode === 'gutter'
       ? {
           top: pos.top,
           right: 'calc(100% + 1rem)' as const,
-          width: 'clamp(13rem, calc(50vw - 27rem), 30rem)',
+          maxWidth: 'clamp(13rem, calc(50vw - 27rem), 30rem)',
         }
       : { top: pos.top }
 
-  const iconBtn =
-    'flex h-8 w-8 items-center justify-center rounded-full text-slate-600 transition-colors hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-700'
+  const iconBtnBase = 'flex h-8 w-8 items-center justify-center rounded-full transition-colors'
+  const iconBtn = `${iconBtnBase} text-slate-600 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-700`
 
   return (
     <div
@@ -160,8 +161,8 @@ const Popover = forwardRef<
       role="dialog"
       aria-label={state.kind === 'text' ? 'Footnote' : 'Link actions'}
       style={style}
-      className={`not-prose absolute z-20 rounded-2xl bg-slate-100 p-4 text-sm dark:bg-slate-800 ${
-        pos.mode === 'gutter' ? '' : 'left-0 w-fit max-w-full'
+      className={`not-prose absolute z-20 w-max rounded-2xl bg-slate-100 p-4 text-sm dark:bg-slate-800 ${
+        pos.mode === 'gutter' ? '' : 'left-0 max-w-full'
       }`}
     >
       {state.kind === 'text' ? (
@@ -189,7 +190,11 @@ const Popover = forwardRef<
               type="button"
               onClick={onCopy}
               aria-label={copied ? 'Copied' : 'Copy link'}
-              className={`${iconBtn} ${copied ? 'text-green-600 dark:text-green-400' : ''}`}
+              className={
+                copied
+                  ? `${iconBtnBase} bg-green-100 text-green-600 dark:bg-green-900/40 dark:text-green-400`
+                  : iconBtn
+              }
             >
               {copied ? (
                 <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
