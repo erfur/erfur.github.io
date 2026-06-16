@@ -157,12 +157,23 @@ interface Props {
   children: ReactNode
 }
 
-const isFootnoteRef = (a: HTMLAnchorElement) =>
+export const isFootnoteRef = (a: HTMLAnchorElement) =>
   a.hasAttribute('data-footnote-ref') || (a.getAttribute('href') || '').startsWith('#user-content-fn')
 
-const isExternal = (a: HTMLAnchorElement) => {
+export const isExternal = (a: HTMLAnchorElement) => {
   const href = a.getAttribute('href') || ''
   return href.length > 0 && !href.startsWith('/') && !href.startsWith('#')
+}
+
+// Read the GFM footnotes section into a map of footnote id -> note HTML (backref stripped).
+export function extractFootnotes(container: HTMLElement): Map<string, string> {
+  const map = new Map<string, string>()
+  container.querySelectorAll('[data-footnotes] li[id]').forEach((li) => {
+    const clone = li.cloneNode(true) as HTMLElement
+    clone.querySelectorAll('[data-footnote-backref]').forEach((b) => b.remove())
+    map.set(li.id, clone.innerHTML.trim())
+  })
+  return map
 }
 
 export default function ProsePopovers({ className, children }: Props) {
@@ -175,13 +186,7 @@ export default function ProsePopovers({ className, children }: Props) {
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
-    const map = new Map<string, string>()
-    container.querySelectorAll('[data-footnotes] li[id]').forEach((li) => {
-      const clone = li.cloneNode(true) as HTMLElement
-      clone.querySelectorAll('[data-footnote-backref]').forEach((b) => b.remove())
-      map.set(li.id, clone.innerHTML.trim())
-    })
-    footnotes.current = map
+    footnotes.current = extractFootnotes(container)
   }, [children])
 
   const onClick = useCallback((e: React.MouseEvent) => {
@@ -416,6 +421,160 @@ git commit -m "Add footnote and external-link popovers to post body"
 
 ---
 
+### Task 3B: Jest unit + component tests
+
+Covers the logic that jsdom can exercise (classification, footnote extraction,
+popover open/close, clipboard, internal-link passthrough). Pixel positioning is
+covered by the Playwright checks in Tasks 3–4.
+
+**Files:**
+- Create: `components/__tests__/ProsePopovers.test.tsx`
+
+- [ ] **Step 1: Write the tests**
+
+Create `components/__tests__/ProsePopovers.test.tsx`:
+
+```tsx
+import { fireEvent, render, screen, within } from '@testing-library/react'
+import ProsePopovers, {
+  extractFootnotes,
+  isExternal,
+  isFootnoteRef,
+} from '@/components/ProsePopovers'
+
+const anchor = (attrs: Record<string, string>) => {
+  const a = document.createElement('a')
+  Object.entries(attrs).forEach(([k, v]) => a.setAttribute(k, v))
+  return a
+}
+
+const Body = () => (
+  <>
+    <p>
+      claim
+      <sup>
+        <a data-footnote-ref href="#user-content-fn-1" id="user-content-fnref-1">
+          1
+        </a>
+      </sup>{' '}
+      and <a href="https://example.com/x">ext</a> and <a href="/blog">internal</a>
+    </p>
+    <section data-footnotes>
+      <ol>
+        <li id="user-content-fn-1">
+          <p>
+            the note{' '}
+            <a href="#user-content-fnref-1" data-footnote-backref>
+              ↩
+            </a>
+          </p>
+        </li>
+      </ol>
+    </section>
+  </>
+)
+
+describe('classification helpers', () => {
+  it('detects external links', () => {
+    expect(isExternal(anchor({ href: 'https://example.com' }))).toBe(true)
+    expect(isExternal(anchor({ href: '/blog' }))).toBe(false)
+    expect(isExternal(anchor({ href: '#x' }))).toBe(false)
+  })
+
+  it('detects footnote refs by attribute or href', () => {
+    expect(isFootnoteRef(anchor({ href: '#user-content-fn-1' }))).toBe(true)
+    expect(isFootnoteRef(anchor({ 'data-footnote-ref': '', href: '#x' }))).toBe(true)
+    expect(isFootnoteRef(anchor({ href: '#section' }))).toBe(false)
+  })
+})
+
+describe('extractFootnotes', () => {
+  it('maps footnote id to note HTML and strips the backref', () => {
+    const c = document.createElement('div')
+    c.innerHTML =
+      '<section data-footnotes><ol><li id="user-content-fn-1"><p>note one <a href="#" data-footnote-backref>back</a></p></li></ol></section>'
+    const m = extractFootnotes(c)
+    expect(m.get('user-content-fn-1')).toContain('note one')
+    expect(m.get('user-content-fn-1')).not.toContain('back')
+  })
+})
+
+describe('<ProsePopovers> interaction', () => {
+  it('opens a text popover with the note on footnote click', () => {
+    render(
+      <ProsePopovers>
+        <Body />
+      </ProsePopovers>
+    )
+    fireEvent.click(screen.getByText('1'))
+    expect(within(screen.getByRole('dialog')).getByText(/the note/)).toBeInTheDocument()
+  })
+
+  it('opens a link popover with Visit and Copy on external link click', () => {
+    render(
+      <ProsePopovers>
+        <Body />
+      </ProsePopovers>
+    )
+    fireEvent.click(screen.getByText('ext'))
+    const dialog = screen.getByRole('dialog')
+    expect(within(dialog).getByText('Visit')).toBeInTheDocument()
+    expect(within(dialog).getByText('Copy')).toBeInTheDocument()
+  })
+
+  it('copies the url to the clipboard on Copy click', () => {
+    const writeText = jest.fn().mockResolvedValue(undefined)
+    Object.assign(navigator, { clipboard: { writeText } })
+    render(
+      <ProsePopovers>
+        <Body />
+      </ProsePopovers>
+    )
+    fireEvent.click(screen.getByText('ext'))
+    fireEvent.click(screen.getByText('Copy'))
+    expect(writeText).toHaveBeenCalledWith('https://example.com/x')
+  })
+
+  it('does not open a popover for internal links', () => {
+    render(
+      <ProsePopovers>
+        <Body />
+      </ProsePopovers>
+    )
+    fireEvent.click(screen.getByText('internal'))
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  it('closes the popover on Escape', () => {
+    render(
+      <ProsePopovers>
+        <Body />
+      </ProsePopovers>
+    )
+    fireEvent.click(screen.getByText('1'))
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+    fireEvent.keyDown(document, { key: 'Escape' })
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+})
+```
+
+- [ ] **Step 2: Run the tests**
+
+Run: `node .yarn/releases/yarn-3.6.1.cjs test:run -- components/__tests__/ProsePopovers.test.tsx`
+Expected: all tests PASS. (jsdom's `getBoundingClientRect` returns zeros, so the
+popover renders at the origin — fine; these tests assert behavior/content, not
+pixels.)
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add components/__tests__/ProsePopovers.test.tsx
+git commit -m "Add unit and component tests for ProsePopovers"
+```
+
+---
+
 ### Task 4: Mobile (below-the-line) positioning check
 
 **Files:** none (verification only; refine `components/ProsePopovers.tsx` if it fails)
@@ -525,13 +684,21 @@ node .yarn/releases/yarn-3.6.1.cjs lint 2>&1 | tail -15
 
 Expected: no errors for the new files (warnings acceptable if pre-existing).
 
-- [ ] **Step 3: Remove the fixture post**
+- [ ] **Step 3: Run the full unit test suite**
+
+```bash
+node .yarn/releases/yarn-3.6.1.cjs test:run 2>&1 | tail -15
+```
+
+Expected: all suites pass (CustomLink + ProsePopovers).
+
+- [ ] **Step 4: Remove the fixture post**
 
 ```bash
 git rm data/blog/_popover_fixture.mdx
 ```
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 5: Commit**
 
 ```bash
 git add -A
