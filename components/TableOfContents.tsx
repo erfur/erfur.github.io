@@ -67,15 +67,6 @@ export function TableOfContentsMobile({ toc }: TableOfContentsProps) {
       {isOpen && (
         <div className="mt-2 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/50">
           <nav className="space-y-1">
-            <button
-              onClick={() => {
-                scrollToTop()
-                setIsOpen(false)
-              }}
-              className="block text-left text-sm text-gray-600 transition-colors hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400"
-            >
-              Top
-            </button>
             {toc.map((item) => {
               const isActive = activeId === item.url.slice(1)
               return (
@@ -147,12 +138,6 @@ export function TableOfContentsDesktop({ toc }: TableOfContentsProps) {
               </svg>
             </button>
             <nav className="space-y-2">
-              <button
-                onClick={scrollToTop}
-                className="block text-left text-sm text-slate-600 transition-all hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
-              >
-                Top
-              </button>
               {toc.map((item) => {
                 const isActive = activeId === item.url.slice(1)
                 return (
