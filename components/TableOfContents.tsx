@@ -104,24 +104,49 @@ export function TableOfContentsMobile({ toc }: TableOfContentsProps) {
 
 export function TableOfContentsDesktop({ toc }: TableOfContentsProps) {
   const [isCollapsed, setIsCollapsed] = useState(true)
+  const [showScrollTop, setShowScrollTop] = useState(false)
   const activeId = useActiveHeading(toc)
+
+  useEffect(() => {
+    const handleScroll = () => setShowScrollTop(window.scrollY > 50)
+    handleScroll()
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   return (
     <aside className="fixed left-[calc(50%+25rem)] top-24 z-10 hidden xl:block">
       {isCollapsed ? (
-        <button
-          onClick={() => setIsCollapsed(false)}
-          className="rounded-full bg-slate-100 p-2 text-slate-600 transition-all hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-          aria-label="Show table of contents"
-        >
-          <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path
-              fillRule="evenodd"
-              d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </button>
+        <div className="flex flex-col gap-3">
+          <button
+            onClick={() => setIsCollapsed(false)}
+            className="rounded-full bg-slate-100 p-2 text-slate-600 transition-all hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+            aria-label="Show table of contents"
+          >
+            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path
+                fillRule="evenodd"
+                d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </button>
+          {showScrollTop && (
+            <button
+              onClick={scrollToTop}
+              className="rounded-full bg-slate-100 p-2 text-slate-600 transition-all hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+              aria-label="Scroll to top"
+            >
+              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  fillRule="evenodd"
+                  d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          )}
+        </div>
       ) : (
         <div className="max-h-[calc(100vh-15rem)] w-56 overflow-y-auto rounded-2xl bg-slate-100 p-4 dark:bg-slate-800">
           <button
