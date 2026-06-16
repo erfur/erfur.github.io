@@ -8,7 +8,7 @@ import SocialIcon from '@/components/social-icons'
 
 const Header = () => {
   return (
-    <header className="mx-auto flex w-full max-w-2xl items-center justify-between py-6">
+    <header className="mx-auto flex w-full max-w-3xl items-center justify-between py-6">
       <Link
         href="/"
         aria-label={siteMetadata.headerTitle}
@@ -31,10 +31,10 @@ const Header = () => {
               {link.title}
             </Link>
           ))}
-        <div className="ml-2 flex items-center border-l border-gray-200 pl-2 dark:border-gray-700">
+        <div className="ml-2 flex h-8 items-center border-l border-gray-200 pl-2 dark:border-gray-700">
           <SocialIcon kind="github" href={siteMetadata.github} size={5} />
         </div>
-        <div className="flex items-center border-l border-gray-200 pl-2 dark:border-gray-700">
+        <div className="flex h-8 items-center border-l border-gray-200 pl-2 dark:border-gray-700">
           <ThemeSwitch />
           <MobileNav />
         </div>

@@ -21,7 +21,7 @@ export default function PostLayout({ content, next, prev, children }: LayoutProp
   return (
     <SectionContainer>
       <ScrollTopAndComment />
-      <article className="mx-auto max-w-2xl">
+      <article className="mx-auto max-w-3xl">
         {/* Header */}
         <header className="pb-8 pt-4">
           <time dateTime={date} className="text-sm text-gray-500 dark:text-gray-400">

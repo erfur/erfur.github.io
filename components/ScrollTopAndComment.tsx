@@ -24,7 +24,7 @@ const ScrollTopAndComment = () => {
   }
   return (
     <div
-      className={`fixed bottom-8 left-[calc(50%+22rem)] hidden flex-col gap-3 ${show ? 'xl:flex' : 'xl:hidden'}`}
+      className={`fixed bottom-8 left-[calc(50%+25rem)] hidden flex-col gap-3 ${show ? 'xl:flex' : 'xl:hidden'}`}
     >
       {siteMetadata.comments?.provider && (
         <button

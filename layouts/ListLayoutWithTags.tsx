@@ -78,7 +78,7 @@ export default function ListLayoutWithTags({
   const currentTag = pathname.split('/tags/')[1]
 
   return (
-    <div className="mx-auto max-w-2xl">
+    <div className="mx-auto max-w-3xl">
       <header className="pb-6 pt-4">
         <h1 className="font-heading text-2xl font-normal tracking-tight text-gray-900 dark:text-gray-100">
           {title}

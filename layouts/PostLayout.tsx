@@ -40,7 +40,7 @@ export default function PostLayout({
     <SectionContainer>
       <ScrollTopAndComment />
       <div>
-        <article className="mx-auto max-w-2xl">
+        <article className="mx-auto max-w-3xl">
           {/* Header */}
           <header className="pb-8 pt-4">
             <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">

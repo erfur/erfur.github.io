@@ -76,7 +76,7 @@ export default function ListLayout({
     initialDisplayPosts.length > 0 && !searchValue ? initialDisplayPosts : filteredBlogPosts
 
   return (
-    <div className="mx-auto max-w-2xl">
+    <div className="mx-auto max-w-3xl">
       <header className="pb-6 pt-4">
         <h1 className="font-heading text-2xl font-normal tracking-tight text-gray-900 dark:text-gray-100">
           {title}
