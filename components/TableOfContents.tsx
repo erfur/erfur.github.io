@@ -73,7 +73,7 @@ export function TableOfContentsMobile({ toc, title }: TableOfContentsProps) {
                 scrollToTop()
                 setIsOpen(false)
               }}
-              className="block text-left text-sm font-medium text-gray-900 transition-colors hover:text-primary-600 dark:text-gray-100 dark:hover:text-primary-400"
+              className="block text-left text-sm text-gray-900 transition-colors hover:text-primary-600 dark:text-gray-100 dark:hover:text-primary-400"
             >
               {title}
             </button>
@@ -150,7 +150,7 @@ export function TableOfContentsDesktop({ toc, title }: TableOfContentsProps) {
             <nav className="space-y-2">
               <button
                 onClick={scrollToTop}
-                className="block text-left text-sm font-medium text-slate-900 transition-all hover:text-primary-600 dark:text-slate-100 dark:hover:text-primary-400"
+                className="block text-left text-sm text-slate-900 transition-all hover:text-primary-600 dark:text-slate-100 dark:hover:text-primary-400"
               >
                 {title}
               </button>
