@@ -162,7 +162,7 @@ const Popover = forwardRef<
       aria-label={state.kind === 'text' ? 'Footnote' : 'Link actions'}
       style={style}
       className={`not-prose absolute z-20 w-max rounded-2xl bg-slate-100 p-4 text-sm dark:bg-slate-800 ${
-        pos.mode === 'gutter' ? '' : 'left-0 max-w-full'
+        pos.mode === 'gutter' ? '' : 'left-0 right-0 mx-auto max-w-full'
       }`}
     >
       {state.kind === 'text' ? (
@@ -173,7 +173,7 @@ const Popover = forwardRef<
       ) : (
         <div className="flex flex-col gap-3">
           <span className="break-all text-slate-600 dark:text-slate-400">{state.url}</span>
-          <div className="flex gap-1">
+          <div className={`flex gap-1 ${pos.mode === 'gutter' ? 'justify-end' : 'justify-center'}`}>
             <a
               href={state.url}
               target="_blank"
