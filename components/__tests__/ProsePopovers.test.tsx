@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import ProsePopovers, {
   extractFootnotes,
   isExternal,
@@ -85,7 +85,7 @@ describe('<ProsePopovers> interaction', () => {
     expect(within(dialog).getByText('Copy')).toBeInTheDocument()
   })
 
-  it('copies the url to the clipboard on Copy click', () => {
+  it('copies the url to the clipboard and shows Copied', async () => {
     const writeText = jest.fn().mockResolvedValue(undefined)
     Object.assign(navigator, { clipboard: { writeText } })
     render(
@@ -94,8 +94,11 @@ describe('<ProsePopovers> interaction', () => {
       </ProsePopovers>
     )
     fireEvent.click(screen.getByText('ext'))
-    fireEvent.click(screen.getByText('Copy'))
+    await act(async () => {
+      fireEvent.click(screen.getByText('Copy'))
+    })
     expect(writeText).toHaveBeenCalledWith('https://example.com/x')
+    expect(screen.getByText('Copied')).toBeInTheDocument()
   })
 
   it('does not open a popover for internal links', () => {
