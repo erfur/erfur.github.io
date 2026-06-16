@@ -125,6 +125,10 @@ export default function ProsePopovers({ className, children }: Props) {
   }, [popover])
 
   return (
+    // Event delegation for the footnote/link anchors inside, which are themselves
+    // keyboard-accessible (Enter fires a click that bubbles here); the container
+    // itself is not an interactive element.
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
     <div ref={containerRef} className={`relative ${className ?? ''}`} onClick={onClick}>
       {children}
       {popover && <Popover ref={popoverRef} state={popover} containerRef={containerRef} />}
