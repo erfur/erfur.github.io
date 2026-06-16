@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Always reserve the scrollbar gutter so centered content doesn't shift left
+   between short pages (no scrollbar, e.g. the home page) and long pages (with a
+   scrollbar, e.g. a blog post). */
+html {
+  scrollbar-gutter: stable;
+}
+
 .task-list-item::before {
   @apply hidden;
 }
