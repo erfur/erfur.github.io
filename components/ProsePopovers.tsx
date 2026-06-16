@@ -140,11 +140,19 @@ const Popover = forwardRef<
 
   if (!pos) return null
 
+  // Desktop: anchored to the right of the gutter, width grows with the viewport.
+  // Narrow: sized to content, capped at the column width (see className below).
   const style =
-    pos.mode === 'gutter' ? { top: pos.top, right: 'calc(100% + 1rem)' as const } : { top: pos.top }
+    pos.mode === 'gutter'
+      ? {
+          top: pos.top,
+          right: 'calc(100% + 1rem)' as const,
+          width: 'clamp(13rem, calc(50vw - 27rem), 30rem)',
+        }
+      : { top: pos.top }
 
-  const btn =
-    'rounded-md bg-slate-200 px-3 py-1.5 font-medium text-slate-800 transition-colors hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-100 dark:hover:bg-slate-600'
+  const iconBtn =
+    'flex h-8 w-8 items-center justify-center rounded-full text-slate-600 transition-colors hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-700'
 
   return (
     <div
@@ -152,8 +160,8 @@ const Popover = forwardRef<
       role="dialog"
       aria-label={state.kind === 'text' ? 'Footnote' : 'Link actions'}
       style={style}
-      className={`not-prose absolute z-20 rounded-2xl bg-slate-100 p-4 text-sm shadow-lg dark:bg-slate-800 ${
-        pos.mode === 'gutter' ? 'w-56' : 'left-0 right-0'
+      className={`not-prose absolute z-20 rounded-2xl bg-slate-100 p-4 text-sm dark:bg-slate-800 ${
+        pos.mode === 'gutter' ? '' : 'left-0 w-fit max-w-full'
       }`}
     >
       {state.kind === 'text' ? (
@@ -164,12 +172,39 @@ const Popover = forwardRef<
       ) : (
         <div className="flex flex-col gap-3">
           <span className="break-all text-slate-600 dark:text-slate-400">{state.url}</span>
-          <div className="flex gap-2">
-            <a href={state.url} target="_blank" rel="noopener noreferrer" className={btn}>
-              Visit
+          <div className="flex gap-1">
+            <a
+              href={state.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Open link in new tab"
+              className={iconBtn}
+            >
+              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
+                <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
+              </svg>
             </a>
-            <button type="button" onClick={onCopy} className={btn}>
-              {copied ? 'Copied' : 'Copy'}
+            <button
+              type="button"
+              onClick={onCopy}
+              aria-label={copied ? 'Copied' : 'Copy link'}
+              className={`${iconBtn} ${copied ? 'text-green-600 dark:text-green-400' : ''}`}
+            >
+              {copied ? (
+                <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path
+                    fillRule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              ) : (
+                <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M7 9a2 2 0 012-2h6a2 2 0 012 2v6a2 2 0 01-2 2H9a2 2 0 01-2-2V9z" />
+                  <path d="M5 3a2 2 0 00-2 2v6a2 2 0 002 2V5h8a2 2 0 00-2-2H5z" />
+                </svg>
+              )}
             </button>
           </div>
         </div>

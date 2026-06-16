@@ -81,8 +81,8 @@ describe('<ProsePopovers> interaction', () => {
     )
     fireEvent.click(screen.getByText('ext'))
     const dialog = screen.getByRole('dialog')
-    expect(within(dialog).getByText('Visit')).toBeInTheDocument()
-    expect(within(dialog).getByText('Copy')).toBeInTheDocument()
+    expect(within(dialog).getByRole('link', { name: /open link in new tab/i })).toBeInTheDocument()
+    expect(within(dialog).getByRole('button', { name: /copy link/i })).toBeInTheDocument()
   })
 
   it('copies the url to the clipboard and shows Copied', async () => {
@@ -95,10 +95,10 @@ describe('<ProsePopovers> interaction', () => {
     )
     fireEvent.click(screen.getByText('ext'))
     await act(async () => {
-      fireEvent.click(screen.getByText('Copy'))
+      fireEvent.click(screen.getByRole('button', { name: /copy link/i }))
     })
     expect(writeText).toHaveBeenCalledWith('https://example.com/x')
-    expect(screen.getByText('Copied')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /copied/i })).toBeInTheDocument()
   })
 
   it('does not open a popover for internal links', () => {
