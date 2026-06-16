@@ -66,7 +66,7 @@ export default function PostLayout({ content, next, prev, children }: LayoutProp
           )}
 
           {/* Comments */}
-          {siteMetadata.comments && (
+          {siteMetadata.comments?.provider && (
             <div className="mt-12" id="comment">
               <Comments slug={slug} />
             </div>
