@@ -8,8 +8,6 @@ import siteMetadata from '@/data/siteMetadata'
 import ScrollTopAndComment from '@/components/ScrollTopAndComment'
 import { TableOfContentsMobile, TableOfContentsDesktop } from '@/components/TableOfContents'
 
-const editUrl = (path) => `${siteMetadata.siteRepo}/blob/${siteMetadata.repoBranch}/data/${path}`
-
 const postDateTemplate: Intl.DateTimeFormatOptions = {
   year: 'numeric',
   month: 'long',
@@ -33,7 +31,7 @@ export default function PostLayout({
   toc,
   children,
 }: LayoutProps) {
-  const { filePath, path, slug, date, title, tags } = content
+  const { path, slug, date, title, tags } = content
   const basePath = path.split('/')[0]
 
   return (
@@ -77,13 +75,7 @@ export default function PostLayout({
 
           {/* Footer */}
           <footer className="mt-12 border-t border-gray-200 pt-8 dark:border-gray-800">
-            <div className="flex items-center justify-between text-sm">
-              <Link
-                href={editUrl(filePath)}
-                className="text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-              >
-                View on GitHub
-              </Link>
+            <div className="flex items-center justify-end text-sm">
               <Link
                 href={`/${basePath}`}
                 className="font-medium text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
