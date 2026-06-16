@@ -7,6 +7,7 @@ import Link from '@/components/Link'
 import SectionContainer from '@/components/SectionContainer'
 import siteMetadata from '@/data/siteMetadata'
 import ScrollTopAndComment from '@/components/ScrollTopAndComment'
+import ProsePopovers from '@/components/ProsePopovers'
 
 interface LayoutProps {
   content: CoreContent<Blog>
@@ -33,7 +34,9 @@ export default function PostLayout({ content, next, prev, children }: LayoutProp
         </header>
 
         {/* Content */}
-        <div className="prose prose-gray max-w-none dark:prose-invert">{children}</div>
+        <ProsePopovers className="prose prose-gray max-w-none dark:prose-invert">
+          {children}
+        </ProsePopovers>
 
         {/* Footer */}
         <footer className="mt-12 border-t border-gray-200 pt-8 dark:border-gray-800">
