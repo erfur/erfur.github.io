@@ -7,6 +7,7 @@ import SectionContainer from '@/components/SectionContainer'
 import siteMetadata from '@/data/siteMetadata'
 import ScrollTopAndComment from '@/components/ScrollTopAndComment'
 import { TableOfContentsMobile, TableOfContentsDesktop } from '@/components/TableOfContents'
+import ProsePopovers from '@/components/ProsePopovers'
 
 const postDateTemplate: Intl.DateTimeFormatOptions = {
   year: 'numeric',
@@ -70,7 +71,9 @@ export default function PostLayout({
           {toc && toc.length > 0 && <TableOfContentsMobile toc={toc} title={title} />}
 
           {/* Content */}
-          <div className="prose prose-gray max-w-none dark:prose-invert">{children}</div>
+          <ProsePopovers className="prose prose-gray max-w-none dark:prose-invert">
+            {children}
+          </ProsePopovers>
 
           {/* Comments */}
           {siteMetadata.comments?.provider && (
