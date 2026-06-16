@@ -16,9 +16,6 @@ const ScrollTopAndComment = () => {
     return () => window.removeEventListener('scroll', handleWindowScroll)
   }, [])
 
-  const handleScrollTop = () => {
-    window.scrollTo({ top: 0 })
-  }
   const handleScrollToComment = () => {
     document.getElementById('comment')?.scrollIntoView()
   }
@@ -41,19 +38,6 @@ const ScrollTopAndComment = () => {
           </svg>
         </button>
       )}
-      <button
-        aria-label="Scroll To Top"
-        onClick={handleScrollTop}
-        className="rounded-full bg-slate-100 p-2 text-slate-600 transition-all hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-      >
-        <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-          <path
-            fillRule="evenodd"
-            d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z"
-            clipRule="evenodd"
-          />
-        </svg>
-      </button>
     </div>
   )
 }
