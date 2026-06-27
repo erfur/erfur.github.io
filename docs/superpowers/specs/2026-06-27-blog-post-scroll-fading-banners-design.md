@@ -20,6 +20,8 @@ fades out as the reader scrolls down into the article.
    then fades toward transparent over the initial scroll distance.
 5. **Layouts:** both `layouts/PostLayout.tsx` and `layouts/PostSimple.tsx`
    support the same banner behavior.
+6. **Agent guidance:** root `AGENTS.md` documents how to add a banner to a blog
+   post so future agents use the existing `images[0]` convention.
 
 ## Architecture
 
@@ -55,6 +57,16 @@ In each post layout:
 This keeps the banner outside the `ProsePopovers` wrapper and avoids affecting
 footnote/link popover behavior, TOC behavior, comments, or article body styling.
 
+### Agent Documentation
+
+Root `AGENTS.md` includes the authoring convention for blog banners:
+
+1. Add an image path as the first entry in the post's `images` frontmatter list.
+2. Store local assets under `public/static/images/` and reference them as
+   `/static/images/...`.
+3. Do not introduce a separate `banner` frontmatter field unless the content
+   model intentionally changes.
+
 ## Visual Treatment
 
 The banner should fit the current minimal article style:
@@ -73,6 +85,7 @@ Automated tests should cover the behavior that can regress in code:
 2. A post without `images` does not render a banner.
 3. Scroll changes the banner opacity.
 4. Reduced-motion preference prevents opacity changes.
+5. `AGENTS.md` explains how to add a banner to a blog post.
 
 Existing layout tests, if present, should be extended. If no suitable layout test
 exists, add focused tests for `PostBanner` plus minimal layout render tests.
