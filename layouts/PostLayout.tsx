@@ -8,6 +8,7 @@ import siteMetadata from '@/data/siteMetadata'
 import ScrollTopAndComment from '@/components/ScrollTopAndComment'
 import { TableOfContentsMobile, TableOfContentsDesktop } from '@/components/TableOfContents'
 import ProsePopovers from '@/components/ProsePopovers'
+import PostBanner from '@/components/PostBanner'
 
 const postDateTemplate: Intl.DateTimeFormatOptions = {
   year: 'numeric',
@@ -32,13 +33,16 @@ export default function PostLayout({
   toc,
   children,
 }: LayoutProps) {
-  const { slug, date, title, tags } = content
+  const { slug, date, title, tags, images } = content
+  const bannerSrc = Array.isArray(images) && typeof images[0] === 'string' ? images[0] : undefined
 
   return (
     <SectionContainer>
       <ScrollTopAndComment />
       <div>
         <article className="mx-auto max-w-3xl">
+          <PostBanner src={bannerSrc} alt={title} />
+
           {/* Header */}
           <header className="pb-8 pt-4">
             <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">

@@ -8,6 +8,7 @@ import SectionContainer from '@/components/SectionContainer'
 import siteMetadata from '@/data/siteMetadata'
 import ScrollTopAndComment from '@/components/ScrollTopAndComment'
 import ProsePopovers from '@/components/ProsePopovers'
+import PostBanner from '@/components/PostBanner'
 
 interface LayoutProps {
   content: CoreContent<Blog>
@@ -17,12 +18,15 @@ interface LayoutProps {
 }
 
 export default function PostLayout({ content, next, prev, children }: LayoutProps) {
-  const { slug, date, title } = content
+  const { slug, date, title, images } = content
+  const bannerSrc = Array.isArray(images) && typeof images[0] === 'string' ? images[0] : undefined
 
   return (
     <SectionContainer>
       <ScrollTopAndComment />
       <article className="mx-auto max-w-3xl">
+        <PostBanner src={bannerSrc} alt={title} />
+
         {/* Header */}
         <header className="pb-8 pt-4">
           <time dateTime={date} className="text-sm text-gray-500 dark:text-gray-400">
