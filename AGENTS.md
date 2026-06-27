@@ -3,7 +3,7 @@
 ## Blog Post Banners
 
 Blog post banners are authored with the existing `images` frontmatter field. The
-first image in the list is used as the banner image for that post.
+first image in the list (`images[0]`) is used as the banner image for that post.
 
 Example:
 
