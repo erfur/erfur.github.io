@@ -41,7 +41,7 @@ export default function PostLayout({
       <ScrollTopAndComment />
       <div>
         <article className="mx-auto max-w-3xl">
-          <PostBanner src={bannerSrc} alt={title} />
+          {bannerSrc && <PostBanner src={bannerSrc} alt={title} />}
 
           {/* Header */}
           <header className="pb-8 pt-4">
