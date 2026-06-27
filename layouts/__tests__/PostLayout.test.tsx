@@ -39,10 +39,12 @@ beforeEach(() => {
 it('renders the first image as the post banner', () => {
   render(
     <PostLayout
-      content={{
-        ...baseContent,
-        images: ['/static/images/example/banner.jpg', '/static/images/example/other.jpg'],
-      } as never}
+      content={
+        {
+          ...baseContent,
+          images: ['/static/images/example/banner.jpg', '/static/images/example/other.jpg'],
+        } as never
+      }
       authorDetails={[]}
     >
       <p>body</p>
@@ -79,7 +81,10 @@ it('does not mount a post banner when images is empty', () => {
 
 it('does not mount a post banner when images is not an array', () => {
   render(
-    <PostLayout content={{ ...baseContent, images: '/static/images/example/banner.jpg' } as never} authorDetails={[]}>
+    <PostLayout
+      content={{ ...baseContent, images: '/static/images/example/banner.jpg' } as never}
+      authorDetails={[]}
+    >
       <p>body</p>
     </PostLayout>
   )

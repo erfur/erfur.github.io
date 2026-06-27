@@ -61,7 +61,14 @@ export default function PostBanner({ src, alt }: PostBannerProps) {
       className="relative mb-8 h-48 overflow-hidden rounded-2xl bg-gray-100 shadow-sm dark:bg-gray-800 sm:h-64"
       style={{ opacity }}
     >
-      <Image src={src} alt={alt} fill sizes="(min-width: 768px) 768px, 100vw" className="object-cover" unoptimized />
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        sizes="(min-width: 768px) 768px, 100vw"
+        className="object-cover"
+        unoptimized
+      />
     </div>
   )
 }

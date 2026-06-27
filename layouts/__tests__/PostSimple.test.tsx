@@ -37,10 +37,12 @@ beforeEach(() => {
 it('renders the first image as the post banner', () => {
   render(
     <PostSimple
-      content={{
-        ...baseContent,
-        images: ['/static/images/example/banner.jpg', '/static/images/example/other.jpg'],
-      } as never}
+      content={
+        {
+          ...baseContent,
+          images: ['/static/images/example/banner.jpg', '/static/images/example/other.jpg'],
+        } as never
+      }
     >
       <p>body</p>
     </PostSimple>
