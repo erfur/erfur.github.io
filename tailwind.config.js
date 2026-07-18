@@ -18,6 +18,7 @@ module.exports = {
         sans: ['var(--font-roboto)', 'system-ui', 'sans-serif'],
         heading: ['var(--font-roboto-slab)', 'Georgia', 'serif'],
         mono: ['var(--font-jetbrains-mono)', 'Menlo', 'monospace'],
+        proseBody: ['var(--font-merriweather)', 'Georgia', 'serif'],
       },
       colors: {
         primary: colors.sky,
@@ -93,6 +94,19 @@ module.exports = {
               fontFamily: theme('fontFamily.mono').join(', '),
               backgroundColor: 'transparent',
               padding: '0',
+            },
+          },
+        },
+        post: {
+          css: {
+            p: {
+              fontFamily: theme('fontFamily.proseBody').join(', '),
+              fontSize: '1.1rem',
+              lineHeight: '1.6',
+            },
+            'ul, ol': {
+              fontFamily: theme('fontFamily.proseBody').join(', '),
+              fontSize: '1.1rem',
             },
           },
         },

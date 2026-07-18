@@ -92,3 +92,13 @@ it('does not mount a post banner when images is not an array', () => {
   expect(screen.queryByTestId('post-banner')).not.toBeInTheDocument()
   expect(mockPostBanner).not.toHaveBeenCalled()
 })
+
+it('opts post prose into the post body typography modifier', () => {
+  render(
+    <PostLayout content={baseContent as never} authorDetails={[]}>
+      <p>body</p>
+    </PostLayout>
+  )
+
+  expect(screen.getByText('body').parentElement).toHaveClass('prose-post')
+})

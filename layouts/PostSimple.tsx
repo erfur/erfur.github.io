@@ -38,7 +38,7 @@ export default function PostLayout({ content, next, prev, children }: LayoutProp
         </header>
 
         {/* Content */}
-        <ProsePopovers className="prose prose-gray max-w-none dark:prose-invert">
+        <ProsePopovers className="prose prose-gray prose-post max-w-none dark:prose-invert">
           {children}
         </ProsePopovers>
 
