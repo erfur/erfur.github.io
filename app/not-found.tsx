@@ -15,7 +15,7 @@ export default function NotFound() {
         <p className="mb-8">But dont worry, you can find plenty of other things on our homepage.</p>
         <Link
           href="/"
-          className="inline border border-primary-container bg-primary-container px-4 py-2 text-body-md font-medium text-on-primary transition-colors hover:border-primary hover:bg-primary focus:outline-none dark:border-inverse-primary dark:bg-[#881d24] dark:text-inverse-on-surface dark:hover:bg-primary"
+          className="inline border border-primary-container bg-primary-container px-4 py-2 text-body-md font-medium text-on-primary transition-colors hover:border-primary hover:bg-primary dark:border-inverse-primary dark:bg-[#881d24] dark:text-inverse-on-surface dark:hover:bg-primary"
         >
           Back to homepage
         </Link>

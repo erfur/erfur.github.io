@@ -112,15 +112,18 @@ export default function ListLayout({
 
       <ul className="divide-y divide-outline-variant border-y border-outline-variant dark:divide-outline dark:border-outline">
         {!filteredBlogPosts.length && (
-          <p className="text-body-md text-tertiary dark:text-[#b7c8e1]">No posts found.</p>
+          <li className="text-body-md text-tertiary dark:text-[#b7c8e1]">No posts found.</li>
         )}
         {displayPosts.map((post) => {
           const { path, date, title, tags } = post
           return (
-            <li key={path}>
+            <li
+              key={path}
+              className="odd:bg-surface-container-lowest even:bg-surface-container-low dark:odd:bg-[#323638] dark:even:bg-[#383d40]"
+            >
               <Link
                 href={`/${path}`}
-                className="group -mx-2 flex items-baseline gap-4 px-2 py-3 transition-colors odd:bg-surface-container-lowest even:bg-surface-container-low hover:bg-surface-container dark:odd:bg-[#323638] dark:even:bg-[#383d40] dark:hover:bg-[#41474a]"
+                className="group -mx-2 flex items-baseline gap-4 px-2 py-3 transition-colors hover:bg-surface-container dark:hover:bg-[#41474a]"
               >
                 <span className="font-semibold text-on-surface transition-colors group-hover:text-primary dark:text-inverse-on-surface dark:group-hover:text-inverse-primary">
                   {title}

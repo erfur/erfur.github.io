@@ -92,6 +92,7 @@ export default function ListLayoutWithTags({
         <div className="mt-4 flex flex-wrap items-center gap-2">
           <Link
             href="/blog"
+            aria-current={!currentTag ? 'page' : undefined}
             className={
               !currentTag
                 ? 'border border-primary-container bg-primary-container px-3 py-1 text-label-sm uppercase text-on-primary dark:border-inverse-primary dark:bg-[#881d24] dark:text-inverse-on-surface'
@@ -106,6 +107,7 @@ export default function ListLayoutWithTags({
               <Link
                 key={t}
                 href={`/tags/${slug(t)}`}
+                aria-current={isActive ? 'page' : undefined}
                 className={
                   isActive
                     ? 'border border-primary-container bg-primary-container px-3 py-1 text-label-sm uppercase text-on-primary dark:border-inverse-primary dark:bg-[#881d24] dark:text-inverse-on-surface'
@@ -125,10 +127,13 @@ export default function ListLayoutWithTags({
         {displayPosts.map((post) => {
           const { path, date, title, tags } = post
           return (
-            <li key={path}>
+            <li
+              key={path}
+              className="odd:bg-surface-container-lowest even:bg-surface-container-low dark:odd:bg-[#323638] dark:even:bg-[#383d40]"
+            >
               <Link
                 href={`/${path}`}
-                className="group -mx-2 flex items-baseline gap-4 px-2 py-3 transition-colors odd:bg-surface-container-lowest even:bg-surface-container-low hover:bg-surface-container dark:odd:bg-[#323638] dark:even:bg-[#383d40] dark:hover:bg-[#41474a]"
+                className="group -mx-2 flex items-baseline gap-4 px-2 py-3 transition-colors hover:bg-surface-container dark:hover:bg-[#41474a]"
               >
                 <span className="font-semibold text-on-surface transition-colors group-hover:text-primary dark:text-inverse-on-surface dark:group-hover:text-inverse-primary">
                   {title}
