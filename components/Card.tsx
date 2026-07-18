@@ -11,15 +11,15 @@ const Card = ({
 }) => {
   const content = (
     <>
-      <h2 className="font-heading font-normal text-gray-900 transition-colors group-hover:text-primary-600 dark:text-gray-100 dark:group-hover:text-primary-400">
+      <h2 className="font-semibold text-on-surface transition-colors group-hover:text-primary dark:text-inverse-on-surface dark:group-hover:text-inverse-primary">
         {title}
       </h2>
-      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{description}</p>
+      <p className="mt-1 text-body-md text-tertiary dark:text-[#b7c8e1]">{description}</p>
     </>
   )
 
   const className =
-    'group block rounded-lg border border-gray-200 p-4 transition-colors hover:border-gray-300 hover:bg-gray-50 dark:border-gray-700 dark:hover:border-gray-600 dark:hover:bg-gray-800/50'
+    'group block border border-outline-variant bg-surface-container-lowest p-4 transition-colors hover:border-primary-container hover:bg-surface-container-low dark:border-outline dark:bg-[#323638] dark:hover:border-inverse-primary dark:hover:bg-[#383d40]'
 
   if (href) {
     return (

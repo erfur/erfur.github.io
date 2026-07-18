@@ -26,21 +26,23 @@ function Pagination({ totalPages, currentPage }: PaginationProps) {
   const nextPage = currentPage + 1 <= totalPages
 
   return (
-    <nav className="flex items-center justify-between border-t border-gray-200 pt-6 dark:border-gray-800">
+    <nav className="flex items-center justify-between border-t border-outline-variant pt-6 dark:border-outline">
       <div>
         {prevPage ? (
           <Link
             href={currentPage - 1 === 1 ? `/${basePath}/` : `/${basePath}/page/${currentPage - 1}`}
             rel="prev"
-            className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+            className="text-body-md font-medium text-secondary hover:text-primary dark:text-[#bcc7de] dark:hover:text-inverse-primary"
           >
             &larr; Previous
           </Link>
         ) : (
-          <span className="text-sm text-gray-400 dark:text-gray-600">&larr; Previous</span>
+          <span className="text-body-md text-tertiary opacity-50 dark:text-[#b7c8e1]">
+            &larr; Previous
+          </span>
         )}
       </div>
-      <span className="text-sm text-gray-500 dark:text-gray-400">
+      <span className="text-body-md text-tertiary dark:text-[#b7c8e1]">
         {currentPage} / {totalPages}
       </span>
       <div>
@@ -48,12 +50,14 @@ function Pagination({ totalPages, currentPage }: PaginationProps) {
           <Link
             href={`/${basePath}/page/${currentPage + 1}`}
             rel="next"
-            className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+            className="text-body-md font-medium text-secondary hover:text-primary dark:text-[#bcc7de] dark:hover:text-inverse-primary"
           >
             Next &rarr;
           </Link>
         ) : (
-          <span className="text-sm text-gray-400 dark:text-gray-600">Next &rarr;</span>
+          <span className="text-body-md text-tertiary opacity-50 dark:text-[#b7c8e1]">
+            Next &rarr;
+          </span>
         )}
       </div>
     </nav>
@@ -78,7 +82,7 @@ export default function ListLayout({
   return (
     <div className="mx-auto max-w-3xl">
       <header className="pb-6 pt-4">
-        <h1 className="font-heading text-2xl font-normal tracking-tight text-gray-900 dark:text-gray-100">
+        <h1 className="text-headline-lg-mobile text-on-surface dark:text-inverse-on-surface sm:text-headline-lg">
           {title}
         </h1>
         <div className="relative mt-4">
@@ -87,10 +91,10 @@ export default function ListLayout({
             type="text"
             onChange={(e) => setSearchValue(e.target.value)}
             placeholder="Search articles..."
-            className="block w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500"
+            className="block w-full border border-outline-variant bg-surface-container-lowest px-4 py-2.5 text-body-md text-on-surface placeholder:text-tertiary focus:border-primary-container focus:outline-none focus:ring-0 dark:border-outline dark:bg-[#383d40] dark:text-inverse-on-surface dark:placeholder:text-[#b7c8e1]"
           />
           <svg
-            className="absolute right-3 top-2.5 h-5 w-5 text-gray-400 dark:text-gray-500"
+            className="absolute right-3 top-2.5 h-5 w-5 text-tertiary dark:text-[#b7c8e1]"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -106,9 +110,9 @@ export default function ListLayout({
         </div>
       </header>
 
-      <ul className="space-y-1">
+      <ul className="divide-y divide-outline-variant border-y border-outline-variant dark:divide-outline dark:border-outline">
         {!filteredBlogPosts.length && (
-          <p className="text-gray-500 dark:text-gray-400">No posts found.</p>
+          <p className="text-body-md text-tertiary dark:text-[#b7c8e1]">No posts found.</p>
         )}
         {displayPosts.map((post) => {
           const { path, date, title, tags } = post
@@ -116,21 +120,24 @@ export default function ListLayout({
             <li key={path}>
               <Link
                 href={`/${path}`}
-                className="group -mx-2 flex items-baseline gap-4 rounded-lg px-2 py-3 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800/50"
+                className="group -mx-2 flex items-baseline gap-4 px-2 py-3 transition-colors odd:bg-surface-container-lowest even:bg-surface-container-low hover:bg-surface-container dark:odd:bg-[#323638] dark:even:bg-[#383d40] dark:hover:bg-[#41474a]"
               >
-                <span className="font-heading font-normal text-gray-900 transition-colors group-hover:text-primary-600 dark:text-gray-100 dark:group-hover:text-primary-400">
+                <span className="font-semibold text-on-surface transition-colors group-hover:text-primary dark:text-inverse-on-surface dark:group-hover:text-inverse-primary">
                   {title}
                 </span>
                 <span className="hidden shrink-0 gap-1.5 sm:flex">
                   {tags?.slice(0, 2).map((tag) => (
-                    <span key={tag} className="text-xs text-gray-400 dark:text-gray-500">
+                    <span
+                      key={tag}
+                      className="text-label-sm uppercase text-tertiary dark:text-[#b7c8e1]"
+                    >
                       #{tag}
                     </span>
                   ))}
                 </span>
                 <time
                   dateTime={date}
-                  className="ml-auto shrink-0 text-sm tabular-nums text-gray-400 dark:text-gray-500"
+                  className="ml-auto shrink-0 text-body-md tabular-nums text-tertiary dark:text-[#b7c8e1]"
                 >
                   {formatDate(date, siteMetadata.locale)}
                 </time>
