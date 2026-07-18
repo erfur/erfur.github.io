@@ -1,7 +1,7 @@
 import 'css/tailwind.css'
 import 'pliny/search/algolia.css'
 
-import { Roboto, Roboto_Slab, JetBrains_Mono, Merriweather } from 'next/font/google'
+import { JetBrains_Mono } from 'next/font/google'
 import { Analytics, AnalyticsConfig } from 'pliny/analytics'
 import { SearchProvider, SearchConfig } from 'pliny/search'
 import Header from '@/components/Header'
@@ -11,31 +11,11 @@ import siteMetadata from '@/data/siteMetadata'
 import { ThemeProviders } from './theme-providers'
 import { Metadata } from 'next'
 
-const roboto = Roboto({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-roboto',
-  weight: ['400', '500', '700'],
-})
-
-const robotoSlab = Roboto_Slab({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-roboto-slab',
-})
-
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-jetbrains-mono',
-})
-
-const merriweather = Merriweather({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-merriweather',
-  weight: ['400', '700'],
-  style: ['normal', 'italic'],
+  weight: ['400', '500', '600', '700'],
 })
 
 export const metadata: Metadata = {
@@ -82,7 +62,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang={siteMetadata.language}
-      className={`${roboto.variable} ${robotoSlab.variable} ${jetbrainsMono.variable} ${merriweather.variable} scroll-smooth`}
+      className={`${jetbrainsMono.variable} scroll-smooth`}
       suppressHydrationWarning
     >
       <link rel="apple-touch-icon" sizes="76x76" href="/static/favicons/apple-touch-icon.png" />
@@ -91,10 +71,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <link rel="manifest" href="/static/favicons/site.webmanifest" />
       <link rel="mask-icon" href="/static/favicons/safari-pinned-tab.svg" color="#5bbad5" />
       <meta name="msapplication-TileColor" content="#000000" />
-      <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fff" />
-      <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000" />
+      <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f7f9fb" />
+      <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#2d3133" />
       <link rel="alternate" type="application/rss+xml" href="/feed.xml" />
-      <body className="bg-slate-50 text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100">
+      <body className="bg-surface font-sans text-on-surface antialiased dark:bg-inverse-surface dark:text-inverse-on-surface">
         <ThemeProviders>
           <Analytics analyticsConfig={siteMetadata.analytics as AnalyticsConfig} />
           <SectionContainer>

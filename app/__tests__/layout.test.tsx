@@ -1,8 +1,5 @@
 jest.mock('next/font/google', () => ({
-  Roboto: jest.fn(() => ({ variable: 'roboto-variable' })),
-  Roboto_Slab: jest.fn(() => ({ variable: 'roboto-slab-variable' })),
   JetBrains_Mono: jest.fn(() => ({ variable: 'jetbrains-mono-variable' })),
-  Merriweather: jest.fn(() => ({ variable: 'merriweather-variable' })),
 }))
 
 jest.mock('@/components/Header', () => () => null)
@@ -21,15 +18,14 @@ jest.mock('../theme-providers', () => ({
   ThemeProviders: ({ children }: { children: React.ReactNode }) => children,
 }))
 
-import { Merriweather } from 'next/font/google'
+import { JetBrains_Mono } from 'next/font/google'
 import '../layout'
 
-it('loads the post body font with normal and italic 400 and 700 variants', () => {
-  expect(Merriweather).toHaveBeenCalledWith({
+it('loads JetBrains Mono as the only site typeface', () => {
+  expect(JetBrains_Mono).toHaveBeenCalledWith({
     subsets: ['latin'],
     display: 'swap',
-    variable: '--font-merriweather',
-    weight: ['400', '700'],
-    style: ['normal', 'italic'],
+    variable: '--font-jetbrains-mono',
+    weight: ['400', '500', '600', '700'],
   })
 })

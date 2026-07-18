@@ -6,35 +6,67 @@ function theme(path) {
   return path.split('.').reduce((value, key) => value[key], extendedTheme)
 }
 
-describe('post body typography', () => {
-  const typography = extendedTheme.typography({ theme })
-
-  it('defines the scoped Merriweather family', () => {
-    expect(extendedTheme.fontFamily.proseBody).toEqual([
-      'var(--font-merriweather)',
-      'Georgia',
-      'serif',
-    ])
+describe('Clinical Precision theme', () => {
+  it('defines the semantic light palette exactly', () => {
+    expect(extendedTheme.colors).toMatchObject({
+      surface: '#f7f9fb',
+      'surface-container-lowest': '#ffffff',
+      'surface-container-low': '#f2f4f6',
+      'surface-container': '#eceef0',
+      'surface-container-high': '#e6e8ea',
+      'surface-container-highest': '#e0e3e5',
+      'on-surface': '#191c1e',
+      'on-surface-variant': '#574140',
+      'inverse-surface': '#2d3133',
+      'inverse-on-surface': '#eff1f3',
+      outline: '#8b7170',
+      'outline-variant': '#debfbe',
+      primary: '#a83639',
+      'on-primary': '#ffffff',
+      'primary-container': '#f87171',
+      'on-primary-container': '#6c0513',
+      'inverse-primary': '#ffb3b0',
+      secondary: '#545f73',
+      tertiary: '#505f76',
+      error: '#ba1a1a',
+    })
   })
 
-  it('uses Merriweather at 1.1rem for paragraphs and lists only', () => {
-    const css = typography.post.css
+  it('uses JetBrains Mono for every text role', () => {
+    expect(extendedTheme.fontFamily).toEqual({
+      mono: ['var(--font-jetbrains-mono)', 'Menlo', 'monospace'],
+      sans: ['var(--font-jetbrains-mono)', 'Menlo', 'monospace'],
+      heading: ['var(--font-jetbrains-mono)', 'Menlo', 'monospace'],
+    })
+  })
 
-    expect(css.p).toMatchObject({
-      fontFamily: 'var(--font-merriweather), Georgia, serif',
-      fontSize: '1.1rem',
-      lineHeight: '1.6',
+  it('defines the approved type scale', () => {
+    expect(extendedTheme.fontSize).toMatchObject({
+      'headline-lg': [
+        '2rem',
+        { lineHeight: '2.5rem', letterSpacing: '-0.02em', fontWeight: '700' },
+      ],
+      'headline-lg-mobile': [
+        '1.5rem',
+        { lineHeight: '2rem', letterSpacing: '-0.02em', fontWeight: '700' },
+      ],
+      'headline-md': ['1.25rem', { lineHeight: '1.75rem', fontWeight: '600' }],
+      'body-lg': ['1rem', { lineHeight: '1.5rem', fontWeight: '400' }],
+      'body-md': ['0.875rem', { lineHeight: '1.25rem', fontWeight: '400' }],
+      'label-sm': ['0.75rem', { lineHeight: '1rem', letterSpacing: '0.05em', fontWeight: '500' }],
+      'code-inline': ['0.8125rem', { lineHeight: '1.125rem', fontWeight: '400' }],
     })
-    expect(css['ul, ol']).toMatchObject({
-      fontFamily: 'var(--font-merriweather), Georgia, serif',
-      fontSize: '1.1rem',
+  })
+
+  it('uses the body and inline-code roles in prose', () => {
+    const css = extendedTheme.typography({ theme }).DEFAULT.css
+    expect(css.fontFamily).toBe('var(--font-jetbrains-mono), Menlo, monospace')
+    expect(css.p).toMatchObject({ fontSize: '1rem', lineHeight: '1.5rem' })
+    expect(css.code).toMatchObject({
+      fontSize: '0.8125rem',
+      lineHeight: '1.125rem',
+      borderRadius: '0',
     })
-    expect(typography.DEFAULT.css.fontFamily).toBe('var(--font-roboto), system-ui, sans-serif')
-    expect(typography.DEFAULT.css['h1,h2,h3,h4,h5,h6'].fontFamily).toBe(
-      'var(--font-roboto-slab), Georgia, serif'
-    )
-    expect(typography.DEFAULT.css.code.fontFamily).toBe(
-      'var(--font-jetbrains-mono), Menlo, monospace'
-    )
+    expect(css.img).toMatchObject({ borderRadius: '0', boxShadow: 'none' })
   })
 })
