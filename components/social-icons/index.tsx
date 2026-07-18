@@ -36,15 +36,13 @@ const SocialIcon = ({ kind, href, size = 8 }: SocialIconProps) => {
 
   return (
     <a
-      className="text-sm text-gray-500 transition hover:text-gray-600"
+      className="flex h-8 w-8 items-center justify-center border border-transparent text-tertiary transition-colors hover:border-primary-container hover:bg-surface-container-low hover:text-primary dark:text-[#b7c8e1] dark:hover:border-inverse-primary dark:hover:bg-[#383d40] dark:hover:text-inverse-primary"
       target="_blank"
       rel="noopener noreferrer"
       href={href}
     >
       <span className="sr-only">{kind}</span>
-      <SocialSvg
-        className={`fill-current text-gray-700 hover:text-primary-500 dark:text-gray-200 dark:hover:text-primary-400 h-${size} w-${size}`}
-      />
+      <SocialSvg className={`h-${size} w-${size} fill-current`} />
     </a>
   )
 }

@@ -23,7 +23,7 @@ const MobileNav = () => {
       <button
         aria-label="Toggle Menu"
         onClick={onToggleNav}
-        className="flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100 sm:hidden"
+        className="flex h-8 w-8 items-center justify-center border border-transparent text-tertiary transition-colors hover:border-primary-container hover:bg-surface-container-low hover:text-primary dark:text-[#b7c8e1] dark:hover:border-inverse-primary dark:hover:bg-[#383d40] dark:hover:text-inverse-primary sm:hidden"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -39,14 +39,14 @@ const MobileNav = () => {
         </svg>
       </button>
       <div
-        className={`fixed inset-0 z-50 transform bg-white/95 backdrop-blur-sm transition-transform duration-200 ease-out dark:bg-gray-950/95 ${
+        className={`fixed inset-0 z-50 transform bg-surface/95 backdrop-blur-sm transition-transform duration-200 ease-out dark:bg-inverse-surface/95 ${
           navShow ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
         <div className="flex h-full flex-col">
           <div className="flex justify-end p-6">
             <button
-              className="flex h-8 w-8 items-center justify-center rounded-md text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100"
+              className="flex h-8 w-8 items-center justify-center border border-transparent text-tertiary transition-colors hover:border-primary-container hover:bg-surface-container-low hover:text-primary dark:text-[#b7c8e1] dark:hover:border-inverse-primary dark:hover:bg-[#383d40] dark:hover:text-inverse-primary"
               aria-label="Close Menu"
               onClick={onToggleNav}
             >
@@ -69,7 +69,7 @@ const MobileNav = () => {
               <Link
                 key={link.title}
                 href={link.href}
-                className="border-b border-gray-100 py-4 font-heading text-lg font-normal text-gray-900 transition-colors hover:text-primary-600 dark:border-gray-800 dark:text-gray-100 dark:hover:text-primary-400"
+                className="border-b border-outline-variant py-4 text-headline-md text-on-surface transition-colors hover:text-primary dark:border-outline dark:text-inverse-on-surface dark:hover:text-inverse-primary"
                 onClick={onToggleNav}
               >
                 {link.title}

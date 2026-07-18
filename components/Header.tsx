@@ -8,11 +8,11 @@ import SocialIcon from '@/components/social-icons'
 
 const Header = () => {
   return (
-    <header className="mx-auto flex w-full max-w-3xl items-center justify-between py-6">
+    <header className="mx-auto flex w-full max-w-3xl items-center justify-between py-6 text-on-surface dark:text-inverse-on-surface">
       <Link
         href="/"
         aria-label={siteMetadata.headerTitle}
-        className="flex items-center gap-2 text-gray-900 transition-colors hover:text-primary-600 dark:text-gray-100 dark:hover:text-primary-400"
+        className="flex items-center gap-2 transition-colors hover:text-primary dark:hover:text-inverse-primary"
       >
         <Logo className="h-8 w-8" />
         <span className="font-heading text-lg font-normal tracking-tight">
@@ -26,15 +26,15 @@ const Header = () => {
             <Link
               key={link.title}
               href={link.href}
-              className="hidden rounded-md px-3 py-1.5 font-heading text-sm font-normal text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100 sm:block"
+              className="hidden px-3 py-1.5 text-body-md text-secondary transition-colors hover:bg-surface-container-low hover:text-on-surface dark:text-[#bcc7de] dark:hover:bg-[#383d40] dark:hover:text-inverse-on-surface sm:block"
             >
               {link.title}
             </Link>
           ))}
-        <div className="ml-2 flex h-8 items-center border-l border-gray-200 pl-2 dark:border-gray-700">
+        <div className="ml-2 flex h-8 items-center border-l border-outline-variant pl-2 dark:border-outline">
           <SocialIcon kind="github" href={siteMetadata.github} size={5} />
         </div>
-        <div className="flex h-8 items-center border-l border-gray-200 pl-2 dark:border-gray-700">
+        <div className="ml-2 flex h-8 items-center border-l border-outline-variant pl-2 dark:border-outline">
           <ThemeSwitch />
           <MobileNav />
         </div>
