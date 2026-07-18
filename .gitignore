@@ -48,3 +48,6 @@ yarn-error.log*
 .contentlayer
 
 /app/tag-data.json
+
+# local git worktrees
+/.worktrees/
