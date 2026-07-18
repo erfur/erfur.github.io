@@ -22,10 +22,15 @@ const components = {
   instagram: Instagram,
 }
 
+const iconSizeClasses = {
+  5: 'h-5 w-5 fill-current',
+  8: 'h-8 w-8 fill-current',
+} as const
+
 type SocialIconProps = {
   kind: keyof typeof components
   href: string | undefined
-  size?: number
+  size?: keyof typeof iconSizeClasses
 }
 
 const SocialIcon = ({ kind, href, size = 8 }: SocialIconProps) => {
@@ -42,7 +47,7 @@ const SocialIcon = ({ kind, href, size = 8 }: SocialIconProps) => {
       href={href}
     >
       <span className="sr-only">{kind}</span>
-      <SocialSvg className={`h-${size} w-${size} fill-current`} />
+      <SocialSvg className={iconSizeClasses[size]} />
     </a>
   )
 }
