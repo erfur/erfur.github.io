@@ -49,6 +49,8 @@ it('renders the banner image when a source is provided', () => {
   const image = screen.getByAltText('Example post')
 
   expect(banner).toBeInTheDocument()
+  expect(banner).toHaveClass('border', 'border-outline-variant')
+  expect(banner).not.toHaveClass('rounded-2xl', 'shadow-sm')
   expect(image).toHaveAttribute('src', expect.stringContaining('/static/images/example/banner.jpg'))
 })
 

@@ -53,7 +53,7 @@ export function TableOfContentsMobile({ toc, title }: TableOfContentsProps) {
     <div className="mb-6 xl:hidden">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-center justify-between rounded-lg border border-gray-200 px-4 py-2 font-heading text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+        className="flex w-full items-center justify-between border border-outline-variant bg-surface-container-low px-4 py-2 text-label-sm font-medium text-on-surface transition-colors hover:border-primary-container hover:bg-surface-container dark:border-outline dark:bg-[#383d40] dark:text-inverse-on-surface dark:hover:border-inverse-primary dark:hover:bg-[#41474a]"
       >
         <span>On this page</span>
         <svg
@@ -66,14 +66,14 @@ export function TableOfContentsMobile({ toc, title }: TableOfContentsProps) {
         </svg>
       </button>
       {isOpen && (
-        <div className="mt-2 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/50">
+        <div className="mt-2 border border-outline-variant bg-surface-container-low p-4 text-body-md text-on-surface dark:border-outline dark:bg-[#383d40] dark:text-inverse-on-surface">
           <nav className="space-y-1">
             <button
               onClick={() => {
                 scrollToTop()
                 setIsOpen(false)
               }}
-              className="block text-left text-sm text-gray-600 transition-colors hover:text-primary-600 dark:text-gray-400 dark:hover:text-primary-400"
+              className="block text-left text-body-md text-tertiary transition-colors hover:text-primary dark:text-[#b7c8e1] dark:hover:text-inverse-primary"
             >
               {title}
             </button>
@@ -84,12 +84,12 @@ export function TableOfContentsMobile({ toc, title }: TableOfContentsProps) {
                   key={item.url}
                   href={item.url}
                   onClick={() => setIsOpen(false)}
-                  className={`block text-sm transition-colors hover:text-primary-600 dark:hover:text-primary-400 ${
+                  className={`block text-body-md transition-colors hover:text-primary dark:hover:text-inverse-primary ${
                     item.depth !== 2 ? 'pl-3' : ''
                   } ${
                     isActive
-                      ? 'font-medium text-primary-600 dark:text-primary-400'
-                      : 'text-gray-600 dark:text-gray-400'
+                      ? 'font-medium text-primary dark:text-inverse-primary'
+                      : 'text-tertiary dark:text-[#b7c8e1]'
                   }`}
                 >
                   {item.value}
@@ -122,7 +122,7 @@ export function TableOfContentsDesktop({ toc, title }: TableOfContentsProps) {
           (isCollapsed ? (
             <button
               onClick={() => setIsCollapsed(false)}
-              className="rounded-full border border-slate-200 bg-slate-100 p-2 text-slate-600 transition-all hover:bg-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+              className="border border-outline-variant bg-surface-container-low p-2 text-tertiary transition-colors hover:border-primary-container hover:bg-surface-container hover:text-primary dark:border-outline dark:bg-[#383d40] dark:text-[#b7c8e1] dark:hover:border-inverse-primary dark:hover:bg-[#41474a] dark:hover:text-inverse-primary"
               aria-label="Show table of contents"
             >
               <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -134,10 +134,10 @@ export function TableOfContentsDesktop({ toc, title }: TableOfContentsProps) {
               </svg>
             </button>
           ) : (
-            <div className="max-h-[calc(100vh-15rem)] w-56 overflow-y-auto rounded-2xl border border-slate-200 bg-slate-100 p-4 dark:border-slate-700 dark:bg-slate-800">
+            <div className="max-h-[calc(100vh-15rem)] w-56 overflow-y-auto border border-outline-variant bg-surface-container-low p-4 text-body-md text-on-surface dark:border-outline dark:bg-[#383d40] dark:text-inverse-on-surface">
               <button
                 onClick={() => setIsCollapsed(true)}
-                className="mb-3 flex w-full items-center justify-between font-heading text-sm font-normal text-slate-900 transition-all hover:text-slate-600 dark:text-slate-100 dark:hover:text-slate-400"
+                className="mb-3 flex w-full items-center justify-between text-label-sm font-medium text-on-surface transition-colors hover:text-primary dark:text-inverse-on-surface dark:hover:text-inverse-primary"
               >
                 <span>On this page</span>
                 <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -151,7 +151,7 @@ export function TableOfContentsDesktop({ toc, title }: TableOfContentsProps) {
               <nav className="space-y-2">
                 <button
                   onClick={scrollToTop}
-                  className="block text-left text-sm text-slate-600 transition-all hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
+                  className="block text-left text-body-md text-tertiary transition-colors hover:text-primary dark:text-[#b7c8e1] dark:hover:text-inverse-primary"
                 >
                   {title}
                 </button>
@@ -161,12 +161,12 @@ export function TableOfContentsDesktop({ toc, title }: TableOfContentsProps) {
                     <a
                       key={item.url}
                       href={item.url}
-                      className={`block text-sm transition-all hover:text-slate-900 dark:hover:text-slate-200 ${
+                      className={`block text-body-md transition-colors hover:text-primary dark:hover:text-inverse-primary ${
                         item.depth !== 2 ? 'pl-3' : ''
                       } ${
                         isActive
-                          ? 'font-medium text-slate-900 dark:text-slate-100'
-                          : 'text-slate-600 dark:text-slate-400'
+                          ? 'font-medium text-primary dark:text-inverse-primary'
+                          : 'text-tertiary dark:text-[#b7c8e1]'
                       }`}
                     >
                       {item.value}
@@ -179,7 +179,7 @@ export function TableOfContentsDesktop({ toc, title }: TableOfContentsProps) {
         {showScrollTop && (
           <button
             onClick={scrollToTop}
-            className="rounded-full border border-slate-200 bg-slate-100 p-2 text-slate-600 transition-all hover:bg-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+            className="border border-outline-variant bg-surface-container-low p-2 text-tertiary transition-colors hover:border-primary-container hover:bg-surface-container hover:text-primary dark:border-outline dark:bg-[#383d40] dark:text-[#b7c8e1] dark:hover:border-inverse-primary dark:hover:bg-[#41474a] dark:hover:text-inverse-primary"
             aria-label="Scroll to top"
           >
             <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">

@@ -45,7 +45,7 @@ export default function PostLayout({
 
           {/* Header */}
           <header className="pb-8 pt-4">
-            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+            <div className="flex items-center gap-2 text-label-sm uppercase text-tertiary dark:text-[#b7c8e1]">
               <time dateTime={date}>
                 {new Date(date).toLocaleDateString(siteMetadata.locale, postDateTemplate)}
               </time>
@@ -57,7 +57,7 @@ export default function PostLayout({
                       <Link
                         key={tag}
                         href={`/tags/${tag}`}
-                        className="transition-colors hover:text-primary-600 dark:hover:text-primary-400"
+                        className="transition-colors hover:text-primary dark:hover:text-inverse-primary"
                       >
                         #{tag}
                       </Link>
@@ -66,7 +66,7 @@ export default function PostLayout({
                 </>
               )}
             </div>
-            <h1 className="mt-2 font-heading text-3xl font-normal tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl">
+            <h1 className="text-headline-lg-mobile text-on-surface dark:text-inverse-on-surface sm:text-headline-lg">
               {title}
             </h1>
           </header>
@@ -75,13 +75,16 @@ export default function PostLayout({
           {toc && toc.length > 0 && <TableOfContentsMobile toc={toc} title={title} />}
 
           {/* Content */}
-          <ProsePopovers className="prose prose-gray prose-post max-w-none dark:prose-invert">
+          <ProsePopovers className="prose prose-gray max-w-none dark:prose-invert">
             {children}
           </ProsePopovers>
 
           {/* Comments */}
           {siteMetadata.comments?.provider && (
-            <div className="mt-12 border-t border-gray-200 pt-8 dark:border-gray-800" id="comment">
+            <div
+              className="mt-12 border-t border-outline-variant pt-8 dark:border-outline"
+              id="comment"
+            >
               <Comments slug={slug} />
             </div>
           )}

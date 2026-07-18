@@ -181,8 +181,8 @@ const Popover = forwardRef<
         }
       : { top: pos.top }
 
-  const iconBtnBase = 'flex h-8 w-8 items-center justify-center rounded-full transition-colors'
-  const iconBtn = `${iconBtnBase} text-slate-600 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-700`
+  const iconBtnBase = 'flex h-9 w-9 items-center justify-center border p-2 transition-colors'
+  const iconBtn = `${iconBtnBase} border-outline-variant bg-surface-container-low text-tertiary hover:border-primary-container hover:bg-surface-container hover:text-primary dark:border-outline dark:bg-[#383d40] dark:text-[#b7c8e1] dark:hover:border-inverse-primary dark:hover:bg-[#41474a] dark:hover:text-inverse-primary`
 
   return (
     <div
@@ -190,18 +190,18 @@ const Popover = forwardRef<
       role="dialog"
       aria-label={state.kind === 'text' ? 'Footnote' : 'Link actions'}
       style={style}
-      className={`not-prose absolute z-20 w-max rounded-2xl border border-slate-200 bg-slate-100 p-4 text-sm dark:border-slate-700 dark:bg-slate-800 ${
+      className={`not-prose absolute z-20 w-max border border-outline-variant bg-surface-container-low p-4 text-body-md text-on-surface dark:border-outline dark:bg-[#383d40] dark:text-inverse-on-surface ${
         pos.mode === 'gutter' ? '' : 'left-0 right-0 mx-auto max-w-full'
       }`}
     >
       {state.kind === 'text' ? (
         <div
-          className="text-slate-700 dark:text-slate-300 [&_a]:text-primary-600 [&_a]:underline [&_p]:m-0"
+          className="text-on-surface dark:text-inverse-on-surface [&_a]:text-primary [&_a]:underline dark:[&_a]:text-inverse-primary [&_p]:m-0"
           dangerouslySetInnerHTML={{ __html: state.html }}
         />
       ) : (
         <div className="flex flex-col gap-3">
-          <span className="break-all text-slate-600 dark:text-slate-400">{state.url}</span>
+          <span className="break-all text-tertiary dark:text-[#b7c8e1]">{state.url}</span>
           <div className={`flex gap-1 ${pos.mode === 'gutter' ? 'justify-end' : 'justify-center'}`}>
             <a
               href={state.url}
@@ -221,7 +221,7 @@ const Popover = forwardRef<
               aria-label={copied ? 'Copied' : 'Copy link'}
               className={
                 copied
-                  ? `${iconBtnBase} bg-green-100 text-green-600 dark:bg-green-900/40 dark:text-green-400`
+                  ? `${iconBtnBase} border-outline-variant bg-emerald-100 text-emerald-700 dark:border-outline dark:bg-emerald-950 dark:text-emerald-300`
                   : iconBtn
               }
             >

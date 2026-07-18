@@ -14,7 +14,7 @@ export default function AuthorLayout({ children, content }: Props) {
   return (
     <div className="mx-auto max-w-3xl">
       <header className="pb-8 pt-4">
-        <h1 className="font-heading text-2xl font-normal tracking-tight text-gray-900 dark:text-gray-100">
+        <h1 className="text-headline-lg-mobile text-on-surface dark:text-inverse-on-surface sm:text-headline-lg">
           Contact
         </h1>
       </header>
@@ -28,14 +28,16 @@ export default function AuthorLayout({ children, content }: Props) {
               alt="avatar"
               width={120}
               height={120}
-              className="h-24 w-24 rounded-full"
+              className="h-24 w-24 border border-outline-variant"
             />
           )}
-          <h2 className="mt-4 font-heading text-lg font-normal text-gray-900 dark:text-gray-100">
+          <h2 className="text-title-lg mt-4 text-on-surface dark:text-inverse-on-surface">
             {name}
           </h2>
-          {occupation && <p className="text-sm text-gray-500 dark:text-gray-400">{occupation}</p>}
-          {company && <p className="text-sm text-gray-500 dark:text-gray-400">{company}</p>}
+          {occupation && (
+            <p className="text-body-md text-tertiary dark:text-[#b7c8e1]">{occupation}</p>
+          )}
+          {company && <p className="text-body-md text-tertiary dark:text-[#b7c8e1]">{company}</p>}
           <div className="mt-4 flex gap-3">
             <SocialIcon kind="github" href={github} size={5} />
             <SocialIcon kind="twitter" href={twitter} size={5} />

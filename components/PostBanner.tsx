@@ -58,7 +58,7 @@ export default function PostBanner({ src, alt }: PostBannerProps) {
   return (
     <div
       data-testid="post-banner"
-      className="relative mb-8 h-48 overflow-hidden rounded-2xl bg-gray-100 shadow-sm dark:bg-gray-800 sm:h-64"
+      className="relative mb-8 h-48 overflow-hidden border border-outline-variant bg-surface-container-low dark:border-outline dark:bg-[#383d40] sm:h-64"
       style={{ opacity }}
     >
       <Image

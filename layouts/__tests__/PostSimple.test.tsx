@@ -87,12 +87,13 @@ it('does not mount a post banner when images is not an array', () => {
   expect(mockPostBanner).not.toHaveBeenCalled()
 })
 
-it('opts post prose into the post body typography modifier', () => {
+it('uses the unified prose typography', () => {
   render(
     <PostSimple content={baseContent as never}>
       <p>body</p>
     </PostSimple>
   )
 
-  expect(screen.getByText('body').parentElement).toHaveClass('prose-post')
+  expect(screen.getByText('body').parentElement).toHaveClass('prose', 'prose-gray', 'max-w-none')
+  expect(screen.getByText('body').parentElement).not.toHaveClass('prose-post')
 })

@@ -10,6 +10,17 @@ const files = [
   'components/Tag.tsx',
   'layouts/ListLayout.tsx',
   'layouts/ListLayoutWithTags.tsx',
+  'layouts/PostLayout.tsx',
+  'layouts/PostSimple.tsx',
+  'layouts/PostBanner.tsx',
+  'layouts/AuthorLayout.tsx',
+  'components/PageTitle.tsx',
+  'components/PostBanner.tsx',
+  'components/TableOfContents.tsx',
+  'components/ScrollTopAndComment.tsx',
+  'components/ProsePopovers.tsx',
+  'components/Comments.tsx',
+  'components/Base64Decoder.tsx',
 ]
 
 it.each(files)('%s contains no legacy visual utilities', (file) => {

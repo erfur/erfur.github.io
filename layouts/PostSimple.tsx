@@ -29,21 +29,24 @@ export default function PostLayout({ content, next, prev, children }: LayoutProp
 
         {/* Header */}
         <header className="pb-8 pt-4">
-          <time dateTime={date} className="text-sm text-gray-500 dark:text-gray-400">
+          <time
+            dateTime={date}
+            className="flex items-center gap-2 text-label-sm uppercase text-tertiary dark:text-[#b7c8e1]"
+          >
             {formatDate(date, siteMetadata.locale)}
           </time>
-          <h1 className="mt-2 font-heading text-3xl font-normal tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl">
+          <h1 className="text-headline-lg-mobile text-on-surface dark:text-inverse-on-surface sm:text-headline-lg">
             {title}
           </h1>
         </header>
 
         {/* Content */}
-        <ProsePopovers className="prose prose-gray prose-post max-w-none dark:prose-invert">
+        <ProsePopovers className="prose prose-gray max-w-none dark:prose-invert">
           {children}
         </ProsePopovers>
 
         {/* Footer */}
-        <footer className="mt-12 border-t border-gray-200 pt-8 dark:border-gray-800">
+        <footer className="mt-12 border-t border-outline-variant pt-8 dark:border-outline">
           {/* Comments */}
           {siteMetadata.comments?.provider && (
             <div className="mt-12" id="comment">

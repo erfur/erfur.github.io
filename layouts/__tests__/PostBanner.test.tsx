@@ -22,12 +22,13 @@ const content = {
   images: ['/static/images/example/banner.jpg'],
 }
 
-it('opts post prose into the post body typography modifier', () => {
+it('uses the unified prose typography', () => {
   render(
     <PostBanner content={content as never}>
       <p>body</p>
     </PostBanner>
   )
 
-  expect(screen.getByText('body').parentElement).toHaveClass('prose-post')
+  expect(screen.getByText('body').parentElement).toHaveClass('prose', 'prose-gray', 'max-w-none')
+  expect(screen.getByText('body').parentElement).not.toHaveClass('prose-post')
 })

@@ -15,12 +15,10 @@ const Base64Decoder = ({ encodedString }) => {
     }
   }, [encodedString])
 
-  // Use a styled div to ensure visibility
   return (
     <div
-      className="base64-content"
+      className="base64-content my-4 block border-l-2 border-tertiary pl-4 text-body-lg"
       dangerouslySetInnerHTML={{ __html: content || 'Decoding...' }}
-      style={{ display: 'block', margin: '1em 0' }}
     />
   )
 }
