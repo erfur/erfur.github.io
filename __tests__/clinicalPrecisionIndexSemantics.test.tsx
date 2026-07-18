@@ -104,6 +104,14 @@ it('allows the global focus-visible outline on the 404 action', () => {
   )
 })
 
+it('uses a defined Clinical Precision role for the 404 message', () => {
+  render(<NotFound />)
+
+  const message = screen.getByText("Sorry we couldn't find this page.")
+  expect(message).toHaveClass('text-headline-md')
+  expect(message).not.toHaveClass('text-title-lg', 'md:text-headline-sm')
+})
+
 it('marks only the All filter as current on the unfiltered blog route', () => {
   render(<ListLayoutWithTags posts={layoutPosts as never} title="Posts" />)
 
