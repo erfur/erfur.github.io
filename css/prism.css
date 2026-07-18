@@ -1,20 +1,19 @@
-/**
- * CSS Styles for code highlighting.
- * Feel free to customize token styles 
- * by copying from a prismjs compatible theme:
- * https://github.com/PrismJS/prism-themes
- */
-
 /* Code title styles */
 .remark-code-title {
-  @apply rounded-t bg-gray-700 px-5 py-3 font-mono text-sm font-bold text-gray-200 dark:bg-gray-800;
+  @apply border border-outline bg-[#202426] px-5 py-3 font-mono text-label-sm font-bold uppercase text-inverse-on-surface;
 }
 
 .remark-code-title + div > pre {
-  @apply mt-0 rounded-t-none;
+  @apply mt-0 border-t-0;
 }
 
 /* Code block styles */
+pre[class*='language-'] {
+  border: 1px solid #574140;
+  background: #202426;
+  color: #eff1f3;
+}
+
 pre code {
   font-size: 0.8rem;
 }
@@ -28,85 +27,76 @@ pre code {
 }
 
 .code-line.inserted {
-  @apply bg-green-500 bg-opacity-20;
+  background: rgba(188, 199, 222, 0.12);
 }
 
 .code-line.deleted {
-  @apply bg-red-500 bg-opacity-20;
+  background: rgba(255, 179, 176, 0.12);
+  color: #ffb3b0;
 }
 
 .highlight-line {
-  @apply -mx-4 border-l-4 border-primary-500 bg-gray-700 bg-opacity-50;
+  @apply -mx-4 border-l-4;
+  border-left-color: #f87171;
+  background: rgba(248, 113, 113, 0.1);
 }
 
 .line-number::before {
-  @apply -ml-2 mr-4 inline-block w-4 text-right text-gray-400;
+  @apply -ml-2 mr-4 inline-block w-4 text-right;
+  color: #8d9db5;
   content: attr(line);
 }
 
 /* Token styles */
-/**
- * MIT License
- * Copyright (c) 2018 Sarah Drasner
- * Sarah Drasner's[@sdras] Night Owl
- * Ported by Sara vieria [@SaraVieira]
- * Added by Souvik Mandal [@SimpleIndian]
- */
 .token.comment,
 .token.prolog,
 .token.cdata {
-  color: rgb(99, 119, 119);
+  color: #8d9db5;
   font-style: italic;
 }
 
 .token.punctuation {
-  color: rgb(199, 146, 234);
+  color: #eff1f3;
 }
 
 .namespace {
-  color: rgb(178, 204, 214);
+  color: #bcc7de;
 }
 
 .token.deleted {
-  color: rgba(239, 83, 80, 0.56);
+  color: #ffb3b0;
   font-style: italic;
 }
 
 .token.symbol,
 .token.property {
-  color: rgb(128, 203, 196);
+  color: #bcc7de;
 }
 
 .token.tag,
 .token.operator,
-.token.keyword {
-  color: rgb(127, 219, 202);
-}
-
+.token.keyword,
 .token.boolean {
-  color: rgb(255, 88, 116);
+  color: #ffb3b0;
 }
 
-.token.number {
-  color: rgb(247, 140, 108);
-}
-
+.token.number,
 .token.constant,
 .token.function,
 .token.builtin,
 .token.char {
-  color: rgb(130, 170, 255);
+  color: #d3e4fe;
 }
 
 .token.selector,
 .token.doctype {
-  color: rgb(199, 146, 234);
+  color: #ffb3b0;
   font-style: italic;
 }
 
 .token.attr-name,
 .token.inserted {
-  color: rgb(173, 219, 103);
+  color: #bcc7de;
   font-style: italic;
 }
 
@@ -115,19 +105,19 @@ pre code {
 .token.entity,
 .language-css .token.string,
 .style .token.string {
-  color: rgb(173, 219, 103);
+  color: #bcc7de;
 }
 
 .token.class-name,
 .token.atrule,
 .token.attr-value {
-  color: rgb(255, 203, 139);
+  color: #d3e4fe;
 }
 
 .token.regex,
 .token.important,
 .token.variable {
-  color: rgb(214, 222, 235);
+  color: #eff1f3;
 }
 
 .token.important,
@@ -137,10 +127,6 @@ pre code {
 
 .token.italic {
   font-style: italic;
-}
-
-.token.table {
-  display: inline;
 }
 
 .token.table {

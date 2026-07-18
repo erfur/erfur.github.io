@@ -51,3 +51,30 @@ input:-webkit-autofill:focus {
   text-decoration: none;
   cursor: pointer;
 }
+
+@layer base {
+  ::selection {
+    background: #ffdad8;
+    color: #410006;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    border-radius: 0;
+    font-family: var(--font-jetbrains-mono), Menlo, monospace;
+  }
+
+  :where(a, button, input, textarea, select):focus-visible {
+    outline: 2px solid #a83639;
+    outline-offset: 2px;
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus {
+    border-color: #f87171;
+    box-shadow: none;
+  }
+}
