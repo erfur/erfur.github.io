@@ -71,6 +71,10 @@ input:-webkit-autofill:focus {
     outline-offset: 2px;
   }
 
+  .dark :where(a, button, input, textarea, select):focus-visible {
+    outline: 2px solid #ffb3b0;
+  }
+
   input:focus,
   textarea:focus,
   select:focus {

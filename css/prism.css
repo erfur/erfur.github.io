@@ -23,7 +23,7 @@ pre code {
 }
 
 .code-line {
-  @apply -mx-4 block border-l-4 border-transparent pl-4 pr-4;
+  @apply -mx-4 block border-l-2 border-transparent pl-4 pr-4;
 }
 
 .code-line.inserted {
@@ -36,7 +36,7 @@ pre code {
 }
 
 .highlight-line {
-  @apply -mx-4 border-l-4;
+  @apply -mx-4 border-l-2;
   border-left-color: #f87171;
   background: rgba(248, 113, 113, 0.1);
 }
