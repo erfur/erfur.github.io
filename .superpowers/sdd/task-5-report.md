@@ -49,3 +49,27 @@ Result: all matched files use Prettier code style; `git diff --check` produced n
 ## Concerns
 
 None.
+
+## Review Fix: Author Name Typography
+
+Verified the review finding against `tailwind.config.js`: `headline-md` is configured and `title-lg` is not. Added a focused render assertion for the author name before changing production code.
+
+RED command:
+
+```bash
+NODE_ENV=test npm run test:run -- layouts/__tests__/AuthorLayout.test.tsx --runInBand
+```
+
+RED result: 1 test suite failed; 1 test failed; 0 snapshots. The author heading received `text-title-lg` and failed the expected `text-headline-md` assertion.
+
+GREEN command:
+
+```bash
+NODE_ENV=test npm run test:run -- layouts/__tests__/AuthorLayout.test.tsx layouts/__tests__/PostLayout.test.tsx layouts/__tests__/PostSimple.test.tsx layouts/__tests__/PostBanner.test.tsx components/__tests__/PostBanner.test.tsx components/__tests__/ProsePopovers.test.tsx __tests__/clinicalPrecisionSourceAudit.test.js --runInBand
+```
+
+GREEN result: 7 test suites passed; 43 tests passed; 0 snapshots; 0 failures.
+
+Fix: replaced only `text-title-lg` with configured `text-headline-md` on the existing author-name `h2`; markup and layout were preserved. New non-amended commit: `Fix author name typography role`.
+
+Concerns: none.
