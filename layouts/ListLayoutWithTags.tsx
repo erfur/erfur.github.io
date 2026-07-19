@@ -133,7 +133,7 @@ export default function ListLayoutWithTags({
             >
               <Link
                 href={`/${path}`}
-                className="group -mx-2 flex items-baseline gap-4 px-2 py-3 transition-colors hover:bg-surface-container dark:hover:bg-[#41474a]"
+                className="group flex items-baseline gap-4 px-2 py-3 transition-colors hover:bg-surface-container dark:hover:bg-[#41474a]"
               >
                 <span className="font-semibold text-on-surface transition-colors group-hover:text-primary dark:text-inverse-on-surface dark:group-hover:text-inverse-primary">
                   {title}
