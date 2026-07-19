@@ -116,6 +116,12 @@ describe('Clinical Precision theme', () => {
     expect(typography.DEFAULT.css.code.fontFamily).toBe(
       'var(--font-jetbrains-mono), Menlo, monospace'
     )
+    expect(typography.DEFAULT.css.table.fontFamily).toBe(
+      'var(--font-jetbrains-mono), Menlo, monospace'
+    )
+    expect(typography.DEFAULT.css.figcaption.fontFamily).toBe(
+      'var(--font-jetbrains-mono), Menlo, monospace'
+    )
   })
 
   it('uses prose variables so inverse foreground and background colors apply', () => {

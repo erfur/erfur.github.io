@@ -153,6 +153,7 @@ module.exports = {
               boxShadow: 'none',
             },
             figcaption: {
+              fontFamily: theme('fontFamily.sans').join(', '),
               marginTop: '0.375em',
               fontSize: '0.75rem',
               lineHeight: '1rem',
@@ -160,7 +161,11 @@ module.exports = {
               textTransform: 'uppercase',
               color: 'var(--tw-prose-captions)',
             },
-            table: { fontSize: '0.875rem', lineHeight: '1.25rem' },
+            table: {
+              fontFamily: theme('fontFamily.sans').join(', '),
+              fontSize: '0.875rem',
+              lineHeight: '1.25rem',
+            },
             thead: { borderBottomColor: 'var(--tw-prose-table-head-border)' },
             'tbody tr': { borderBottomColor: 'var(--tw-prose-table-row-border)' },
             'tbody tr:nth-child(even)': {
