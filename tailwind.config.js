@@ -103,6 +103,7 @@ module.exports = {
             '--tw-prose-body': theme('colors.on-surface'),
             '--tw-prose-links': theme('colors.primary.DEFAULT'),
             '--tw-prose-code': theme('colors.on-surface'),
+            '--tw-prose-code-bg': theme('colors.surface-container'),
             color: 'var(--tw-prose-body)',
             p: {
               fontSize: '1rem',
@@ -124,7 +125,7 @@ module.exports = {
             code: {
               fontFamily: theme('fontFamily.mono').join(', '),
               color: 'var(--tw-prose-code)',
-              backgroundColor: theme('colors.surface-container'),
+              backgroundColor: 'var(--tw-prose-code-bg)',
               fontSize: '0.8125rem',
               lineHeight: '1.125rem',
               fontWeight: '400',
@@ -161,6 +162,7 @@ module.exports = {
             '--tw-prose-headings': theme('colors.inverse-on-surface'),
             '--tw-prose-links': theme('colors.inverse-primary'),
             '--tw-prose-code': theme('colors.inverse-on-surface'),
+            '--tw-prose-code-bg': '#383d40',
             '--tw-prose-pre-bg': '#202426',
             '--tw-prose-hr': '#574140',
             '--tw-prose-th-borders': '#8b7170',
