@@ -21,7 +21,10 @@ describe('Clinical Precision theme', () => {
       'inverse-on-surface': '#eff1f3',
       outline: '#8b7170',
       'outline-variant': '#debfbe',
-      primary: '#a83639',
+      primary: {
+        DEFAULT: '#a83639',
+        600: '#a83639',
+      },
       'on-primary': '#ffffff',
       'primary-container': '#f87171',
       'on-primary-container': '#6c0513',
@@ -29,6 +32,21 @@ describe('Clinical Precision theme', () => {
       secondary: '#545f73',
       tertiary: '#505f76',
       error: '#ba1a1a',
+    })
+  })
+
+  it('maps Pliny search shade contracts to the semantic palette', () => {
+    expect(extendedTheme.colors.gray).toEqual({
+      50: '#ffffff',
+      100: '#f2f4f6',
+      200: '#eceef0',
+      300: '#e0e3e5',
+      400: '#8b7170',
+      500: '#574140',
+      600: '#505f76',
+      700: '#191c1e',
+      800: '#2d3133',
+      900: '#202426',
     })
   })
 

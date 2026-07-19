@@ -24,12 +24,14 @@
 ### Task 1: Semantic Palette And Typography Foundation
 
 **Files:**
+
 - Modify: `tailwind.config.js:1-140`
 - Modify: `app/layout.tsx:1-113`
 - Modify: `app/__tests__/layout.test.tsx:1-35`
 - Modify: `__tests__/typographyConfig.test.js:1-40`
 
 **Interfaces:**
+
 - Consumes: Existing Tailwind `theme.extend` and Next.js root layout.
 - Produces: Semantic color utilities (`surface`, `on-surface`, `outline-variant`, `primary-container`, and the remaining supplied tokens), typography utilities (`headline-lg`, `headline-md`, `body-lg`, `body-md`, `label-sm`, `code-inline`), and the single CSS variable `--font-jetbrains-mono`.
 
@@ -82,8 +84,14 @@ describe('Clinical Precision theme', () => {
 
   it('defines the approved type scale', () => {
     expect(extendedTheme.fontSize).toMatchObject({
-      'headline-lg': ['2rem', { lineHeight: '2.5rem', letterSpacing: '-0.02em', fontWeight: '700' }],
-      'headline-lg-mobile': ['1.5rem', { lineHeight: '2rem', letterSpacing: '-0.02em', fontWeight: '700' }],
+      'headline-lg': [
+        '2rem',
+        { lineHeight: '2.5rem', letterSpacing: '-0.02em', fontWeight: '700' },
+      ],
+      'headline-lg-mobile': [
+        '1.5rem',
+        { lineHeight: '2rem', letterSpacing: '-0.02em', fontWeight: '700' },
+      ],
       'headline-md': ['1.25rem', { lineHeight: '1.75rem', fontWeight: '600' }],
       'body-lg': ['1rem', { lineHeight: '1.5rem', fontWeight: '400' }],
       'body-md': ['0.875rem', { lineHeight: '1.25rem', fontWeight: '400' }],
@@ -96,7 +104,11 @@ describe('Clinical Precision theme', () => {
     const css = extendedTheme.typography({ theme }).DEFAULT.css
     expect(css.fontFamily).toBe('var(--font-jetbrains-mono), Menlo, monospace')
     expect(css.p).toMatchObject({ fontSize: '1rem', lineHeight: '1.5rem' })
-    expect(css.code).toMatchObject({ fontSize: '0.8125rem', lineHeight: '1.125rem', borderRadius: '0' })
+    expect(css.code).toMatchObject({
+      fontSize: '0.8125rem',
+      lineHeight: '1.125rem',
+      borderRadius: '0',
+    })
     expect(css.img).toMatchObject({ borderRadius: '0', boxShadow: 'none' })
   })
 })
@@ -198,14 +210,44 @@ typography: ({ theme }) => ({
       color: theme('colors.on-surface'),
       p: { fontSize: '1rem', lineHeight: '1.5rem', marginTop: '0.75em', marginBottom: '0.75em' },
       'ul, ol': { fontSize: '1rem', lineHeight: '1.5rem' },
-      'h1,h2,h3,h4,h5,h6': { fontFamily: theme('fontFamily.heading').join(', '), fontWeight: '600', letterSpacing: '-0.02em' },
-      a: { color: theme('colors.primary'), fontWeight: '500', textDecorationColor: theme('colors.primary-container') },
-      code: { fontFamily: theme('fontFamily.mono').join(', '), color: theme('colors.on-surface'), backgroundColor: theme('colors.surface-container'), fontSize: '0.8125rem', lineHeight: '1.125rem', fontWeight: '400', padding: '0.125rem 0.25rem', borderRadius: '0' },
+      'h1,h2,h3,h4,h5,h6': {
+        fontFamily: theme('fontFamily.heading').join(', '),
+        fontWeight: '600',
+        letterSpacing: '-0.02em',
+      },
+      a: {
+        color: theme('colors.primary'),
+        fontWeight: '500',
+        textDecorationColor: theme('colors.primary-container'),
+      },
+      code: {
+        fontFamily: theme('fontFamily.mono').join(', '),
+        color: theme('colors.on-surface'),
+        backgroundColor: theme('colors.surface-container'),
+        fontSize: '0.8125rem',
+        lineHeight: '1.125rem',
+        fontWeight: '400',
+        padding: '0.125rem 0.25rem',
+        borderRadius: '0',
+      },
       'code::before': { content: 'none' },
       'code::after': { content: 'none' },
       'pre code': { backgroundColor: 'transparent', padding: '0' },
-      img: { marginTop: '1em', marginBottom: '0.5em', borderRadius: '0', border: `1px solid ${theme('colors.outline-variant')}`, boxShadow: 'none' },
-      figcaption: { marginTop: '0.375em', fontSize: '0.75rem', lineHeight: '1rem', letterSpacing: '0.05em', textTransform: 'uppercase', color: theme('colors.tertiary') },
+      img: {
+        marginTop: '1em',
+        marginBottom: '0.5em',
+        borderRadius: '0',
+        border: `1px solid ${theme('colors.outline-variant')}`,
+        boxShadow: 'none',
+      },
+      figcaption: {
+        marginTop: '0.375em',
+        fontSize: '0.75rem',
+        lineHeight: '1rem',
+        letterSpacing: '0.05em',
+        textTransform: 'uppercase',
+        color: theme('colors.tertiary'),
+      },
       table: { fontSize: '0.875rem', lineHeight: '1.25rem' },
       thead: { borderBottomColor: theme('colors.outline') },
       'tbody tr': { borderBottomColor: theme('colors.outline-variant') },
@@ -251,11 +293,13 @@ git commit -m "Add Clinical Precision design tokens"
 ### Task 2: Global Focus, Prose, And Syntax Theme
 
 **Files:**
+
 - Modify: `css/tailwind.css:5-53`
 - Modify: `css/prism.css:1-148`
 - Create: `__tests__/clinicalPrecisionCss.test.js`
 
 **Interfaces:**
+
 - Consumes: Semantic tokens and font roles from Task 1.
 - Produces: Shared focus/input behavior and the Clinical Precision Prism token theme used by all MDX code blocks.
 
@@ -367,6 +411,7 @@ git commit -m "Restyle prose and syntax highlighting"
 ### Task 3: Site Shell And Global Controls
 
 **Files:**
+
 - Modify: `components/Header.tsx:9-42`
 - Modify: `components/Footer.tsx:5-18`
 - Modify: `components/MobileNav.tsx:21-80`
@@ -377,6 +422,7 @@ git commit -m "Restyle prose and syntax highlighting"
 - Create: `components/__tests__/ClinicalShell.test.tsx`
 
 **Interfaces:**
+
 - Consumes: Semantic Tailwind utilities from Task 1 and global focus behavior from Task 2.
 - Produces: A consistent semantic header, footer, mobile overlay, theme control, search control, and social-icon treatment.
 
@@ -436,7 +482,8 @@ Keep `LayoutWrapper` behavior and change only its shell font class to `font-sans
 For `MobileNav`, `ThemeSwitch`, `SearchButton`, and social icon links, replace rounded gray/slate controls with this shared literal class pattern in each file:
 
 ```tsx
-className="flex h-8 w-8 items-center justify-center border border-transparent text-tertiary transition-colors hover:border-primary-container hover:bg-surface-container-low hover:text-primary dark:text-[#b7c8e1] dark:hover:border-inverse-primary dark:hover:bg-[#383d40] dark:hover:text-inverse-primary"
+className =
+  'flex h-8 w-8 items-center justify-center border border-transparent text-tertiary transition-colors hover:border-primary-container hover:bg-surface-container-low hover:text-primary dark:text-[#b7c8e1] dark:hover:border-inverse-primary dark:hover:bg-[#383d40] dark:hover:text-inverse-primary'
 ```
 
 Use `bg-surface/95 dark:bg-inverse-surface/95` for the mobile overlay, `border-outline-variant dark:border-outline` for link dividers, and `text-headline-md` for mobile links. Preserve body-scroll locking and transition behavior.
@@ -455,6 +502,7 @@ git commit -m "Restyle the site shell and navigation"
 ### Task 4: Indexes, Cards, Filters, Inputs, And Empty States
 
 **Files:**
+
 - Modify: `app/Main.tsx:9-72`
 - Modify: `app/projects/page.tsx:7-23`
 - Modify: `app/tags/page.tsx:8-40`
@@ -466,6 +514,7 @@ git commit -m "Restyle the site shell and navigation"
 - Create: `__tests__/clinicalPrecisionSourceAudit.test.js`
 
 **Interfaces:**
+
 - Consumes: Semantic utilities and type roles from Task 1.
 - Produces: Clinical post rows, rectangular technical tags, project cards, search inputs, pagination, and 404 action styling.
 
@@ -564,6 +613,7 @@ git commit -m "Restyle indexes cards and filters"
 ### Task 5: Article Layouts, Media, Panels, And Comments
 
 **Files:**
+
 - Modify: `layouts/PostLayout.tsx:28-95`
 - Modify: `layouts/PostSimple.tsx:20-57`
 - Modify: `layouts/PostBanner.tsx:20-52`
@@ -581,6 +631,7 @@ git commit -m "Restyle indexes cards and filters"
 - Modify: `__tests__/clinicalPrecisionSourceAudit.test.js`
 
 **Interfaces:**
+
 - Consumes: Semantic prose and code styles from Tasks 1-2 and control patterns from Task 3.
 - Produces: Unified article typography, square banners/media, semantic TOC/popovers, and a styled comments action.
 
@@ -614,19 +665,21 @@ Use the following exact style contracts while preserving article structure and b
 
 ```tsx
 // Post metadata
-className="flex items-center gap-2 text-label-sm uppercase text-tertiary dark:text-[#b7c8e1]"
+className = 'flex items-center gap-2 text-label-sm uppercase text-tertiary dark:text-[#b7c8e1]'
 
 // Post/PageTitle
-className="text-headline-lg-mobile text-on-surface dark:text-inverse-on-surface sm:text-headline-lg"
+className =
+  'text-headline-lg-mobile text-on-surface dark:text-inverse-on-surface sm:text-headline-lg'
 
 // Prose
-className="prose prose-gray max-w-none dark:prose-invert"
+className = 'prose prose-gray max-w-none dark:prose-invert'
 
 // Current PostBanner
-className="relative mb-8 h-48 overflow-hidden border border-outline-variant bg-surface-container-low dark:border-outline dark:bg-[#383d40] sm:h-64"
+className =
+  'relative mb-8 h-48 overflow-hidden border border-outline-variant bg-surface-container-low dark:border-outline dark:bg-[#383d40] sm:h-64'
 
 // Article separators
-className="mt-12 border-t border-outline-variant pt-8 dark:border-outline"
+className = 'mt-12 border-t border-outline-variant pt-8 dark:border-outline'
 ```
 
 Make the Author avatar `h-24 w-24 border border-outline-variant` with no radius. Remove `prose-post` everywhere, because Task 1 makes unified prose the default.
@@ -637,16 +690,19 @@ Use square 1px-bordered controls and panels:
 
 ```tsx
 // Compact icon control
-className="border border-outline-variant bg-surface-container-low p-2 text-tertiary transition-colors hover:border-primary-container hover:bg-surface-container hover:text-primary dark:border-outline dark:bg-[#383d40] dark:text-[#b7c8e1] dark:hover:border-inverse-primary dark:hover:bg-[#41474a] dark:hover:text-inverse-primary"
+className =
+  'border border-outline-variant bg-surface-container-low p-2 text-tertiary transition-colors hover:border-primary-container hover:bg-surface-container hover:text-primary dark:border-outline dark:bg-[#383d40] dark:text-[#b7c8e1] dark:hover:border-inverse-primary dark:hover:bg-[#41474a] dark:hover:text-inverse-primary'
 
 // Information panel
-className="border border-outline-variant bg-surface-container-low p-4 text-body-md text-on-surface dark:border-outline dark:bg-[#383d40] dark:text-inverse-on-surface"
+className =
+  'border border-outline-variant bg-surface-container-low p-4 text-body-md text-on-surface dark:border-outline dark:bg-[#383d40] dark:text-inverse-on-surface'
 
 // Load comments button
-className="border border-primary bg-transparent px-4 py-2 text-body-md font-medium text-primary transition-colors hover:bg-primary-fixed dark:border-inverse-primary dark:text-inverse-primary dark:hover:bg-[#410006]"
+className =
+  'border border-primary bg-transparent px-4 py-2 text-body-md font-medium text-primary transition-colors hover:bg-primary-fixed dark:border-inverse-primary dark:text-inverse-primary dark:hover:bg-[#410006]'
 
 // Base64 content
-className="base64-content my-4 block border-l-2 border-tertiary pl-4 text-body-lg"
+className = 'base64-content my-4 block border-l-2 border-tertiary pl-4 text-body-lg'
 ```
 
 Retain TOC collapse/active-heading logic, popover positioning/copy behavior, scroll behavior, comment loading, and decoder error behavior. Replace the copied-success circle with a square muted emerald state: `bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300`.
@@ -665,10 +721,12 @@ git commit -m "Restyle article surfaces and utilities"
 ### Task 6: Whole-Site Audit And Verification
 
 **Files:**
+
 - Modify: `__tests__/clinicalPrecisionSourceAudit.test.js`
 - Modify only if audit identifies application-owned remnants: files under `app/`, `components/`, or `layouts/`
 
 **Interfaces:**
+
 - Consumes: All prior task deliverables.
 - Produces: A complete regression guard against legacy rounded, shadowed, gray/slate/blue, and superseded font-role styling.
 
