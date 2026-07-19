@@ -100,7 +100,10 @@ module.exports = {
         DEFAULT: {
           css: {
             fontFamily: theme('fontFamily.sans').join(', '),
-            color: theme('colors.on-surface'),
+            '--tw-prose-body': theme('colors.on-surface'),
+            '--tw-prose-links': theme('colors.primary.DEFAULT'),
+            '--tw-prose-code': theme('colors.on-surface'),
+            color: 'var(--tw-prose-body)',
             p: {
               fontSize: '1rem',
               lineHeight: '1.5rem',
@@ -114,13 +117,13 @@ module.exports = {
               letterSpacing: '-0.02em',
             },
             a: {
-              color: theme('colors.primary.DEFAULT'),
+              color: 'var(--tw-prose-links)',
               fontWeight: '500',
               textDecorationColor: theme('colors.primary-container'),
             },
             code: {
               fontFamily: theme('fontFamily.mono').join(', '),
-              color: theme('colors.on-surface'),
+              color: 'var(--tw-prose-code)',
               backgroundColor: theme('colors.surface-container'),
               fontSize: '0.8125rem',
               lineHeight: '1.125rem',

@@ -87,4 +87,16 @@ describe('Clinical Precision theme', () => {
     })
     expect(css.img).toMatchObject({ borderRadius: '0', boxShadow: 'none' })
   })
+
+  it('uses prose variables so inverse colors apply in dark mode', () => {
+    const css = extendedTheme.typography({ theme }).DEFAULT.css
+    expect(css).toMatchObject({
+      '--tw-prose-body': '#191c1e',
+      '--tw-prose-links': '#a83639',
+      '--tw-prose-code': '#191c1e',
+      color: 'var(--tw-prose-body)',
+    })
+    expect(css.a.color).toBe('var(--tw-prose-links)')
+    expect(css.code.color).toBe('var(--tw-prose-code)')
+  })
 })
