@@ -116,12 +116,26 @@ describe('Clinical Precision theme', () => {
     expect(typography.DEFAULT.css.code.fontFamily).toBe(
       'var(--font-jetbrains-mono), Menlo, monospace'
     )
+    expect(typography.DEFAULT.css.pre.fontFamily).toBe(
+      'var(--font-jetbrains-mono), Menlo, monospace'
+    )
     expect(typography.DEFAULT.css.table.fontFamily).toBe(
       'var(--font-jetbrains-mono), Menlo, monospace'
     )
     expect(typography.DEFAULT.css.figcaption.fontFamily).toBe(
       'var(--font-jetbrains-mono), Menlo, monospace'
     )
+  })
+
+  it('preserves the default prose body, inline code, and image geometry', () => {
+    const css = extendedTheme.typography({ theme }).DEFAULT.css
+    expect(css.p).toMatchObject({ fontSize: '1rem', lineHeight: '1.5rem' })
+    expect(css.code).toMatchObject({
+      fontSize: '0.8125rem',
+      lineHeight: '1.125rem',
+      borderRadius: '0',
+    })
+    expect(css.img).toMatchObject({ borderRadius: '0', boxShadow: 'none' })
   })
 
   it('uses prose variables so inverse foreground and background colors apply', () => {

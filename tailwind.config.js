@@ -144,6 +144,7 @@ module.exports = {
             },
             'code::before': { content: 'none' },
             'code::after': { content: 'none' },
+            pre: { fontFamily: theme('fontFamily.mono').join(', ') },
             'pre code': { backgroundColor: 'transparent', padding: '0' },
             img: {
               marginTop: '1em',

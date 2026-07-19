@@ -22,6 +22,7 @@ beforeAll(async () => {
                   <h2>Heading</h2>
                   <a href="#example">Link</a>
                   <code>code</code>
+                  <pre><code>fenced code</code></pre>
                   <table><tbody><tr><td>Table</td></tr></tbody></table>
                   <figure><figcaption>Caption</figcaption></figure>
                 </li>
@@ -50,6 +51,12 @@ function generatedFontFamily(selectorFragment) {
   return fontFamily
 }
 
+function resolvedFontFamily(...inheritanceChain) {
+  return inheritanceChain
+    .map(generatedFontFamily)
+    .find((fontFamily) => fontFamily && fontFamily !== 'inherit')
+}
+
 it('generates Merriweather declarations for post paragraphs and lists', () => {
   expect(generatedFontFamily('.prose-post :where(p)')).toBe(merriweather)
   expect(generatedFontFamily('.prose-post :where(ul, ol)')).toBe(merriweather)
@@ -59,6 +66,18 @@ it('generates JetBrains declarations for protected elements nested in post lists
   expect(generatedFontFamily('.prose :where(h1,h2,h3,h4,h5,h6)')).toBe(jetbrainsMono)
   expect(generatedFontFamily('.prose :where(a)')).toBe(jetbrainsMono)
   expect(generatedFontFamily('.prose :where(code)')).toBe(jetbrainsMono)
+  expect(generatedFontFamily('.prose :where(pre)')).toBe(jetbrainsMono)
   expect(generatedFontFamily('.prose :where(table)')).toBe(jetbrainsMono)
   expect(generatedFontFamily('.prose :where(figcaption)')).toBe(jetbrainsMono)
+})
+
+it('resolves fenced code nested in a post list through the pre declaration', () => {
+  expect(generatedFontFamily('.prose :where(pre code)')).toBe('inherit')
+  expect(
+    resolvedFontFamily(
+      '.prose :where(pre code)',
+      '.prose :where(pre)',
+      '.prose-post :where(ul, ol)'
+    )
+  ).toBe(jetbrainsMono)
 })
