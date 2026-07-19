@@ -5,9 +5,15 @@ const globalCss = fs.readFileSync(path.join(__dirname, '../css/tailwind.css'), '
 const prismCss = fs.readFileSync(path.join(__dirname, '../css/prism.css'), 'utf8')
 
 it('defines square semantic controls and visible focus', () => {
-  expect(globalCss).toContain('border-radius: 0;')
+  expect(globalCss).toContain('border-radius: 0 !important;')
   expect(globalCss).toContain('outline: 2px solid #a83639;')
   expect(globalCss).toContain('border-color: #f87171;')
+})
+
+it('uses semantic footnote borders without legacy gray utilities', () => {
+  expect(globalCss).toContain('border-outline-variant')
+  expect(globalCss).toContain('dark:border-outline')
+  expect(globalCss).not.toMatch(/(?:text|bg|border|ring|placeholder)-(?:gray|slate|blue)-/)
 })
 
 it('uses the inverse focus outline in dark mode', () => {

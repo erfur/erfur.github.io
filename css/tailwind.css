@@ -18,7 +18,7 @@ html {
 }
 
 .footnotes {
-  @apply mt-12 border-t border-gray-200 pt-8 dark:border-gray-700;
+  @apply mt-12 border-t border-outline-variant pt-8 dark:border-outline;
 }
 
 .data-footnote-backref {
@@ -62,7 +62,7 @@ input:-webkit-autofill:focus {
   input,
   textarea,
   select {
-    border-radius: 0;
+    border-radius: 0 !important;
     font-family: var(--font-jetbrains-mono), Menlo, monospace;
   }
 

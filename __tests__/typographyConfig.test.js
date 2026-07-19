@@ -23,7 +23,10 @@ describe('Clinical Precision theme', () => {
       'outline-variant': '#debfbe',
       primary: {
         DEFAULT: '#a83639',
+        400: '#881d24',
+        500: '#a83639',
         600: '#a83639',
+        700: '#881d24',
       },
       'on-primary': '#ffffff',
       'primary-container': '#f87171',
@@ -47,6 +50,16 @@ describe('Clinical Precision theme', () => {
       700: '#191c1e',
       800: '#2d3133',
       900: '#202426',
+    })
+  })
+
+  it('maps Pliny newsletter states to approved semantic reds', () => {
+    expect(extendedTheme.colors.primary).toEqual({
+      DEFAULT: '#a83639',
+      400: '#881d24',
+      500: '#a83639',
+      600: '#a83639',
+      700: '#881d24',
     })
   })
 
@@ -105,6 +118,26 @@ describe('Clinical Precision theme', () => {
     expect(typography.invert.css).toMatchObject({
       '--tw-prose-code': '#eff1f3',
       '--tw-prose-code-bg': '#383d40',
+    })
+  })
+
+  it('uses semantic variables for captions and table surfaces in both themes', () => {
+    const typography = extendedTheme.typography({ theme })
+    expect(typography.DEFAULT.css).toMatchObject({
+      '--tw-prose-captions': '#505f76',
+      '--tw-prose-table-head-border': '#8b7170',
+      '--tw-prose-table-row-border': '#debfbe',
+      '--tw-prose-table-row-even': '#f2f4f6',
+      figcaption: { color: 'var(--tw-prose-captions)' },
+      thead: { borderBottomColor: 'var(--tw-prose-table-head-border)' },
+      'tbody tr': { borderBottomColor: 'var(--tw-prose-table-row-border)' },
+      'tbody tr:nth-child(even)': { backgroundColor: 'var(--tw-prose-table-row-even)' },
+    })
+    expect(typography.invert.css).toMatchObject({
+      '--tw-prose-captions': '#b7c8e1',
+      '--tw-prose-table-head-border': '#8b7170',
+      '--tw-prose-table-row-border': '#8b7170',
+      '--tw-prose-table-row-even': '#383d40',
     })
   })
 })

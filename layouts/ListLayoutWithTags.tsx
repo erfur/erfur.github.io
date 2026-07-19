@@ -95,7 +95,7 @@ export default function ListLayoutWithTags({
             aria-current={!currentTag ? 'page' : undefined}
             className={
               !currentTag
-                ? 'border border-primary-container bg-primary-container px-3 py-1 text-label-sm uppercase text-on-primary dark:border-inverse-primary dark:bg-[#881d24] dark:text-inverse-on-surface'
+                ? 'border border-primary-container bg-primary-container px-3 py-1 text-label-sm uppercase text-on-primary-container dark:border-inverse-primary dark:bg-[#881d24] dark:text-inverse-on-surface'
                 : 'border border-outline-variant bg-surface-container-low px-3 py-1 text-label-sm uppercase text-secondary transition-colors hover:border-primary-container hover:text-primary dark:border-outline dark:bg-[#383d40] dark:text-[#bcc7de] dark:hover:border-inverse-primary dark:hover:text-inverse-primary'
             }
           >
@@ -110,7 +110,7 @@ export default function ListLayoutWithTags({
                 aria-current={isActive ? 'page' : undefined}
                 className={
                   isActive
-                    ? 'border border-primary-container bg-primary-container px-3 py-1 text-label-sm uppercase text-on-primary dark:border-inverse-primary dark:bg-[#881d24] dark:text-inverse-on-surface'
+                    ? 'border border-primary-container bg-primary-container px-3 py-1 text-label-sm uppercase text-on-primary-container dark:border-inverse-primary dark:bg-[#881d24] dark:text-inverse-on-surface'
                     : 'border border-outline-variant bg-surface-container-low px-3 py-1 text-label-sm uppercase text-secondary transition-colors hover:border-primary-container hover:text-primary dark:border-outline dark:bg-[#383d40] dark:text-[#bcc7de] dark:hover:border-inverse-primary dark:hover:text-inverse-primary'
                 }
                 aria-label={`View posts tagged ${t}`}

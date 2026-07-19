@@ -17,3 +17,14 @@ it('uses the configured headline role for the author name', () => {
   expect(authorName).toHaveClass('text-headline-md')
   expect(authorName).not.toHaveClass('text-title-lg')
 })
+
+it('uses semantic prose without a gray modifier for the biography', () => {
+  render(
+    <AuthorLayout content={{ name: 'Example Author' } as never}>
+      <p>Biography</p>
+    </AuthorLayout>
+  )
+
+  expect(screen.getByText('Biography').parentElement).toHaveClass('prose', 'max-w-none')
+  expect(screen.getByText('Biography').parentElement).not.toHaveClass('prose-gray')
+})

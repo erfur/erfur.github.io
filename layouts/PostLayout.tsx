@@ -75,9 +75,7 @@ export default function PostLayout({
           {toc && toc.length > 0 && <TableOfContentsMobile toc={toc} title={title} />}
 
           {/* Content */}
-          <ProsePopovers className="prose prose-gray max-w-none dark:prose-invert">
-            {children}
-          </ProsePopovers>
+          <ProsePopovers className="prose max-w-none dark:prose-invert">{children}</ProsePopovers>
 
           {/* Comments */}
           {siteMetadata.comments?.provider && (

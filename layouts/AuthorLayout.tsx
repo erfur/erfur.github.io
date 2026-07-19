@@ -47,7 +47,7 @@ export default function AuthorLayout({ children, content }: Props) {
         </div>
 
         {/* Bio */}
-        <div className="prose prose-gray max-w-none flex-1 dark:prose-invert">{children}</div>
+        <div className="prose max-w-none flex-1 dark:prose-invert">{children}</div>
       </div>
     </div>
   )

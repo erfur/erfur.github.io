@@ -100,6 +100,7 @@ it('uses the unified prose typography', () => {
     </PostLayout>
   )
 
-  expect(screen.getByText('body').parentElement).toHaveClass('prose', 'prose-gray', 'max-w-none')
+  expect(screen.getByText('body').parentElement).toHaveClass('prose', 'max-w-none')
+  expect(screen.getByText('body').parentElement).not.toHaveClass('prose-gray')
   expect(screen.getByText('body').parentElement).not.toHaveClass('prose-post')
 })
