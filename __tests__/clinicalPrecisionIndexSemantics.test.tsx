@@ -100,6 +100,17 @@ it.each(postLists)(
   }
 )
 
+it('insets links in the home Latest list', () => {
+  render(<Home posts={homePosts} />)
+
+  const rows = within(screen.getByRole('list')).getAllByRole('listitem')
+  rows.forEach((row) => {
+    const link = within(row).getByRole('link')
+    expect(link).toHaveClass('px-2')
+    expect(link).not.toHaveClass('-mx-2')
+  })
+})
+
 it.each([
   ['home', () => <Home posts={[]} />],
   ['standard layout', () => <ListLayout posts={[]} title="Posts" />],
