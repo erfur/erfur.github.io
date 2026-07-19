@@ -90,27 +90,22 @@ describe('Clinical Precision theme', () => {
     })
   })
 
-  it('scopes the Merriweather reading scale to post paragraphs and lists', () => {
+  it('uses inherited Merriweather throughout post prose except protected elements', () => {
     const typography = extendedTheme.typography({ theme })
+
     expect(typography.post.css).toEqual({
-      p: {
-        fontFamily: 'var(--font-merriweather), Georgia, serif',
-        fontSize: '1.1rem',
-        lineHeight: '1.6',
-      },
-      'ul, ol': {
-        fontFamily: 'var(--font-merriweather), Georgia, serif',
-        fontSize: '1.1rem',
-        lineHeight: '1.6',
-      },
+      fontFamily: 'var(--font-merriweather), Georgia, serif',
+      fontSize: '1.1rem',
+      lineHeight: '1.6',
+      p: { fontSize: '1.1rem', lineHeight: '1.6' },
+      'ul, ol': { fontSize: '1.1rem', lineHeight: '1.6' },
+      'code:not(pre code)': { fontSize: '1.1rem', lineHeight: 'inherit' },
     })
+
     expect(typography.DEFAULT.css.fontFamily).toBe(
       'var(--font-jetbrains-mono), Menlo, monospace'
     )
     expect(typography.DEFAULT.css['h1,h2,h3,h4,h5,h6'].fontFamily).toBe(
-      'var(--font-jetbrains-mono), Menlo, monospace'
-    )
-    expect(typography.DEFAULT.css.a.fontFamily).toBe(
       'var(--font-jetbrains-mono), Menlo, monospace'
     )
     expect(typography.DEFAULT.css.code.fontFamily).toBe(
@@ -119,12 +114,9 @@ describe('Clinical Precision theme', () => {
     expect(typography.DEFAULT.css.pre.fontFamily).toBe(
       'var(--font-jetbrains-mono), Menlo, monospace'
     )
-    expect(typography.DEFAULT.css.table.fontFamily).toBe(
-      'var(--font-jetbrains-mono), Menlo, monospace'
-    )
-    expect(typography.DEFAULT.css.figcaption.fontFamily).toBe(
-      'var(--font-jetbrains-mono), Menlo, monospace'
-    )
+    expect(typography.DEFAULT.css.a.fontFamily).toBeUndefined()
+    expect(typography.DEFAULT.css.table.fontFamily).toBeUndefined()
+    expect(typography.DEFAULT.css.figcaption.fontFamily).toBeUndefined()
   })
 
   it('preserves the default prose body, inline code, and image geometry', () => {

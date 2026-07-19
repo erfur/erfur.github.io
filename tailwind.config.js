@@ -127,7 +127,6 @@ module.exports = {
               letterSpacing: '-0.02em',
             },
             a: {
-              fontFamily: theme('fontFamily.sans').join(', '),
               color: 'var(--tw-prose-links)',
               fontWeight: '500',
               textDecorationColor: theme('colors.primary-container'),
@@ -154,7 +153,6 @@ module.exports = {
               boxShadow: 'none',
             },
             figcaption: {
-              fontFamily: theme('fontFamily.sans').join(', '),
               marginTop: '0.375em',
               fontSize: '0.75rem',
               lineHeight: '1rem',
@@ -163,7 +161,6 @@ module.exports = {
               color: 'var(--tw-prose-captions)',
             },
             table: {
-              fontFamily: theme('fontFamily.sans').join(', '),
               fontSize: '0.875rem',
               lineHeight: '1.25rem',
             },
@@ -176,16 +173,12 @@ module.exports = {
         },
         post: {
           css: {
-            p: {
-              fontFamily: theme('fontFamily.proseBody').join(', '),
-              fontSize: '1.1rem',
-              lineHeight: '1.6',
-            },
-            'ul, ol': {
-              fontFamily: theme('fontFamily.proseBody').join(', '),
-              fontSize: '1.1rem',
-              lineHeight: '1.6',
-            },
+            fontFamily: theme('fontFamily.proseBody').join(', '),
+            fontSize: '1.1rem',
+            lineHeight: '1.6',
+            p: { fontSize: '1.1rem', lineHeight: '1.6' },
+            'ul, ol': { fontSize: '1.1rem', lineHeight: '1.6' },
+            'code:not(pre code)': { fontSize: '1.1rem', lineHeight: 'inherit' },
           },
         },
         invert: {
