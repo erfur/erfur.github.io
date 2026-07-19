@@ -28,7 +28,7 @@ export default function AuthorLayout({ children, content }: Props) {
               alt="avatar"
               width={120}
               height={120}
-              className="h-24 w-24 border border-outline-variant"
+              className="h-24 w-24 border border-outline-variant dark:border-outline"
             />
           )}
           <h2 className="mt-4 text-headline-md text-on-surface dark:text-inverse-on-surface">

@@ -140,4 +140,15 @@ describe('Clinical Precision theme', () => {
       '--tw-prose-table-row-even': '#383d40',
     })
   })
+
+  it('uses semantic image-border variables in both themes', () => {
+    const typography = extendedTheme.typography({ theme })
+    expect(typography.DEFAULT.css).toMatchObject({
+      '--tw-prose-image-border': '#debfbe',
+      img: { border: '1px solid var(--tw-prose-image-border)' },
+    })
+    expect(typography.invert.css).toMatchObject({
+      '--tw-prose-image-border': '#8b7170',
+    })
+  })
 })

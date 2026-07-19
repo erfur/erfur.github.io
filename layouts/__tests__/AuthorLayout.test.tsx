@@ -28,3 +28,17 @@ it('uses semantic prose without a gray modifier for the biography', () => {
   expect(screen.getByText('Biography').parentElement).toHaveClass('prose', 'max-w-none')
   expect(screen.getByText('Biography').parentElement).not.toHaveClass('prose-gray')
 })
+
+it('uses the muted outline border for the author avatar in dark mode', () => {
+  render(
+    <AuthorLayout content={{ name: 'Example Author', avatar: '/avatar.png' } as never}>
+      <p>Biography</p>
+    </AuthorLayout>
+  )
+
+  expect(screen.getByAltText('avatar')).toHaveClass(
+    'border',
+    'border-outline-variant',
+    'dark:border-outline'
+  )
+})

@@ -111,6 +111,7 @@ module.exports = {
             '--tw-prose-table-head-border': theme('colors.outline'),
             '--tw-prose-table-row-border': theme('colors.outline-variant'),
             '--tw-prose-table-row-even': theme('colors.surface-container-low'),
+            '--tw-prose-image-border': theme('colors.outline-variant'),
             color: 'var(--tw-prose-body)',
             p: {
               fontSize: '1rem',
@@ -146,7 +147,7 @@ module.exports = {
               marginTop: '1em',
               marginBottom: '0.5em',
               borderRadius: '0',
-              border: `1px solid ${theme('colors.outline-variant')}`,
+              border: '1px solid var(--tw-prose-image-border)',
               boxShadow: 'none',
             },
             figcaption: {
@@ -176,6 +177,7 @@ module.exports = {
             '--tw-prose-table-head-border': '#8b7170',
             '--tw-prose-table-row-border': '#8b7170',
             '--tw-prose-table-row-even': '#383d40',
+            '--tw-prose-image-border': theme('colors.outline'),
             '--tw-prose-pre-bg': '#202426',
             '--tw-prose-hr': '#574140',
             '--tw-prose-th-borders': '#8b7170',
