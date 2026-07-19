@@ -16,6 +16,7 @@ module.exports = {
         mono: ['var(--font-jetbrains-mono)', 'Menlo', 'monospace'],
         sans: ['var(--font-jetbrains-mono)', 'Menlo', 'monospace'],
         heading: ['var(--font-jetbrains-mono)', 'Menlo', 'monospace'],
+        proseBody: ['var(--font-merriweather)', 'Georgia', 'serif'],
       },
       colors: {
         surface: '#f7f9fb',
@@ -126,6 +127,7 @@ module.exports = {
               letterSpacing: '-0.02em',
             },
             a: {
+              fontFamily: theme('fontFamily.sans').join(', '),
               color: 'var(--tw-prose-links)',
               fontWeight: '500',
               textDecorationColor: theme('colors.primary-container'),
@@ -142,6 +144,7 @@ module.exports = {
             },
             'code::before': { content: 'none' },
             'code::after': { content: 'none' },
+            pre: { fontFamily: theme('fontFamily.mono').join(', ') },
             'pre code': { backgroundColor: 'transparent', padding: '0' },
             img: {
               marginTop: '1em',
@@ -151,6 +154,7 @@ module.exports = {
               boxShadow: 'none',
             },
             figcaption: {
+              fontFamily: theme('fontFamily.sans').join(', '),
               marginTop: '0.375em',
               fontSize: '0.75rem',
               lineHeight: '1rem',
@@ -158,11 +162,29 @@ module.exports = {
               textTransform: 'uppercase',
               color: 'var(--tw-prose-captions)',
             },
-            table: { fontSize: '0.875rem', lineHeight: '1.25rem' },
+            table: {
+              fontFamily: theme('fontFamily.sans').join(', '),
+              fontSize: '0.875rem',
+              lineHeight: '1.25rem',
+            },
             thead: { borderBottomColor: 'var(--tw-prose-table-head-border)' },
             'tbody tr': { borderBottomColor: 'var(--tw-prose-table-row-border)' },
             'tbody tr:nth-child(even)': {
               backgroundColor: 'var(--tw-prose-table-row-even)',
+            },
+          },
+        },
+        post: {
+          css: {
+            p: {
+              fontFamily: theme('fontFamily.proseBody').join(', '),
+              fontSize: '1.1rem',
+              lineHeight: '1.6',
+            },
+            'ul, ol': {
+              fontFamily: theme('fontFamily.proseBody').join(', '),
+              fontSize: '1.1rem',
+              lineHeight: '1.6',
             },
           },
         },

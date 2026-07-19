@@ -39,7 +39,7 @@ export default function PostMinimal({ content, next, prev, children }: LayoutPro
               <PageTitle>{title}</PageTitle>
             </div>
           </div>
-          <div className="prose max-w-none dark:prose-invert">{children}</div>
+          <div className="prose prose-post max-w-none dark:prose-invert">{children}</div>
           {siteMetadata.comments?.provider && (
             <div
               className="mt-12 border-t border-outline-variant pt-8 dark:border-outline"
