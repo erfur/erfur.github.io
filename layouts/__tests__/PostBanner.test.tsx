@@ -31,4 +31,5 @@ it('uses scoped Merriweather post body typography', () => {
 
   expect(screen.getByText('body').parentElement).toHaveClass('prose', 'prose-post', 'max-w-none')
   expect(screen.getByText('body').parentElement).not.toHaveClass('prose-gray')
+  expect(screen.getByText('body').parentElement).not.toHaveClass('py-4')
 })
