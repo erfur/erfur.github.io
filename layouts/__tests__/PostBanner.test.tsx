@@ -22,14 +22,13 @@ const content = {
   images: ['/static/images/example/banner.jpg'],
 }
 
-it('uses the unified prose typography', () => {
+it('uses scoped Merriweather post body typography', () => {
   render(
     <PostBanner content={content as never}>
       <p>body</p>
     </PostBanner>
   )
 
-  expect(screen.getByText('body').parentElement).toHaveClass('prose', 'max-w-none')
+  expect(screen.getByText('body').parentElement).toHaveClass('prose', 'prose-post', 'max-w-none')
   expect(screen.getByText('body').parentElement).not.toHaveClass('prose-gray')
-  expect(screen.getByText('body').parentElement).not.toHaveClass('prose-post')
 })

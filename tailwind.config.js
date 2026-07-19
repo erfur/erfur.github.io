@@ -16,6 +16,7 @@ module.exports = {
         mono: ['var(--font-jetbrains-mono)', 'Menlo', 'monospace'],
         sans: ['var(--font-jetbrains-mono)', 'Menlo', 'monospace'],
         heading: ['var(--font-jetbrains-mono)', 'Menlo', 'monospace'],
+        proseBody: ['var(--font-merriweather)', 'Georgia', 'serif'],
       },
       colors: {
         surface: '#f7f9fb',
@@ -126,6 +127,7 @@ module.exports = {
               letterSpacing: '-0.02em',
             },
             a: {
+              fontFamily: theme('fontFamily.sans').join(', '),
               color: 'var(--tw-prose-links)',
               fontWeight: '500',
               textDecorationColor: theme('colors.primary-container'),
@@ -163,6 +165,20 @@ module.exports = {
             'tbody tr': { borderBottomColor: 'var(--tw-prose-table-row-border)' },
             'tbody tr:nth-child(even)': {
               backgroundColor: 'var(--tw-prose-table-row-even)',
+            },
+          },
+        },
+        post: {
+          css: {
+            p: {
+              fontFamily: theme('fontFamily.proseBody').join(', '),
+              fontSize: '1.1rem',
+              lineHeight: '1.6',
+            },
+            'ul, ol': {
+              fontFamily: theme('fontFamily.proseBody').join(', '),
+              fontSize: '1.1rem',
+              lineHeight: '1.6',
             },
           },
         },

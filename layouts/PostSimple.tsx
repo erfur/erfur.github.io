@@ -41,7 +41,9 @@ export default function PostLayout({ content, next, prev, children }: LayoutProp
         </header>
 
         {/* Content */}
-        <ProsePopovers className="prose max-w-none dark:prose-invert">{children}</ProsePopovers>
+        <ProsePopovers className="prose prose-post max-w-none dark:prose-invert">
+          {children}
+        </ProsePopovers>
 
         {/* Footer */}
         <footer className="mt-12 border-t border-outline-variant pt-8 dark:border-outline">

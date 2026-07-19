@@ -87,14 +87,13 @@ it('does not mount a post banner when images is not an array', () => {
   expect(mockPostBanner).not.toHaveBeenCalled()
 })
 
-it('uses the unified prose typography', () => {
+it('uses scoped Merriweather post body typography', () => {
   render(
     <PostSimple content={baseContent as never}>
       <p>body</p>
     </PostSimple>
   )
 
-  expect(screen.getByText('body').parentElement).toHaveClass('prose', 'max-w-none')
+  expect(screen.getByText('body').parentElement).toHaveClass('prose', 'prose-post', 'max-w-none')
   expect(screen.getByText('body').parentElement).not.toHaveClass('prose-gray')
-  expect(screen.getByText('body').parentElement).not.toHaveClass('prose-post')
 })

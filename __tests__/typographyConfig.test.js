@@ -63,11 +63,12 @@ describe('Clinical Precision theme', () => {
     })
   })
 
-  it('uses JetBrains Mono for every text role', () => {
+  it('uses JetBrains Mono for interface roles and Merriweather for post bodies', () => {
     expect(extendedTheme.fontFamily).toEqual({
       mono: ['var(--font-jetbrains-mono)', 'Menlo', 'monospace'],
       sans: ['var(--font-jetbrains-mono)', 'Menlo', 'monospace'],
       heading: ['var(--font-jetbrains-mono)', 'Menlo', 'monospace'],
+      proseBody: ['var(--font-merriweather)', 'Georgia', 'serif'],
     })
   })
 
@@ -89,16 +90,32 @@ describe('Clinical Precision theme', () => {
     })
   })
 
-  it('uses the body and inline-code roles in prose', () => {
-    const css = extendedTheme.typography({ theme }).DEFAULT.css
-    expect(css.fontFamily).toBe('var(--font-jetbrains-mono), Menlo, monospace')
-    expect(css.p).toMatchObject({ fontSize: '1rem', lineHeight: '1.5rem' })
-    expect(css.code).toMatchObject({
-      fontSize: '0.8125rem',
-      lineHeight: '1.125rem',
-      borderRadius: '0',
+  it('scopes the Merriweather reading scale to post paragraphs and lists', () => {
+    const typography = extendedTheme.typography({ theme })
+    expect(typography.post.css).toEqual({
+      p: {
+        fontFamily: 'var(--font-merriweather), Georgia, serif',
+        fontSize: '1.1rem',
+        lineHeight: '1.6',
+      },
+      'ul, ol': {
+        fontFamily: 'var(--font-merriweather), Georgia, serif',
+        fontSize: '1.1rem',
+        lineHeight: '1.6',
+      },
     })
-    expect(css.img).toMatchObject({ borderRadius: '0', boxShadow: 'none' })
+    expect(typography.DEFAULT.css.fontFamily).toBe(
+      'var(--font-jetbrains-mono), Menlo, monospace'
+    )
+    expect(typography.DEFAULT.css['h1,h2,h3,h4,h5,h6'].fontFamily).toBe(
+      'var(--font-jetbrains-mono), Menlo, monospace'
+    )
+    expect(typography.DEFAULT.css.a.fontFamily).toBe(
+      'var(--font-jetbrains-mono), Menlo, monospace'
+    )
+    expect(typography.DEFAULT.css.code.fontFamily).toBe(
+      'var(--font-jetbrains-mono), Menlo, monospace'
+    )
   })
 
   it('uses prose variables so inverse foreground and background colors apply', () => {
