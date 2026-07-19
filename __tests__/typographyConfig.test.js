@@ -95,8 +95,6 @@ describe('Clinical Precision theme', () => {
 
     expect(typography.post.css).toEqual({
       fontFamily: 'var(--font-merriweather), Georgia, serif',
-      fontSize: '1.1rem',
-      lineHeight: '1.6',
       p: { fontSize: '1.1rem', lineHeight: '1.6' },
       'ul, ol': { fontSize: '1.1rem', lineHeight: '1.6' },
       'code:not(pre code)': { fontSize: '1.1rem', lineHeight: 'inherit' },

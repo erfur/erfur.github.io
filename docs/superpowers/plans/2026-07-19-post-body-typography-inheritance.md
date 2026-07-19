@@ -4,7 +4,7 @@
 
 **Goal:** Use Merriweather throughout post body prose except headings and code, and make inline code match the `1.1rem` post reading size without changing fenced code sizing.
 
-**Architecture:** Keep typography ownership in `tailwind.config.js`. Establish Merriweather on the `prose-post` root so ordinary descendants inherit it, remove redundant element-level JetBrains declarations, and retain explicit JetBrains declarations for headings and code. Apply the post inline-code size with a selector that excludes code beneath `pre`, preserving the existing Prism block-code rule.
+**Architecture:** Keep typography ownership in `tailwind.config.js`. Establish only Merriweather on the `prose-post` root so ordinary descendants inherit it, keep the reading size and line height on paragraphs and lists, remove redundant element-level JetBrains declarations, and retain explicit JetBrains declarations for headings and code. Apply the post inline-code size with a selector that excludes code beneath `pre`, preserving the existing fenced-code sizing chain.
 
 **Tech Stack:** Next.js 14, Tailwind CSS 3, `@tailwindcss/typography`, PostCSS, Jest
 
@@ -13,9 +13,9 @@
 - Scope the change to existing post wrappers using `prose-post`.
 - Keep headings, inline code, and block code in JetBrains Mono.
 - Use Merriweather for links, blockquotes, lists, tables, captions, and other post prose.
-- Keep the post reading size at `1.1rem` with `1.6` line height.
+- Keep paragraphs and lists at the post reading size of `1.1rem` with `1.6` line height without sizing the post root.
 - Make inline post code `1.1rem` while preserving its existing color, background, padding, weight, and square geometry.
-- Keep block code at the existing `0.8rem` Prism size with its current presentation.
+- Keep existing fenced-code sizing and presentation unchanged.
 - Do not change font loading, layouts, content, routing, responsive behavior, dark mode, non-post prose, or interface typography.
 - Do not add dependencies.
 
@@ -30,7 +30,7 @@
 
 **Interfaces:**
 - Consumes: Existing `fontFamily.proseBody`, `typography.DEFAULT`, `typography.post`, `prose-post` wrappers, and `css/prism.css` rule `pre code { font-size: 0.8rem; }`.
-- Produces: A `typography.post.css` root family and reading scale, inherited Merriweather for ordinary post prose, and a `code:not(pre code)` inline-size rule.
+- Produces: A `typography.post.css` root family, paragraph/list reading scale, inherited Merriweather for ordinary post prose, and a `code:not(pre code)` inline-size rule.
 
 - [ ] **Step 1: Write failing configuration tests**
 
@@ -42,8 +42,6 @@ it('uses inherited Merriweather throughout post prose except protected elements'
 
   expect(typography.post.css).toEqual({
     fontFamily: 'var(--font-merriweather), Georgia, serif',
-    fontSize: '1.1rem',
-    lineHeight: '1.6',
     p: { fontSize: '1.1rem', lineHeight: '1.6' },
     'ul, ol': { fontSize: '1.1rem', lineHeight: '1.6' },
     'code:not(pre code)': { fontSize: '1.1rem', lineHeight: 'inherit' },
@@ -100,6 +98,18 @@ function generatedFontFamily(selectorFragment) {
 function generatedFontSize(selectorFragment) {
   return generatedDeclaration(selectorFragment, 'font-size')
 }
+
+function generatedPostRootDeclaration(property) {
+  let value
+
+  generatedCss.walkRules('.prose-post', (rule) => {
+    rule.walkDecls(property, (declaration) => {
+      value = declaration.value
+    })
+  })
+
+  return value
+}
 ```
 
 Replace `generates Merriweather declarations for post paragraphs and lists` with:
@@ -107,6 +117,8 @@ Replace `generates Merriweather declarations for post paragraphs and lists` with
 ```js
 it('establishes inherited Merriweather on the post prose root', () => {
   expect(generatedFontFamily('.prose-post')).toBe(merriweather)
+  expect(generatedPostRootDeclaration('font-size')).toBeUndefined()
+  expect(generatedPostRootDeclaration('line-height')).toBeUndefined()
   expect(generatedFontFamily('.prose-post :where(p)')).toBeUndefined()
   expect(generatedFontFamily('.prose-post :where(ul, ol)')).toBeUndefined()
   expect(generatedFontFamily('.prose :where(a)')).toBeUndefined()
@@ -129,6 +141,7 @@ Add this test after it:
 ```js
 it('matches inline code to the post reading size without changing fenced code', () => {
   expect(generatedFontSize('.prose-post :where(code:not(pre code))')).toBe('1.1rem')
+  expect(generatedFontSize('.prose :where(pre)')).toBe('0.875em')
   expect(generatedFontSize('.prose :where(pre code)')).toBe('inherit')
 })
 ```
@@ -165,8 +178,6 @@ Replace `typography.post` with:
 post: {
   css: {
     fontFamily: theme('fontFamily.proseBody').join(', '),
-    fontSize: '1.1rem',
-    lineHeight: '1.6',
     p: { fontSize: '1.1rem', lineHeight: '1.6' },
     'ul, ol': { fontSize: '1.1rem', lineHeight: '1.6' },
     'code:not(pre code)': { fontSize: '1.1rem', lineHeight: 'inherit' },
@@ -174,7 +185,7 @@ post: {
 },
 ```
 
-Do not alter the explicit heading, `code`, `pre`, or `pre code` font-family declarations. The `code:not(pre code)` selector is required: a general post `code` rule would have class-level specificity and override the later Prism `pre code { font-size: 0.8rem; }` rule.
+Do not alter the explicit heading, `code`, `pre`, or `pre code` font-family declarations. The `code:not(pre code)` selector is required so the inline size does not leak into the existing typography/Prism fenced-code sizing chain. The post root must not set size or line height: `pre` retains the typography plugin's `0.875em` size and `pre code` remains `inherit`.
 
 - [ ] **Step 5: Run focused tests and verify GREEN**
 

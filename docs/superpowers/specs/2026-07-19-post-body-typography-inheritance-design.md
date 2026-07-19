@@ -12,7 +12,7 @@ Post links, blockquotes, lists, tables, captions, and other prose elements will 
 
 ## Typography Architecture
 
-The existing Tailwind typography configuration remains the single owner of prose typography. The `post` typography modifier will set Merriweather and the current `1.1rem` reading size on the post prose root. Descendants will inherit that family unless they are explicitly protected.
+The existing Tailwind typography configuration remains the single owner of prose typography. The `post` typography modifier will set Merriweather on the post prose root so descendants inherit that family unless they are explicitly protected. The current `1.1rem` reading size and `1.6` line height remain scoped to paragraphs and lists.
 
 Redundant JetBrains Mono declarations will be removed from links, tables, and captions. Those elements will still use JetBrains Mono in non-post prose because the default prose root remains JetBrains Mono, while post prose will inherit Merriweather from `prose-post`.
 
@@ -32,11 +32,11 @@ No font-loading, layout, content model, routing, responsive behavior, or dark-mo
 
 Configuration and generated-CSS tests will verify:
 
-- The post modifier establishes Merriweather and the `1.1rem` reading size.
+- The post modifier establishes Merriweather on the root and the `1.1rem` reading size with `1.6` line height on paragraphs and lists.
 - Links, tables, captions, blockquotes, paragraphs, and lists resolve to Merriweather in posts.
 - Headings, inline code, and block code resolve to JetBrains Mono.
 - Inline post code resolves to `1.1rem`.
-- Code nested in `pre` retains the block code size rather than the inline code size.
+- The post root sets no size or line height, `pre` retains the typography plugin's `0.875em` size, and code nested in `pre` remains `inherit` so existing fenced-code sizing is unchanged.
 - Default non-post prose remains JetBrains Mono.
 
 The focused typography tests, full Jest suite, lint command, production build, and `git diff --check` must pass.

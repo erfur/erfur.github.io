@@ -60,6 +60,18 @@ function generatedFontSize(selectorFragment) {
   return generatedDeclaration(selectorFragment, 'font-size')
 }
 
+function generatedPostRootDeclaration(property) {
+  let value
+
+  generatedCss.walkRules('.prose-post', (rule) => {
+    rule.walkDecls(property, (declaration) => {
+      value = declaration.value
+    })
+  })
+
+  return value
+}
+
 function resolvedFontFamily(...inheritanceChain) {
   return inheritanceChain
     .map(generatedFontFamily)
@@ -68,6 +80,8 @@ function resolvedFontFamily(...inheritanceChain) {
 
 it('establishes inherited Merriweather on the post prose root', () => {
   expect(generatedFontFamily('.prose-post')).toBe(merriweather)
+  expect(generatedPostRootDeclaration('font-size')).toBeUndefined()
+  expect(generatedPostRootDeclaration('line-height')).toBeUndefined()
   expect(generatedFontFamily('.prose-post :where(p)')).toBeUndefined()
   expect(generatedFontFamily('.prose-post :where(ul, ol)')).toBeUndefined()
   expect(generatedFontFamily('.prose :where(a)')).toBeUndefined()
@@ -84,6 +98,7 @@ it('generates JetBrains declarations only for protected post elements', () => {
 
 it('matches inline code to the post reading size without changing fenced code', () => {
   expect(generatedFontSize('.prose-post :where(code:not(pre code))')).toBe('1.1rem')
+  expect(generatedFontSize('.prose :where(pre)')).toBe('0.875em')
   expect(generatedFontSize('.prose :where(pre code)')).toBe('inherit')
 })
 
