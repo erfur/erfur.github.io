@@ -22,7 +22,7 @@ jest.mock('../theme-providers', () => ({
 import { JetBrains_Mono, Merriweather } from 'next/font/google'
 import '../layout'
 
-it('loads JetBrains Mono for the interface and Merriweather for post bodies', () => {
+it('loads the interface font immediately and avoids flashing fallback post text', () => {
   expect(JetBrains_Mono).toHaveBeenCalledWith({
     subsets: ['latin'],
     display: 'swap',
@@ -31,7 +31,7 @@ it('loads JetBrains Mono for the interface and Merriweather for post bodies', ()
   })
   expect(Merriweather).toHaveBeenCalledWith({
     subsets: ['latin'],
-    display: 'swap',
+    display: 'block',
     variable: '--font-merriweather',
     weight: ['400', '700'],
     style: ['normal', 'italic'],

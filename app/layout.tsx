@@ -20,7 +20,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 const merriweather = Merriweather({
   subsets: ['latin'],
-  display: 'swap',
+  display: 'block',
   variable: '--font-merriweather',
   weight: ['400', '700'],
   style: ['normal', 'italic'],
