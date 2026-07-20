@@ -13,14 +13,14 @@ import { Metadata } from 'next'
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
-  display: 'swap',
+  display: 'block',
   variable: '--font-jetbrains-mono',
   weight: ['400', '500', '600', '700'],
 })
 
 const merriweather = Merriweather({
   subsets: ['latin'],
-  display: 'block',
+  display: 'swap',
   variable: '--font-merriweather',
   weight: ['400', '700'],
   style: ['normal', 'italic'],
