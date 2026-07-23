@@ -19,7 +19,7 @@
 
 ---
 
-### Task 1: Update Text-First Post Header Typography And Spacing
+### Task 1: Update Post Header Typography And Spacing
 
 **Files:**
 - Modify: `layouts/__tests__/PostLayout.test.tsx`
