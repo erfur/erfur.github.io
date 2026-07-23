@@ -21,3 +21,7 @@ it('removes layout selection only from blog frontmatter', () => {
   expect(blogSchema).not.toMatch(/\n\s+layout:/)
   expect(authorSchema).toMatch(/\n\s+layout:/)
 })
+
+it('types the computed table of contents as structured data', () => {
+  expect(contentlayerSource).toMatch(/toc:\s*{\s*type:\s*'json'/)
+})
