@@ -9,8 +9,8 @@
     "serve": "next start",
     "analyze": "cross-env ANALYZE=true next build",
     "lint": "next lint --fix --dir pages --dir app --dir components --dir lib --dir layouts --dir scripts",
-    "test": "jest --watch",
-    "test:run": "jest"
+    "test": "cross-env NODE_ENV=test jest --watch",
+    "test:run": "cross-env NODE_ENV=test jest"
   },
   "dependencies": {
     "@next/bundle-analyzer": "14.0.3",
