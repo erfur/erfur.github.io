@@ -15,7 +15,7 @@
 - Use a `2.25rem` title with a `2.75rem` line height from the `sm` breakpoint onward.
 - Increase post header bottom padding from `2rem` to `2.5rem`.
 - Preserve existing top padding, metadata layout, title weight, letter spacing, colors, banners, and post body typography.
-- Do not change `PostBanner`, other layouts, or shared typography tokens.
+- Do not change the retained `components/PostBanner.tsx`, other layouts, or shared typography tokens.
 
 ---
 

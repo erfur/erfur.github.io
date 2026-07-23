@@ -6,7 +6,7 @@ Give post titles more visual room and move the post body slightly lower by modes
 
 ## Scope
 
-The change applies only to `PostLayout`, the supported post template. The alternative `PostSimple` and `PostBanner` layouts are being removed separately, and other page titles remain unchanged.
+The change applies only to `PostLayout`, the supported post template. The former alternative `PostSimple` and `PostBanner` layouts have been removed, and other page titles remain unchanged.
 
 ## Design
 
