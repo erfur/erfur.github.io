@@ -44,7 +44,7 @@ export default function PostLayout({
           {bannerSrc && <PostBanner src={bannerSrc} alt={title} />}
 
           {/* Header */}
-          <header className="pb-8 pt-4">
+          <header className="pb-10 pt-4">
             <div className="flex items-center gap-2 text-label-sm uppercase text-tertiary dark:text-[#b7c8e1]">
               <time dateTime={date}>
                 {new Date(date).toLocaleDateString(siteMetadata.locale, postDateTemplate)}
@@ -66,7 +66,7 @@ export default function PostLayout({
                 </>
               )}
             </div>
-            <h1 className="text-headline-lg-mobile text-on-surface dark:text-inverse-on-surface sm:text-headline-lg">
+            <h1 className="text-[1.75rem] font-bold leading-[2.25rem] tracking-[-0.02em] text-on-surface dark:text-inverse-on-surface sm:text-[2.25rem] sm:leading-[2.75rem]">
               {title}
             </h1>
           </header>

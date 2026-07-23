@@ -103,3 +103,23 @@ it('uses scoped Merriweather post body typography', () => {
   expect(screen.getByText('body').parentElement).toHaveClass('prose', 'prose-post', 'max-w-none')
   expect(screen.getByText('body').parentElement).not.toHaveClass('prose-gray')
 })
+
+it('gives the post title more size and space before the body', () => {
+  render(
+    <PostLayout content={baseContent as never} authorDetails={[]}>
+      <p>body</p>
+    </PostLayout>
+  )
+
+  const title = screen.getByRole('heading', { level: 1, name: 'Example Post' })
+  expect(title).toHaveClass(
+    'text-[1.75rem]',
+    'leading-[2.25rem]',
+    'font-bold',
+    'tracking-[-0.02em]',
+    'sm:text-[2.25rem]',
+    'sm:leading-[2.75rem]'
+  )
+  expect(title).not.toHaveClass('text-headline-lg-mobile', 'sm:text-headline-lg')
+  expect(title.closest('header')).toHaveClass('pb-10', 'pt-4')
+})
