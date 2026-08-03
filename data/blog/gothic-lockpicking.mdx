@@ -53,7 +53,7 @@ means that the first pin is in hole 2, the second is already centered, and the t
 - Moves are edges.
 - `[4, 4, 4]` is the goal node. Once the problem is represented as a graph, finding a solution becomes a graph-search problem.
 
-The solver uses **breadth-first search**, exploring states in layers:
+The solver uses breadth-first search, exploring states in layers:
 
 1. Check every state reachable in one move.
 2. Then check every state reachable in two moves.
@@ -76,16 +76,16 @@ As a summary, the solver is mostly a clean application of BFS:
 - Generate legal neighboring states.
 - Remember visited states.
 - Stop when all pins reach hole 4.
-- Follow parent links to recover the shortest path. There can be up to `7^N` possible states, so the search grows quickly as layers are added. For the supported maximum of seven layers, however, the state space is still finite and manageable. Sometimes the simple algorithm is the correct one. BFS may not look particularly exotic, but it gives us exactly what this puzzle needs: either a shortest solution or proof that no solution exists.
+- Follow parent links to recover the shortest path. There can be up to `7^N` possible states, so the search grows quickly as layers are added. For the supported maximum of seven layers, however, the state space is still finite and manageable.
 
 ## Conclusion
 
 AI has caused a huge paradigm shift over the last two years. So much so that many (even big) tasks can be delegated to agents with almost no guidance and minimal guardrails. It's not without its flaws though; the excitement of being able to do more in less time eventually starts taxing mentally. There is a lot more noise (slop) to filter now. With different models that differ in capabilities, personalities and information cutoff across updates, it's necessary to keep up with harnesses, skills and workflows. All in all, AI did not solve world hunger, or bring about the perfect world. It simply changed the playing field. It doesn't look like it's going away anytime soon, so it's time to adapt.
 
-[^1]: [Gothic Lockpick Solver](https://xetoxyc.github.io/gothic-remake-lockpicker/)
+[^1]: https://xetoxyc.github.io/gothic-remake-lockpicker/
 
-[^2]: [Gothic 1: Remake Lock Solver](https://locksolver.com/)
+[^2]: https://locksolver.com/
 
-[^3]: [Gothic Lockpick Solver](https://sh1ftry.github.io/gothic-lockpick-solver/)
+[^3]: https://sh1ftry.github.io/gothic-lockpick-solver/
 
-[^4]: [Lock Picker](https://gothic-lock-picking.com/lock/)
+[^4]: https://gothic-lock-picking.com/lock/
