@@ -1,0 +1,91 @@
+---
+title: 'Cheating Evolved: Breaking Locks in Gothic 1 Remake'
+tags: ['ai', 'gaming', 'dev']
+date: 2026-08-04
+summary: How I used AI to build a BFS solver for the maddening lockpicking minigame in the Gothic 1 Remake, and what the algorithm actually does under the hood.
+images:
+  - /static/images/gothic-lockpicking/banner.png
+---
+
+I'm a big fan of open-world RPGs. Used to spend countless hours playing The Elder Scrolls, Fallout, Deus Ex and anything and everything I could get my hands on. As I finished and ran out of modern games, I started looking into older ones. That's when I found out about the Gothic series.
+
+I wanted to play the whole trilogy but I was never able to get into the first two games. The controls were too weird for my taste and that pretty much killed the enthusiasm. So I decided to pick up Gothic 3 and had a blast! The vast and unforgiving world that rewarded exploration, the lack of handholding and the freedom in playstyle were just a small part of what made it such a great experience. I did not finish the game though; grinding too much without understanding the story (as my english wasn't so good back then) and bugs such as my character's head disappearing forever made it hard to see it through so the joy eventually phased out. I still remember it well, if I play it again I'm sure I will be able to finish it.
+
+All of this brings me to recently-released Gothic 1 Remake. I had it wishlisted since it was announced (a couple years ago?). Once released, I saw a couple review saying good things about it so I didn't waste any time and got right into it.
+
+Not having played the original, I can't say how faithful this remake is to the cult classic but I can confidently say that it truly feels like a game that keeps the old RPG feeling. The player is dropped into a small area surrounded by a shield. Inside is a relentless world: You start with no equipment, no money, no skills, not even a map! Even the weakest creatures can kill you, you have no chance against human NPC's and you have to work hard for the currency. Only a handful of quests have payment as a reward, which means you mainly have to trade items to make money. The map is dense with something to discover in every corner. Leveling up only gives you skill points to spend; you have to pay a trainer to actually acquire the skills themselves. Progress feels immensely rewarding. Once equipped with armor, weapons and skills, you are able to go down paths you could not before. As a result, it feels like you enter a different world each time even though you walk the same paths many times.
+
+The game surely has bugs. I have a habit of quick saving with each step so crashes did not affect me that much. I got locked out of some progression in a couple of instances but fortunately found workarounds and progressed further.
+
+All things considered, I had tremendous joy during my 50 hours in my playthrough. There is pretty much only one aspect of the game that drove me crazy though, and that is the lockpicking minigame.
+
+## Lockpicking Minigame
+
+The lockpicking game is a new design that was introduced in the remake. When the player interacts with a locked chest, a number of sliding plates in different positions show up. The goal is to align them all so that all pins are red, or they are all in the fourth position. The caveat is that the plates do not always slide alone; one plate may move other plates in either direction. This is the core constraint of the puzzle. On top of that, depending on the level of lockpicking skill, lockpicks break and the puzzle resets. All in all, in my opinion it's too hard and not worth the headache.
+
+<div>
+![The in-game lockpicking minigame showing the sliding plates of a locked chest](/static/images/gothic-lockpicking/minigame.png)
+</div>
+
+Nevertheless I was still curious about what chests held inside so I gave Claude a description of the game with its constraints and asked it to create a solver app. I also thought that someone else might have done the same already so I looked for solvers on the internet as well. Of course there were a ton of solvers already available, from basic solvers[^1][^2] to more interactive ones[^3] to even one with a 3d model of the minigame[^4]! It didn't surprise me to find so many. In the age of AI, for problems like this we are basically limited by our imagination and tokens.
+
+<div>
+![One of the many community-built lockpick solvers, complete with a 3D model of the minigame](/static/images/gothic-lockpicking/web-solver.png)
+</div>
+
+AI surely made solving this puzzle trivial. Though I wanted to take it a step further and understand the puzzle and the solver in algorithmic terms. So I employed AI again, this time to break things down for me.
+
+## Diving into the implementation
+
+<div>
+![My own lockpick solver visualizing the BFS search and the resulting solution steps](/static/images/gothic-lockpicking/bfs-solver.png)
+</div>
+
+The solver treats every arrangement of pins as a **state**. For example, for a three-plate lock:
+
+```text
+[2, 4, 6]
+```
+
+means that the first pin is in hole 2, the second is already centered, and the third is in hole 6. From each state, we can move every plate either left or right. Each valid move produces another state. This gives us a graph:
+
+- States are nodes.
+- Moves are edges.
+- `[4, 4, 4]` is the goal node. Once the problem is represented as a graph, finding a solution becomes a graph-search problem.
+
+The solver uses **breadth-first search**, exploring states in layers:
+
+1. Check every state reachable in one move.
+2. Then check every state reachable in two moves.
+3. Continue until the solved state appears. Each state can produce at most `2N` moves, where `N` is the number of lock layers: left and right for every layer. The biggest lock in the game has 7 layers so the state space size is 7^N.
+
+Moves are applied in two passes. First, the solver calculates where every affected pin would go. If even one pin would leave the range from 1 to 7, the entire move is blocked. Only after all pins pass this check are their new positions applied together. This matters because the pins are supposed to move simultaneously. Updating them one at a time could accidentally make the result depend on iteration order, which would be a rather unfortunate property for a lock.
+
+A graph search can easily return to a state it has already seen. Moving left and then right is the most obvious example. To avoid searching the same arrangement repeatedly, every state is stored in a `visited` set. The pin positions are encoded as digits of a base-7 number:
+
+```text
+[1, 1, 1] -> 0
+[1, 1, 2] -> 1
+```
+
+This gives each arrangement a compact integer key. If a generated key is already in `visited`, the solver ignores it. Blocked moves also disappear naturally: they produce the current state again, which has already been visited.
+
+As a summary, the solver is mostly a clean application of BFS:
+
+- Represent the puzzle as a graph.
+- Generate legal neighboring states.
+- Remember visited states.
+- Stop when all pins reach hole 4.
+- Follow parent links to recover the shortest path. There can be up to `7^N` possible states, so the search grows quickly as layers are added. For the supported maximum of seven layers, however, the state space is still finite and manageable. Sometimes the simple algorithm is the correct one. BFS may not look particularly exotic, but it gives us exactly what this puzzle needs: either a shortest solution or proof that no solution exists.
+
+## Conclusion
+
+AI has caused a huge paradigm shift over the last two years. So much so that many (even big) tasks can be delegated to agents with almost no guidance and minimal guardrails. It's not without its flaws though; the excitement of being able to do more in less time eventually starts taxing mentally. There is a lot more noise (slop) to filter now. With different models that differ in capabilities, personalities and information cutoff across updates, it's necessary to keep up with harnesses, skills and workflows. All in all, AI did not solve world hunger, or bring about the perfect world. It simply changed the playing field. It doesn't look like it's going away anytime soon, so it's time to adapt.
+
+[^1]: [Gothic Lockpick Solver](https://xetoxyc.github.io/gothic-remake-lockpicker/)
+
+[^2]: [Gothic 1: Remake Lock Solver](https://locksolver.com/)
+
+[^3]: [Gothic Lockpick Solver](https://sh1ftry.github.io/gothic-lockpick-solver/)
+
+[^4]: [Lock Picker](https://gothic-lock-picking.com/lock/)
