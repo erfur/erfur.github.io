@@ -15,7 +15,7 @@ const Header = () => {
         className="flex items-center gap-2 transition-colors hover:text-primary dark:hover:text-inverse-primary"
       >
         <Logo className="h-8 w-8" />
-        <span className="font-heading text-lg font-normal tracking-tight">
+        <span className="font-heading text-sm font-normal tracking-tight sm:text-lg">
           {siteMetadata.headerTitle}
         </span>
       </Link>
@@ -26,12 +26,12 @@ const Header = () => {
             <Link
               key={link.title}
               href={link.href}
-              className="hidden px-3 py-1.5 text-body-md text-secondary transition-colors hover:bg-surface-container-low hover:text-on-surface dark:text-[#bcc7de] dark:hover:bg-[#383d40] dark:hover:text-inverse-on-surface sm:block"
+              className="hidden px-3 py-1.5 text-body-md text-secondary transition-colors hover:bg-surface-container-low hover:text-on-surface dark:text-[#bcc7de] dark:hover:bg-[#383d40] dark:hover:text-inverse-on-surface md:block"
             >
               {link.title}
             </Link>
           ))}
-        <div className="ml-2 flex h-8 items-center border-l border-outline-variant pl-2 dark:border-outline">
+        <div className="ml-2 hidden h-8 items-center border-l border-outline-variant pl-2 dark:border-outline md:flex">
           <SocialIcon kind="github" href={siteMetadata.github} size={5} />
         </div>
         <div className="ml-2 flex h-8 items-center border-l border-outline-variant pl-2 dark:border-outline">

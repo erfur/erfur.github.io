@@ -1,13 +1,18 @@
 import { render, screen } from '@testing-library/react'
 import PostLayout from '@/layouts/PostLayout'
 
-const mockPostBanner = jest.fn(({ src, alt }: { src: string; alt: string }) => (
-  <div data-testid="post-banner" data-src={src} data-alt={alt} />
-))
+const mockPostBanner = jest.fn(
+  ({ src, alt, children }: { src: string; alt: string; children?: React.ReactNode }) => (
+    <div data-testid="post-banner" data-src={src} data-alt={alt}>
+      {children}
+    </div>
+  )
+)
 
 jest.mock('@/components/PostBanner', () => ({
   __esModule: true,
-  default: (props: { src: string; alt: string }) => mockPostBanner(props),
+  default: (props: { src: string; alt: string; children?: React.ReactNode }) =>
+    mockPostBanner(props),
 }))
 
 jest.mock('@/components/ScrollTopAndComment', () => ({
@@ -122,4 +127,21 @@ it('gives the post title more size and space before the body', () => {
   )
   expect(title).not.toHaveClass('text-headline-lg-mobile', 'sm:text-headline-lg')
   expect(title.closest('header')).toHaveClass('pb-10', 'pt-4')
+})
+
+it('places the post header inside the banner when an image is present', () => {
+  render(
+    <PostLayout
+      content={{ ...baseContent, images: ['/static/images/example/banner.jpg'] } as never}
+      authorDetails={[]}
+    >
+      <p>body</p>
+    </PostLayout>
+  )
+
+  const banner = screen.getByTestId('post-banner')
+  const title = screen.getByRole('heading', { level: 1, name: 'Example Post' })
+
+  expect(banner).toContainElement(title)
+  expect(title.closest('header')).not.toHaveClass('pb-10', 'pt-4')
 })

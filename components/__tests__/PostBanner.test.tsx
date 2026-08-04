@@ -1,46 +1,5 @@
-import { act, render, screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import PostBanner from '@/components/PostBanner'
-
-const originalRequestAnimationFrame = window.requestAnimationFrame
-const originalCancelAnimationFrame = window.cancelAnimationFrame
-const originalMatchMedia = window.matchMedia
-
-function setScrollY(value: number) {
-  Object.defineProperty(window, 'scrollY', {
-    configurable: true,
-    writable: true,
-    value,
-  })
-}
-
-function setReducedMotion(matches: boolean) {
-  window.matchMedia = jest.fn().mockImplementation((query: string) => ({
-    matches,
-    media: query,
-    onchange: null,
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    addListener: jest.fn(),
-    removeListener: jest.fn(),
-    dispatchEvent: jest.fn(),
-  }))
-}
-
-beforeEach(() => {
-  setScrollY(0)
-  window.requestAnimationFrame = (callback: FrameRequestCallback) => {
-    callback(0)
-    return 1
-  }
-  window.cancelAnimationFrame = jest.fn()
-  setReducedMotion(false)
-})
-
-afterEach(() => {
-  window.requestAnimationFrame = originalRequestAnimationFrame
-  window.cancelAnimationFrame = originalCancelAnimationFrame
-  window.matchMedia = originalMatchMedia
-})
 
 it('renders the banner image when a source is provided', () => {
   render(<PostBanner src="/static/images/example/banner.jpg" alt="Example post" />)
@@ -49,9 +8,28 @@ it('renders the banner image when a source is provided', () => {
   const image = screen.getByAltText('Example post')
 
   expect(banner).toBeInTheDocument()
-  expect(banner).toHaveClass('border', 'border-outline-variant')
-  expect(banner).not.toHaveClass('rounded-2xl', 'shadow-sm')
+  expect(banner).toHaveClass('w-screen', 'h-[calc(46svh-5rem)]')
+  expect(banner).not.toHaveClass('border', 'rounded-2xl', 'shadow-sm')
   expect(image).toHaveAttribute('src', expect.stringContaining('/static/images/example/banner.jpg'))
+})
+
+it('keeps banner content above the body on mobile and positions it at 40 percent on desktop', () => {
+  render(
+    <PostBanner src="/static/images/example/banner.jpg" alt="Example post">
+      <h1>Example post</h1>
+    </PostBanner>
+  )
+
+  expect(screen.getByRole('heading')).toHaveTextContent('Example post')
+  expect(screen.getByRole('heading').parentElement).toHaveClass(
+    'bottom-4',
+    'md:bottom-auto',
+    'md:top-[calc(40svh-5rem)]',
+    'md:-translate-y-1/2',
+    'px-8',
+    'sm:px-12',
+    'xl:px-0'
+  )
 })
 
 it('renders nothing without a source', () => {
@@ -60,38 +38,8 @@ it('renders nothing without a source', () => {
   expect(screen.queryByTestId('post-banner')).not.toBeInTheDocument()
 })
 
-it('fades as the user scrolls down', () => {
+it('does not fade the banner as the user scrolls', () => {
   render(<PostBanner src="/static/images/example/banner.jpg" alt="Example post" />)
 
-  const banner = screen.getByTestId('post-banner')
-  expect(banner).toHaveStyle({ opacity: '1' })
-
-  act(() => {
-    setScrollY(144)
-    window.dispatchEvent(new Event('scroll'))
-  })
-
-  expect(Number(banner.style.opacity)).toBeLessThan(1)
-  expect(Number(banner.style.opacity)).toBeGreaterThan(0)
-
-  act(() => {
-    setScrollY(320)
-    window.dispatchEvent(new Event('scroll'))
-  })
-
-  expect(banner).toHaveStyle({ opacity: '0' })
-})
-
-it('stays fully visible when reduced motion is preferred', () => {
-  setReducedMotion(true)
-  render(<PostBanner src="/static/images/example/banner.jpg" alt="Example post" />)
-
-  const banner = screen.getByTestId('post-banner')
-
-  act(() => {
-    setScrollY(320)
-    window.dispatchEvent(new Event('scroll'))
-  })
-
-  expect(banner).toHaveStyle({ opacity: '1' })
+  expect(screen.getByTestId('post-banner')).not.toHaveAttribute('style')
 })

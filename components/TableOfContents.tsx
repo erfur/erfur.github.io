@@ -106,17 +106,29 @@ export function TableOfContentsMobile({ toc, title }: TableOfContentsProps) {
 export function TableOfContentsDesktop({ toc, title }: TableOfContentsProps) {
   const [isCollapsed, setIsCollapsed] = useState(true)
   const [showScrollTop, setShowScrollTop] = useState(false)
+  const [sideTop, setSideTop] = useState<number>()
   const activeId = useActiveHeading(toc)
 
   useEffect(() => {
-    const handleScroll = () => setShowScrollTop(window.scrollY > 50)
-    handleScroll()
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
+    const updateSideControls = () => {
+      setShowScrollTop(window.scrollY > 50)
+      setSideTop(Math.max(96, window.innerHeight * 0.4 - window.scrollY))
+    }
+
+    updateSideControls()
+    window.addEventListener('scroll', updateSideControls, { passive: true })
+    window.addEventListener('resize', updateSideControls)
+    return () => {
+      window.removeEventListener('scroll', updateSideControls)
+      window.removeEventListener('resize', updateSideControls)
+    }
   }, [])
 
   return (
-    <aside className="fixed left-[calc(50%+25rem)] top-24 z-10 hidden xl:block">
+    <aside
+      className="fixed left-[calc(50%+25rem)] top-[40svh] z-10 hidden xl:block"
+      style={sideTop === undefined ? undefined : { top: sideTop }}
+    >
       <div className="flex flex-col items-start gap-3">
         {toc.length > 0 &&
           (isCollapsed ? (
