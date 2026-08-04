@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lockpick Solver</title>
+<style>
+  :root { --bg:#0f1117; --panel:#171a23; --line:#2a2f3a; --muted:#8b93a7; --pin:#7dd3fc; --goal:#22c55e; --accent:#fbbf24; --text:#e6e9ef; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+  h1 { font-size:20px; padding:16px 20px; margin:0; border-bottom:1px solid var(--line); }
+  .wrap { display:flex; gap:16px; padding:16px 20px; flex-wrap:wrap; align-items:flex-start; }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:16px; min-width:360px; flex:1; resize:both; overflow:auto; }
+  .panel h2 { font-size:14px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:0 0 12px; }
+  .label { font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin:14px 0 6px; }
+  .row { display:flex; align-items:center; gap:8px; margin:4px 0; }
+  .rowlabel { width:64px; color:var(--muted); font-size:13px; }
+  .holes { display:flex; gap:6px; }
+  .hole { width:30px; height:30px; border-radius:50%; border:2px solid var(--line); display:inline-flex; align-items:center; justify-content:center; font-size:12px; color:var(--muted); cursor:pointer; user-select:none; background:transparent; }
+  .hole.target { border-color:var(--goal); color:var(--goal); }
+  .hole.pin { background:var(--pin); color:#000; border-color:var(--pin); }
+  .hole.pin.ongoal { background:var(--goal); border-color:var(--goal); }
+  .hole.movedrow { box-shadow:0 0 0 2px var(--accent) inset; }
+  button { background:#222735; color:var(--text); border:1px solid var(--line); border-radius:6px; padding:6px 12px; cursor:pointer; font-size:13px; }
+  button:hover { border-color:var(--muted); }
+  button:disabled { opacity:.4; cursor:default; }
+  button.primary { background:var(--pin); color:#000; border-color:var(--pin); font-weight:600; }
+  .count { font-size:16px; min-width:24px; text-align:center; display:inline-block; }
+  table.wiring { border-collapse:collapse; }
+  table.wiring td { text-align:center; padding:2px; }
+  table.wiring th { color:var(--muted); font-weight:500; font-size:12px; padding:2px 6px; }
+  .cell { width:30px; height:30px; border:1px solid var(--line); border-radius:6px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; font-size:15px; }
+  .cell.diag { background:#1e3a5f; color:var(--pin); cursor:default; }
+  .cell.left, .cell.right { color:var(--accent); }
+  .cell.none { color:#444; }
+  .status { font-size:15px; margin:4px 0 12px; }
+  .status.ok { color:var(--goal); }
+  .status.bad { color:#f87171; }
+  .steps { font-family:ui-monospace,monospace; font-size:13px; }
+  .step { padding:2px 6px; border-radius:4px; color:var(--muted); }
+  .step.current { background:#1e3a5f; color:var(--pin); }
+  .controls { display:flex; gap:8px; margin:12px 0; align-items:center; }
+  .stepinfo { color:var(--muted); font-size:13px; }
+  .viz-panel { display:flex; flex-direction:column; }
+  .viz-panel #viz-stage { flex:1; min-height:0; flex-direction:column; }
+  .viz-panel #glcanvas { flex:1; min-width:0; min-height:240px; }
+  @media (max-width: 520px) {
+    h1 { padding:12px; }
+    .wrap { padding:10px; gap:10px; }
+    .panel { min-width:0; width:100%; padding:10px; resize:none; }
+    .viz-panel { margin:0 10px 10px !important; }
+    .row { align-items:flex-start; }
+    .rowlabel { width:38px; flex:none; }
+    .holes { gap:3px; }
+    .hole { width:27px; height:27px; }
+    .controls { flex-wrap:wrap; }
+  }
+</style>
+</head>
+<body>
+  <h1>🔓 Lockpick Solver</h1>
+  <div class="panel viz-panel" style="margin:0 20px 20px;">
+    <h2>BFS search — WebGL</h2>
+    <button class="primary" id="viz-btn">Visualize search</button>
+    <div id="viz-msg" style="color:var(--muted);font-size:13px;margin-top:8px;"></div>
+    <div id="viz-stage" style="display:none;">
+      <div class="controls">
+        <button id="viz-play">⏸ Pause</button>
+        <label class="stepinfo">speed <input id="viz-speed" type="range" min="1" max="30" value="8"></label>
+        <label class="stepinfo">depth <input id="viz-seek" type="range" min="0" max="100" value="0" step="0.01"></label>
+        <button id="viz-reset">Reset view</button>
+        <span class="stepinfo" id="viz-hud"></span>
+      </div>
+      <canvas id="glcanvas" style="width:100%;height:440px;display:block;background:#0b0d13;border:1px solid var(--line);border-radius:8px;cursor:grab;"></canvas>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="panel">
+      <h2>① Set up the puzzle</h2>
+      <div class="row">
+        <span class="rowlabel">Layers</span>
+        <button id="dec">−</button>
+        <span class="count" id="ncount">4</span>
+        <button id="inc">+</button>
+      </div>
+
+      <div class="label">Starting pin per layer (click a hole)</div>
+      <div id="starts"></div>
+
+      <div class="label">Wiring — "when I move this layer ←, who else moves?"</div>
+      <div id="wiring"></div>
+      <div style="color:var(--muted);font-size:12px;margin-top:6px;">Click a cell to cycle through · (none), ← (left), and → (right). Diagonal is locked to ←. Moving a layer → is the auto-mirror.</div>
+
+      <div class="controls">
+        <button class="primary" id="solve">Solve</button>
+        <button id="reset">Reset</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>② Solution</h2>
+      <div class="status" id="status">Set up the puzzle and press Solve.</div>
+      <div class="label">Board</div>
+      <div id="board"></div>
+      <div class="controls" id="playback" style="display:none;">
+        <button id="prev">⏮ Prev</button>
+        <button id="next">Next ⏭</button>
+        <button id="play">▶ Play</button>
+        <span class="stepinfo" id="stepinfo"></span>
+      </div>
+      <div class="label">Steps</div>
+      <div class="steps" id="stepslist"></div>
+    </div>
+  </div>
+
+  <script src="solver.js"></script>
+  <script src="bfs-viz.js"></script>
+  <script>
+  (function () {
+    const MIN_N = 3, MAX_N = 7, HOLES = 7, TARGET = 4;
+    const DIR_ARROW = { L: '←', R: '→' };
+
+    let state = load() || defaults(4);
+    let solution = null;  // { solvable, steps } or null
+    let cursor = 0;       // step index 0..steps.length
+    let timer = null;
+
+    function defaults(n) {
+      const start = Array(n).fill(TARGET);
+      const wiring = Array.from({ length: n }, (_, i) =>
+        Array.from({ length: n }, (_, j) => (i === j ? -1 : 0)));
+      return { n, start, wiring };
+    }
+
+    function load() {
+      try {
+        const s = JSON.parse(localStorage.getItem('lockpick'));
+        if (!s || !Number.isInteger(s.n) || s.n < MIN_N || s.n > MAX_N) return null;
+        if (!Array.isArray(s.start) || s.start.length !== s.n) return null;
+        if (!s.start.every(v => Number.isInteger(v) && v >= 1 && v <= HOLES)) return null;
+        if (!Array.isArray(s.wiring) || s.wiring.length !== s.n) return null;
+        for (let i = 0; i < s.n; i++) {
+          const row = s.wiring[i];
+          if (!Array.isArray(row) || row.length !== s.n) return null;
+          if (!row.every(v => v === -1 || v === 0 || v === 1)) return null;
+          if (row[i] !== -1) return null; // diagonal must stay locked at ←
+        }
+        return s;
+      } catch (e) { return null; }
+    }
+    function save() { localStorage.setItem('lockpick', JSON.stringify(state)); }
+
+    function resizeTo(n) {
+      n = Math.max(MIN_N, Math.min(MAX_N, n));
+      const old = state;
+      const start = Array.from({ length: n }, (_, i) => (i < old.n ? old.start[i] : TARGET));
+      const wiring = Array.from({ length: n }, (_, i) =>
+        Array.from({ length: n }, (_, j) => {
+          if (i === j) return -1;
+          if (i < old.n && j < old.n) return old.wiring[i][j];
+          return 0;
+        }));
+      state = { n, start, wiring };
+      invalidateSolution();
+      save(); renderAll();
+    }
+
+    function holeEl(num, onclick) {
+      const el = document.createElement('span');
+      el.className = 'hole' + (num === TARGET ? ' target' : '');
+      el.textContent = num;
+      if (onclick) el.addEventListener('click', onclick);
+      return el;
+    }
+
+    function renderStarts() {
+      const box = document.getElementById('starts');
+      box.innerHTML = '';
+      for (let i = 0; i < state.n; i++) {
+        const row = document.createElement('div'); row.className = 'row';
+        const lab = document.createElement('span');
+        lab.className = 'rowlabel'; lab.textContent = 'L' + (i + 1);
+        row.appendChild(lab);
+        const holes = document.createElement('div'); holes.className = 'holes';
+        for (let h = 1; h <= HOLES; h++) {
+          const el = holeEl(h, () => { state.start[i] = h; invalidateSolution(); save(); renderAll(); });
+          if (state.start[i] === h) el.classList.add('pin');
+          holes.appendChild(el);
+        }
+        row.appendChild(holes);
+        box.appendChild(row);
+      }
+    }
+
+    function renderWiring() {
+      const box = document.getElementById('wiring');
+      box.innerHTML = '';
+      const table = document.createElement('table'); table.className = 'wiring';
+      const head = document.createElement('tr');
+      head.appendChild(document.createElement('th'));
+      for (let j = 0; j < state.n; j++) {
+        const th = document.createElement('th'); th.textContent = 'L' + (j + 1); head.appendChild(th);
+      }
+      table.appendChild(head);
+      for (let i = 0; i < state.n; i++) {
+        const tr = document.createElement('tr');
+        const rl = document.createElement('th');
+        rl.textContent = 'Move L' + (i + 1) + ' ←'; rl.style.textAlign = 'right';
+        tr.appendChild(rl);
+        for (let j = 0; j < state.n; j++) {
+          const td = document.createElement('td');
+          const cell = document.createElement('span'); cell.className = 'cell';
+          const v = state.wiring[i][j];
+          if (i === j) {
+            cell.classList.add('diag'); cell.textContent = '←';
+          } else {
+            cell.classList.add(v === -1 ? 'left' : v === 1 ? 'right' : 'none');
+            cell.textContent = v === -1 ? '←' : v === 1 ? '→' : '·';
+            cell.addEventListener('click', () => {
+              const cur = state.wiring[i][j];
+              state.wiring[i][j] = cur === 0 ? -1 : cur === -1 ? 1 : 0;
+              invalidateSolution(); save(); renderAll();
+            });
+          }
+          td.appendChild(cell); tr.appendChild(td);
+        }
+        table.appendChild(tr);
+      }
+      box.appendChild(table);
+    }
+
+    function renderBoard() {
+      const box = document.getElementById('board');
+      box.innerHTML = '';
+      const positions = (solution && solution.solvable)
+        ? replaySteps(state, solution.steps, cursor)
+        : state.start;
+      const movedLayer = (solution && solution.solvable && cursor > 0)
+        ? solution.steps[cursor - 1].layer : -1;
+      for (let i = 0; i < state.n; i++) {
+        const row = document.createElement('div'); row.className = 'row';
+        const lab = document.createElement('span');
+        lab.className = 'rowlabel'; lab.textContent = 'L' + (i + 1);
+        row.appendChild(lab);
+        const holes = document.createElement('div'); holes.className = 'holes';
+        for (let h = 1; h <= HOLES; h++) {
+          const el = holeEl(h, null);
+          if (positions[i] === h) {
+            el.classList.add('pin');
+            if (h === TARGET) el.classList.add('ongoal');
+          }
+          if (i === movedLayer) el.classList.add('movedrow');
+          holes.appendChild(el);
+        }
+        row.appendChild(holes);
+        box.appendChild(row);
+      }
+    }
+
+    function renderSteps() {
+      const list = document.getElementById('stepslist');
+      list.innerHTML = '';
+      if (!solution || !solution.solvable) return;
+      if (solution.steps.length === 0) {
+        const d = document.createElement('div'); d.className = 'step';
+        d.textContent = 'Already solved — no moves needed.';
+        list.appendChild(d); return;
+      }
+      solution.steps.forEach((s, k) => {
+        const d = document.createElement('div');
+        d.className = 'step' + (k === cursor - 1 ? ' current' : '');
+        d.textContent = (k + 1) + '. Move L' + (s.layer + 1) + ' ' + DIR_ARROW[s.dir];
+        list.appendChild(d);
+      });
+    }
+
+    function renderStatus() {
+      const el = document.getElementById('status');
+      const pb = document.getElementById('playback');
+      if (!solution) {
+        el.className = 'status'; el.textContent = 'Set up the puzzle and press Solve.';
+        pb.style.display = 'none'; return;
+      }
+      if (!solution.solvable) {
+        el.className = 'status bad'; el.textContent = '✗ No solution exists for this setup.';
+        pb.style.display = 'none'; return;
+      }
+      el.className = 'status ok';
+      el.textContent = solution.steps.length === 0
+        ? '✓ Already solved.'
+        : '✓ Solved in ' + solution.steps.length + ' moves.';
+      pb.style.display = solution.steps.length ? 'flex' : 'none';
+      document.getElementById('stepinfo').textContent = cursor + ' of ' + solution.steps.length + ' moves applied';
+      document.getElementById('prev').disabled = cursor === 0;
+      document.getElementById('next').disabled = cursor === solution.steps.length;
+    }
+
+    function renderAll() {
+      document.getElementById('ncount').textContent = state.n;
+      renderStarts(); renderWiring(); renderBoard(); renderSteps(); renderStatus();
+    }
+
+    function invalidateSolution() { stopPlay(); solution = null; cursor = 0; }
+
+    function doSolve() { stopPlay(); solution = solve(state); cursor = 0; renderAll(); }
+
+    function step(delta) {
+      if (!solution || !solution.solvable) return;
+      cursor = Math.max(0, Math.min(solution.steps.length, cursor + delta));
+      renderBoard(); renderSteps(); renderStatus();
+      if (cursor >= solution.steps.length) stopPlay();
+    }
+    function stopPlay() {
+      if (timer) { clearInterval(timer); timer = null; document.getElementById('play').textContent = '▶ Play'; }
+    }
+    function togglePlay() {
+      if (timer) { stopPlay(); return; }
+      if (!solution || !solution.solvable || !solution.steps.length) return;
+      if (cursor >= solution.steps.length) cursor = 0;
+      document.getElementById('play').textContent = '⏸ Pause';
+      timer = setInterval(() => {
+        if (cursor >= solution.steps.length) { stopPlay(); return; }
+        step(1);
+      }, 700);
+    }
+
+    document.getElementById('inc').addEventListener('click', () => resizeTo(state.n + 1));
+    document.getElementById('dec').addEventListener('click', () => resizeTo(state.n - 1));
+    document.getElementById('solve').addEventListener('click', doSolve);
+    document.getElementById('reset').addEventListener('click', () => { state = defaults(state.n); invalidateSolution(); save(); renderAll(); });
+    document.getElementById('prev').addEventListener('click', () => { stopPlay(); step(-1); });
+    document.getElementById('next').addEventListener('click', () => { stopPlay(); step(1); });
+    document.getElementById('play').addEventListener('click', togglePlay);
+
+    window.__lockpick = { getConfig: () => ({ n: state.n, start: state.start.slice(), wiring: state.wiring.map(r => r.slice()) }) };
+
+    renderAll();
+  })();
+  </script>
+  <script>
+  (function () {
+    const $ = id => document.getElementById(id);
+    const btn = $('viz-btn'), stage = $('viz-stage'), msg = $('viz-msg'), canvas = $('glcanvas');
+    const hud = $('viz-hud'), playBtn = $('viz-play'), speed = $('viz-speed'), seek = $('viz-seek'), resetBtn = $('viz-reset');
+    let viz = null;
+    function visualize() {
+      const cfg = window.__lockpick && window.__lockpick.getConfig();
+      if (!cfg) { msg.textContent = 'Set up a puzzle first.'; return; }
+      const trace = solveTrace(cfg);
+      if (viz) { viz.destroy(); viz = null; }
+      try { viz = BFSViz.create(canvas); }
+      catch (e) { stage.style.display = 'none'; msg.textContent = 'WebGL2 is not available in this browser.'; return; }
+      msg.textContent = trace.solvable
+        ? ('Exploring ' + trace.nodes.length + ' states; goal at depth ' + trace.maxDepth + '.')
+        : ('No solution — exploring all ' + trace.nodes.length + ' reachable states.');
+      stage.style.display = 'flex';
+      viz.onTick(s => {
+        hud.textContent = 'depth ' + s.depth + ' / ' + s.maxDepth + ' · visited ' + s.visited + (s.note ? ' · ' + s.note : '');
+        seek.value = String(s.t);
+        playBtn.textContent = s.playing ? '⏸ Pause' : '▶ Play';
+      });
+      viz.load(trace);
+      seek.max = String(viz.total());
+      speed.value = '8'; viz.setSpeed(8);
+    }
+    btn.addEventListener('click', visualize);
+    $('solve').addEventListener('click', visualize);
+    playBtn.addEventListener('click', () => viz && viz.toggle());
+    speed.addEventListener('input', () => viz && viz.setSpeed(Number(speed.value)));
+    seek.addEventListener('input', () => viz && viz.seek(Number(seek.value)));
+    resetBtn.addEventListener('click', () => viz && viz.resetView());
+  })();
+  </script>
+  <script>
+  (function () {
+    function reportHeight() {
+      window.parent.postMessage({
+        type: 'lockpick-solver-height',
+        height: document.body.getBoundingClientRect().height
+      }, window.location.origin);
+    }
+    new ResizeObserver(reportHeight).observe(document.body);
+    window.addEventListener('load', reportHeight);
+  })();
+  </script>
+</body>
+</html>
